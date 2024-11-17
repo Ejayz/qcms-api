@@ -8,10 +8,10 @@ import { useRef, useState } from "react";
 export default function UserListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
-  const [limit, setLimit] = useState(10);
+  const [limit] = useState(10);
   const [search, setSearch] = useState("");
 
-  const { data, error, isFetching, isLoading, refetch, isError } = useQuery({
+  const { data, isFetching, isLoading, isError } = useQuery({
     queryKey: ["site_list", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
