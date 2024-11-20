@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-export default function AddOrderList() {
+export default function AddProductioList() {
   const navigator = useRouter();
 
   const Add_Site_Validator = Yup.object().shape({
@@ -82,7 +82,7 @@ export default function AddOrderList() {
             <div className="flex flex-col gap-y-6">
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
-                <div className="grid grid-cols-2 gap-6 w-full">
+                <div className="grid grid-cols-3 gap-6 w-full">
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
@@ -154,9 +154,6 @@ export default function AddOrderList() {
                       </span>
                     ) : null}
                   </div>
-                
-                </div>
-                <div className="grid grid-cols-3 gap-6 w-full">
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
@@ -192,86 +189,49 @@ export default function AddOrderList() {
                       </span>
                     ) : null}
                   </div>
-                
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Delivery Date
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Production Date
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                
                 </div>
-                <div className="grid grid-cols-3 gap-6 w-full">
+                <div className="grid grid-cols-2 gap-6 w-full">
+                  <div>
+                    <label className="form-control w-96 max-w-lg">
+                      <div className="label">
+                        <span className="label-text font-bold gap-x-2 flex flex-row">
+                          Date and Time of Entry
+                          <span
+                            className="tooltip tooltip-right"
+                            data-tip="Name of the site. This is required."
+                          >
+                            <CircleHelp
+                              className=" my-auto"
+                              size={20}
+                              strokeWidth={0.75}
+                            />
+                          </span>
+                        </span>
+                      </div>
+                      <Field
+                        type="text"
+                        placeholder="Site Name: Example: EzMiner"
+                        name="site_name"
+                        className={`input input-bordered w-full max-w-md ${
+                          errors.site_name && touched.site_name
+                            ? "input-error"
+                            : ""
+                        }`}
+                      />
+                    </label>
+
+                    {errors.site_name && touched.site_name ? (
+                      <span className="text-error  flex flex-row">
+                        {errors.site_name}
+                      </span>
+                    ) : null}
+                  </div>
                 
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Lenght
+                          Date and Time of Exit
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Name of the site. This is required."
@@ -302,178 +262,7 @@ export default function AddOrderList() {
                       </span>
                     ) : null}
                   </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Inside diameter
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Outside diameter
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Link: Example: https://ezminer.tech"
-                        name="site_link"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_link && touched.site_link
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.site_link && touched.site_link ? (
-                      <span className="text-error gap-2 flex flex-row ">
-                        {errors.site_link}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Flat Crush
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Description of the site. This is optional."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Description: Example: Best Faucet Site"
-                        name="description"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.description && touched.description
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.description && touched.description ? (
-                      <span className="text-error gap-2 flex flex-row">
-                        <TriangleAlert color="#ff0000" />
-                        {errors.description}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                      <span className="label-text font-bold gap-x-2 flex flex-row">
-                      %H₂O
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Link: Example: https://ezminer.tech"
-                        name="site_link"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_link && touched.site_link
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.site_link && touched.site_link ? (
-                      <span className="text-error gap-2 flex flex-row ">
-                        {errors.site_link}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                      <span className="label-text font-bold gap-x-2 flex flex-row">
-                        
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Link: Example: https://ezminer.tech"
-                        name="site_link"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_link && touched.site_link
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.site_link && touched.site_link ? (
-                      <span className="text-error gap-2 flex flex-row ">
-                        {errors.site_link}
-                      </span>
-                    ) : null}
-                  </div>
+                
                 </div>
               </div>
             
@@ -492,11 +281,11 @@ export default function AddOrderList() {
                   </>
                 ) : (
                   <>
-                    <Plus /> Add Order
+                    <Plus /> Add Production
                   </>
                 )}
               </button>
-              <Link className="btn btn-ghost btn-md " href="/dashboard/order_management">
+              <Link className="btn btn-ghost btn-md " href="/dashboard/production_management">
                 BACK
               </Link>
             </div>

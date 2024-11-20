@@ -2,12 +2,12 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-export default function AddOrderList() {
+export default function EditOrderList() {
   const navigator = useRouter();
 
   const Add_Site_Validator = Yup.object().shape({
@@ -124,115 +124,6 @@ export default function AddOrderList() {
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
                           Customer Number
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                
-                </div>
-                <div className="grid grid-cols-3 gap-6 w-full">
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Order Number
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Delivery Date
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Production Date
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Name of the site. This is required."
@@ -444,7 +335,7 @@ export default function AddOrderList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                       <span className="label-text font-bold gap-x-2 flex flex-row">
-                        
+                      Number of Controls Required
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
@@ -488,11 +379,11 @@ export default function AddOrderList() {
                 {mutateNewSite.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
+                    Editing Site...
                   </>
                 ) : (
                   <>
-                    <Plus /> Add Order
+                      <Pencil color="#000000" />Edit Order
                   </>
                 )}
               </button>

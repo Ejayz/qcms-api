@@ -6,7 +6,7 @@ import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LayoutDashboard, ShoppingCart, User } from "lucide-react";
+import { Boxes, FileChartColumnIncreasing, LayoutDashboard, Microscope, ShoppingCart, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function IndexHeader({
@@ -121,14 +121,36 @@ export default function IndexHeader({
               </Link>
             </li>
             <li>
-              <Link href="#services"> Services </Link>
+              <Link
+                href="/dashboard/laboratory_management"
+                className={`${
+                  query=="/dashboard/laboratory_management"? "bg-primary" : ""
+                }`}
+              >
+                <Microscope color="#000000" />Laboratory Management
+              </Link>
             </li>
             <li>
-              <Link href="#team"> Team </Link>
+              <Link
+                href="/dashboard/production_management"
+                className={`${
+                  query=="/dashboard/production_management"? "bg-primary" : ""
+                }`}
+              >
+                <Boxes color="#000000" />Production Management
+              </Link>
             </li>
             <li>
-              <Link href="#productgallery"> Product Gallery </Link>
+              <Link
+                href="/dashboard/analytical_management"
+                className={`${
+                  query=="/dashboard/analytical_management"? "bg-primary" : ""
+                }`}
+              >
+                <FileChartColumnIncreasing color="#000000" />Analytical Report
+              </Link>
             </li>
+            
           </ul>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { Pencil, Search } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-export default function OrderListView() {
+export default function ProductionListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
@@ -59,10 +59,10 @@ export default function OrderListView() {
           </label>
 
           <Link
-            href="/dashboard/addorder"
+            href="/dashboard/addproduction"
             className="btn btn-primary btn-outline"
           >
-            Add Order
+            Add Production
           </Link>
         </div>
 

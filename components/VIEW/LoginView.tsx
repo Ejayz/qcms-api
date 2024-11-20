@@ -36,8 +36,8 @@ export default function LoginView() {
     },
     onError: (error) => {
       console.log("Login error:", error);  // Inspect the error structure
-      toast.error("Login Failed");
-      toast.error(error?.message || "An unknown error occurred");
+      toast.error("Invalid email or password");
+      //toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: () => {
       toast.success("Login Successful");
