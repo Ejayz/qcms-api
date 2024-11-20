@@ -25,16 +25,26 @@ export default function LoginView() {
         },
         body: JSON.stringify(values),
       });
+  
+      if (!response.ok) {
+        // You can handle specific error status codes here
+        const errorData = await response.json();
+        throw new Error(errorData?.message || "An error occurred while logging in");
+      }
+  
       return response.json();
     },
     onError: (error) => {
-      toast.error(error.message);
+      console.log("Login error:", error);  // Inspect the error structure
+      toast.error("Login Failed");
+      toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: () => {
       toast.success("Login Successful");
       route.push("/dashboard");
     },
   });
+  
 
   return (
     <div className="w-full h-screen flex min-h-screen text-black ">

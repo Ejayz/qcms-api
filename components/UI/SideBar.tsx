@@ -6,8 +6,9 @@ import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LayoutDashboard, User } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
+
 export default function IndexHeader({
   children,
 }: Readonly<{
@@ -107,6 +108,16 @@ export default function IndexHeader({
                 }`}
               >
                 <User></User> User Management
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/dashboard/order_management"
+                className={`${
+                  query=="/dashboard/order_management"? "bg-primary" : ""
+                }`}
+              >
+                <ShoppingCart></ShoppingCart>Order Management
               </Link>
             </li>
             <li>

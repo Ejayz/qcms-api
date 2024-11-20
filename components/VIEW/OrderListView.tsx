@@ -5,7 +5,7 @@ import { Pencil, Search } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-export default function UserListView() {
+export default function OrderListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
@@ -59,7 +59,7 @@ export default function UserListView() {
           </label>
 
           <Link
-            href="@/components/VIEW/AddUserView"
+            href="/dashboard/AddOrderList"
             className="btn btn-primary btn-outline"
           >
             Add User

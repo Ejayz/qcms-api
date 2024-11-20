@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-export default function AddUserView() {
+export default function AddOrderList() {
   const navigator = useRouter();
 
   const Add_Site_Validator = Yup.object().shape({
