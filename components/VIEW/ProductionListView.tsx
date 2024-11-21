@@ -5,7 +5,7 @@ import { Pencil, Search } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-export default function UserListView() {
+export default function ProductionListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
@@ -44,7 +44,7 @@ export default function UserListView() {
             <Link href="/"> </Link>
           </li>
           <li>  
-            <span>User Management</span>
+            <span>Production Management</span>
           </li>
         </ul>
       </div>
@@ -69,10 +69,10 @@ export default function UserListView() {
           </label>
 
           <Link
-            href="@/components/VIEW/AddUserView"
+            href="/dashboard/addproduction"
             className="btn btn-primary btn-outline"
           >
-            Add User
+            Add Production
           </Link>
         </div>
 
@@ -112,9 +112,10 @@ export default function UserListView() {
                   <td>{site.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/sites/edit/${site.site_id}`}
+                      href={`/dashboard/editproduction`}
                       className="flex flex-row gap-x-2 link"
                     >
+                      {/* /${site.site_id} */}
                       <Pencil className="text-warning" /> Edit
                     </Link>
                   </td>

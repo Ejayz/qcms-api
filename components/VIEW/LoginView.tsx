@@ -1,7 +1,7 @@
 "use client";
 
 import { Form, Formik } from "formik";
-import { FormInput } from "../UI/FormInput";
+import { FormInput } from "../UI/FormInputLogin";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -25,38 +25,49 @@ export default function LoginView() {
         },
         body: JSON.stringify(values),
       });
+  
+      if (!response.ok) {
+        // You can handle specific error status codes here
+        const errorData = await response.json();
+        throw new Error(errorData?.message || "An error occurred while logging in");
+      }
+  
       return response.json();
     },
     onError: (error) => {
-      toast.error(error.message);
+      console.log("Login error:", error);  // Inspect the error structure
+      toast.error("Invalid email or password");
+      //toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: () => {
       toast.success("Login Successful");
       route.push("/dashboard");
     },
   });
+  
 
   return (
-    <div className="w-full h-screen flex min-h-screen text-black ">
-      <div className="card lg:card-side bg-base-100  my-auto mx-auto shadow-xl ">
-        <figure className="flex flex-col">
+    <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-no-repeat"
+    
+    style={{
+      backgroundImage: "url('/Img/loginbg.png')",
+      
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}>
+      <div className="place-content-center bg-transparent card lg:card-side bg-base-100 inline  my-auto mx-auto shadow-xl ">
+        
+
+      
+        <div className="w-full place-content-center inline bg-transparent">
+          
           <Image
-            src="/Img/logo.png"
+            src="/Img/logo1.png"
             className=""
             alt="logo"
-            width={1074}
+            width={400}
             height={429}
           />
-
-          <div className="card-actions lg:justify-start indent-0 justify-center lg:indent-10">
-            <h2 className="card-title">Need assistance ?</h2>
-            <p className="w-auto text-center">
-              For password reset,account creation and other concern please
-              contact system administrator.
-            </p>
-          </div>
-        </figure>
-        <div className="card-body flex lg:w-1/2 w-full flex-col">
           <Formik
             initialValues={{
               email: "",
@@ -74,11 +85,10 @@ export default function LoginView() {
             }}
           >
             {({ errors, touched }) => (
-              <Form className="w-full justify-evenly gap-y-2flex flex-col p-4 mx-auto my-auto">
-                <h1 className="text-2xl indent-4 text-primary-content font-bold">
-                  Log In
-                </h1>
+              <Form className="w-full justify-evenly gap-y-2 flex flex-col p-4 mx-auto my-auto bg-transparent">
+              
                 <FormInput
+                  
                   errors={errors.email}
                   touched={touched.email?.toString()}
                   tooltip="Enter your email address"
@@ -99,7 +109,7 @@ export default function LoginView() {
                 <div className="mx-auto w-3/4 flex">
                   <button
                     type="submit"
-                    className={`btn w-full  bg-gradient-to-r ${
+                    className={`btn w-full bg-white  bg-gradient-to-r ${
                       mutateManangementLogin.isPending
                         ? "btn-disabled"
                         : "btn-primary"
@@ -107,7 +117,7 @@ export default function LoginView() {
                   >
                     {mutateManangementLogin.isPending ? (
                       <div className="flex justify-center items-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>{" "}
+                        <div className="animate-spin text-slate-700 rounded-full h-5 w-5 border-b-2 border-white"></div>{" "}
                         Authenticating...
                       </div>
                     ) : (
