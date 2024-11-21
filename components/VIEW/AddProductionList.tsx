@@ -45,16 +45,16 @@ export default function AddProductioList() {
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
-      <div className="breadcrumbs my-12 text-xl font-bold">
+       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/dashboard">Dashboard</Link>
           </li>
           <li>
-            <Link href="/sites">Order Management</Link>
+            <Link href="/dashbaord/production_management">Production Management</Link>
           </li>
           <li>
-            <Link href="/sites/new">Add Order</Link>
+            <span>Add Production</span>
           </li>
         </ul>
       </div>

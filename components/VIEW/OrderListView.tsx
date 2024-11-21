@@ -37,7 +37,18 @@ export default function OrderListView() {
   });
 
   return (
+    
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
+           <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
+        <ul>
+          <li>
+            <Link href="/"> </Link>
+          </li>
+          <li>  
+            <span>Order Management</span>
+          </li>
+        </ul>
+      </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
         <div className="w-full flex flex-row  justify-between items-center">
           <label className="input pr-0 input-bordered flex flex-row justify-center items-center">
@@ -102,9 +113,10 @@ export default function OrderListView() {
                   <td>{site.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/sites/edit/${site.site_id}`}
+                      href={`/dashboard/editorder`}
                       className="flex flex-row gap-x-2 link"
                     >
+                      {/* /${site.site_id} */}
                       <Pencil className="text-warning" /> Edit
                     </Link>
                   </td>

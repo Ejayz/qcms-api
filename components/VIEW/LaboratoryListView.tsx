@@ -5,7 +5,7 @@ import { Pencil, Search } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-export default function ProductionListView() {
+export default function LaboratoryListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
@@ -37,14 +37,15 @@ export default function ProductionListView() {
   });
 
   return (
+    
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
-      <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
+           <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/"> </Link>
           </li>
           <li>  
-            <span>Production Management</span>
+            <span>Laboratory Management</span>
           </li>
         </ul>
       </div>
@@ -69,10 +70,10 @@ export default function ProductionListView() {
           </label>
 
           <Link
-            href="/dashboard/addproduction"
+            href="/dashboard/addorder"
             className="btn btn-primary btn-outline"
           >
-            Add Production
+            Add Laboratory
           </Link>
         </div>
 
@@ -112,7 +113,7 @@ export default function ProductionListView() {
                   <td>{site.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/editproduction`}
+                      href={`/dashboard/editorder`}
                       className="flex flex-row gap-x-2 link"
                     >
                       {/* /${site.site_id} */}

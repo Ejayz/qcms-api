@@ -38,6 +38,16 @@ export default function UserListView() {
 
   return (
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
+      <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
+        <ul>
+          <li>
+            <Link href="/"> </Link>
+          </li>
+          <li>  
+            <span>User Management</span>
+          </li>
+        </ul>
+      </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
         <div className="w-full flex flex-row  justify-between items-center">
           <label className="input pr-0 input-bordered flex flex-row justify-center items-center">

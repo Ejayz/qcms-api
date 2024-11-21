@@ -45,16 +45,16 @@ export default function AddOrderList() {
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
-      <div className="breadcrumbs my-12 text-xl font-bold">
+       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/dashboard">Dashboard</Link>
           </li>
           <li>
-            <Link href="/sites">Order Management</Link>
+            <Link href="/dashboard/order_management">Order Management</Link>
           </li>
           <li>
-            <Link href="/sites/new">Add Order</Link>
+            <span>Add Order</span>
           </li>
         </ul>
       </div>

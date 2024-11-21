@@ -45,7 +45,7 @@ export default function AddUserView() {
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
-      <div className="breadcrumbs my-12 text-xl font-bold">
+       <div className="breadcrumbs my-4 text-lg text-slate-800 font-semibold">
         <ul>
           <li>
             <Link href="/dashboard">Dashboard</Link>
