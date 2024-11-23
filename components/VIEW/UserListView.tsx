@@ -69,7 +69,7 @@ export default function UserListView() {
           </label>
 
           <Link
-            href="@/components/VIEW/AddUserView"
+            href="/dashboard/adduser"
             className="btn btn-primary btn-outline"
           >
             Add User

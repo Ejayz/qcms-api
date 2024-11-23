@@ -19,9 +19,9 @@ export default function IndexHeader({
   console.log(query)
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="drawer lg:drawer-open">
+      <div className="drawer lg:drawer-open bg-white">
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content flex flex-col bg-white">
+        <div className="drawer-content flex flex-col">
           {/* Navbar */}
           <div className="navbar bg-white w-full shadow-md lg:hidden text-black glass">
             <div className="flex-none lg:hidden">
@@ -88,7 +88,7 @@ export default function IndexHeader({
             className="drawer-overlay"
           ></label>
          
-          <ul className="menu bg-base-200 text-black min-h-full w-80 p-4">
+          <ul className="menu bg-white text-black min-h-full w-80 p-4">
             {/* Sidebar content here */}
             <li>
               <Link
