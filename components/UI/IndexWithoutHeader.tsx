@@ -14,7 +14,7 @@ export default function IndexWithoutHeader({
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="drawer bg-white">
+      <div className="drawer bg-red-700">
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
           <Toaster position="top-right" reverseOrder={false} />

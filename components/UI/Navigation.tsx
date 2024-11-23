@@ -20,10 +20,10 @@ export default function Navigation() {
     return (
 
       
-<div className="navbar bg-base-100">
+<div className="navbar bg-transparent border-b-2 border-black">
   <div className="flex-1">
   <Image
-                src="/Img/logo.png"
+                src="/Img/logo1.png"
                 className=""
                 alt="logo"
                 width={150}
