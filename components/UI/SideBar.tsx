@@ -6,8 +6,9 @@ import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LayoutDashboard, User } from "lucide-react";
+import { Boxes, FileChartColumnIncreasing, LayoutDashboard, Microscope, ShoppingCart, User } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
+
 export default function IndexHeader({
   children,
 }: Readonly<{
@@ -18,9 +19,9 @@ export default function IndexHeader({
   console.log(query)
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="drawer lg:drawer-open">
+      <div className="drawer lg:drawer-open bg-white">
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content flex flex-col bg-white">
+        <div className="drawer-content flex flex-col">
           {/* Navbar */}
           <div className="navbar bg-white w-full shadow-md lg:hidden text-black glass">
             <div className="flex-none lg:hidden">
@@ -87,7 +88,7 @@ export default function IndexHeader({
             className="drawer-overlay"
           ></label>
          
-          <ul className="menu bg-base-200 text-black min-h-full w-80 p-4">
+          <ul className="menu bg-white text-black min-h-full w-80 p-4">
             {/* Sidebar content here */}
             <li>
               <Link
@@ -110,14 +111,46 @@ export default function IndexHeader({
               </Link>
             </li>
             <li>
-              <Link href="#services"> Services </Link>
+              <Link
+                href="/dashboard/order_management"
+                className={`${
+                  query=="/dashboard/order_management"? "bg-primary" : ""
+                }`}
+              >
+                <ShoppingCart></ShoppingCart>Order Management
+              </Link>
             </li>
             <li>
-              <Link href="#team"> Team </Link>
+              <Link
+                href="/dashboard/laboratory_management"
+                className={`${
+                  query=="/dashboard/laboratory_management"? "bg-primary" : ""
+                }`}
+              >
+                <Microscope color="#000000" />Laboratory Management
+              </Link>
             </li>
             <li>
-              <Link href="#productgallery"> Product Gallery </Link>
+              <Link
+                href="/dashboard/production_management"
+                className={`${
+                  query=="/dashboard/production_management"? "bg-primary" : ""
+                }`}
+              >
+                <Boxes color="#000000" />Production Management
+              </Link>
             </li>
+            <li>
+              <Link
+                href="/dashboard/analytical_management"
+                className={`${
+                  query=="/dashboard/analytical_management"? "bg-primary" : ""
+                }`}
+              >
+                <FileChartColumnIncreasing color="#000000" />Analytical Report
+              </Link>
+            </li>
+            
           </ul>
         </div>
       </div>

@@ -5,11 +5,13 @@ import LoginView from "@/components/VIEW/LoginView";
 import UserListView from "@/components/VIEW/UserListView";
 import Navigation from "@/components/UI/Navigation";
 import SideBar from "@/components/UI/SideBar";
+import OrderListView from "@/components/VIEW/OrderListView";
 
-export default function Home() {
+export default function Order() {
   return (
     <><Navigation></Navigation><SideBar>
-      <UserListView></UserListView>
+        <OrderListView></OrderListView>
     </SideBar></>
   );
 }
+
