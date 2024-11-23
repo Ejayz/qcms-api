@@ -13,7 +13,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" data-theme="light">
-      <body className={` antialiased`}>{children}</body>
+      <body className={` antialiased `} style={{
+      backgroundImage: "url('/Img/4.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}>{children}</body>
     </html>
   );
 }

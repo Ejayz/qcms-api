@@ -2,22 +2,20 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Edit, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-export default function EditOrderList() {
+import { FormSelect } from "../UI/FormInput";
+export default function AddOrderList() {
   const navigator = useRouter();
 
-  const Add_Site_Validator = Yup.object().shape({
-    site_name: Yup.string().required("Site Name is required"),
-    site_link: Yup.string()
-      .required("Site Link is required")
-      .url("Invalid URL"),
-    description: Yup.string(),
-    faucetpay_api_key: Yup.string().required("FaucetPay API Key is required"),
-    auto_payment: Yup.string(),
+  const Edit_Order_Validator = Yup.object().shape({
+    customerName: Yup.string().required("Customer Name is required"),
+    articleName: Yup.string().required("Article Name is required"),
+    palleteCount: Yup.string().required("Pallete Count is required"),
+    
   });
 
   const mutateNewSite = useMutation({
@@ -48,9 +46,6 @@ export default function EditOrderList() {
        <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard">Dashboard</Link>
-          </li>
-          <li>
             <Link href="/dashboard/order_management">Order Management</Link>
           </li>
           <li>
@@ -60,20 +55,16 @@ export default function EditOrderList() {
       </div>
       <Formik
         initialValues={{
-          site_link: "",
-          site_name: "",
-          description: "",
-          faucetpay_api_key: "",
-          auto_payment: "true",
+          CustomerName: "",
+          ArticleName: "",
+          PalleteCount: "",
         }}
-        validationSchema={Add_Site_Validator}
+        validationSchema={Edit_Order_Validator}
         onSubmit={async (e, actions) => {
           mutateNewSite.mutate({
-            site_name: e.site_name,
-            site_link: e.site_link,
-            description: e.description,
-            faucetpay_api_key: e.faucetpay_api_key,
-            auto_payment: e.auto_payment,
+            customer_id: e.CustomerName,
+            article_id: e.ArticleName,
+            palletecount: e.PalleteCount,
           });
         }}
       >
@@ -83,291 +74,80 @@ export default function EditOrderList() {
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-2 gap-6 w-full">
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Customer Name
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
+                 <div>
+                 <FormSelect
+       
+        tooltip="Select the customer's name from the dropdown"
+        name="customerName"
+        placeholder="Choose a customer"
+        label="Customer Name"
+        options={[
+          { value: "1", label: "Customer 1" },
+          { value: "2", label: "Customer 2" },
+          { value: "3", label: "Customer 3" },
+        ]}
+        errors={errors.CustomerName ? errors.CustomerName : ""}
+        touched={touched.CustomerName ? "true" : ""}
+      />
                   </div>
-                
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Customer Number
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
+                <div>
+                 <FormSelect
+       
+        tooltip="Select the articles name from the dropdown"
+        name="articleName"
+        placeholder="Choose a Article"
+        label="Article Name"
+        options={[
+          { value: "1", label: "article 1" },
+          { value: "2", label: "article 2" },
+          { value: "3", label: "article 3" },
+        ]}
+        errors={errors.ArticleName ? errors.ArticleName : ""}
+        touched={touched.ArticleName ? "true" : ""}
+      />
                   </div>
-                
                 </div>
                 <div className="grid grid-cols-3 gap-6 w-full">
+                  <div>
+                    <label className="form-control w-96 max-w-lg">
+                      <div className="label">
+                        <span className="label-text font-bold gap-x-2 flex flex-row">
+                          Pallete Count
+                          <span
+                            className="tooltip tooltip-right"
+                            data-tip="Name of the site. This is required."
+                          >
+                            <CircleHelp
+                              className=" my-auto"
+                              size={20}
+                              strokeWidth={0.75}
+                            />
+                          </span>
+                        </span>
+                      </div>
+                      <Field
+                        type="text"
+                        placeholder="Site Name: Example: EzMiner"
+                        name="site_name"
+                        className={`input input-bordered w-full max-w-md ${
+                          errors.PalleteCount && touched.PalleteCount
+                            ? "input-error"
+                            : ""
+                        }`}
+                      />
+                    </label>
+
+                    {errors.PalleteCount && touched.PalleteCount ? (
+                      <span className="text-error  flex flex-row">
+                        {errors.PalleteCount}
+                      </span>
+                    ) : null}
+                  </div>
                 
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Lenght
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Inside diameter
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_name && touched.site_name
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-
-                    {errors.site_name && touched.site_name ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.site_name}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Outside diameter
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Link: Example: https://ezminer.tech"
-                        name="site_link"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_link && touched.site_link
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.site_link && touched.site_link ? (
-                      <span className="text-error gap-2 flex flex-row ">
-                        {errors.site_link}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Flat Crush
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Description of the site. This is optional."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Description: Example: Best Faucet Site"
-                        name="description"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.description && touched.description
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.description && touched.description ? (
-                      <span className="text-error gap-2 flex flex-row">
-                        <TriangleAlert color="#ff0000" />
-                        {errors.description}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                      <span className="label-text font-bold gap-x-2 flex flex-row">
-                      %H₂O
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Link: Example: https://ezminer.tech"
-                        name="site_link"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_link && touched.site_link
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.site_link && touched.site_link ? (
-                      <span className="text-error gap-2 flex flex-row ">
-                        {errors.site_link}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                      <span className="label-text font-bold gap-x-2 flex flex-row">
-                      Number of Controls Required
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Site Link is the URL of the site. Example: https://ezminer.tech . This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder="Site Link: Example: https://ezminer.tech"
-                        name="site_link"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.site_link && touched.site_link
-                            ? "input-error"
-                            : ""
-                        }`}
-                      />
-                    </label>
-                    {errors.site_link && touched.site_link ? (
-                      <span className="text-error gap-2 flex flex-row ">
-                        {errors.site_link}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
+                
               </div>
             
+            </div>
             </div>
             <div className="modal-action p-6">
               <button
@@ -383,7 +163,7 @@ export default function EditOrderList() {
                   </>
                 ) : (
                   <>
-                      <Pencil color="#000000" />Edit Order
+                    <Plus /> Edit Order
                   </>
                 )}
               </button>
