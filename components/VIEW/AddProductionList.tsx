@@ -48,9 +48,6 @@ export default function AddProductioList() {
        <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard">Dashboard</Link>
-          </li>
-          <li>
             <Link href="/dashbaord/production_management">Production Management</Link>
           </li>
           <li>

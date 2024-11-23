@@ -50,7 +50,7 @@ export default function LoginView() {
     <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-no-repeat"
     
     style={{
-      backgroundImage: "url('/Img/loginbg.png')",
+      backgroundImage: "url('/Img/4.png')",
       
       backgroundSize: "cover",
       backgroundPosition: "center",

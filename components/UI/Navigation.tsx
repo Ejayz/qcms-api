@@ -1,6 +1,25 @@
+"use client";
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 export default function Navigation() {
+  const router = useRouter();
+    const supabase = createClient(); // Create the Supabase client instance
+
+    const handleLogout = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Error during logout:', error.message);
+        } else {
+            // Clear additional client-side data if needed
+            localStorage.removeItem('customUserData'); // Example for custom storage
+            // Redirect to the login page or another route
+            router.push('/login');
+        }
+    };
     return (
+
+      
 <div className="navbar bg-base-100">
   <div className="flex-1">
   <Image
@@ -27,7 +46,7 @@ export default function Navigation() {
         tabIndex={0}
         className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow">
         
-        <li><a className="text-black">Logout</a></li>
+        <li><a className="text-black" onClick={handleLogout}>Logout</a></li>
       </ul>
     </div>
   </div>
