@@ -12,7 +12,7 @@ export default function UserListView() {
   const [search, setSearch] = useState("");
 
   const { data, isFetching, isLoading, isError } = useQuery({
-    queryKey: ["site_list", page, search, limit],
+    queryKey: ["get_users", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
         `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
@@ -101,18 +101,18 @@ export default function UserListView() {
                 </td>
               </tr>
             ) : data.length > 0 ? (
-              data?.map((site: any, index: any) => (
+              data?.map((get_users: any, index: any) => (
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{site.id}</td>
-                  <td>{site.email}</td>
-                  <td>{`${site.last_name} ${site.suffix ? site.suffix : ""}, ${
-                    site.first_name
-                  } ${site.middle_name}`}</td>
-                  <td>{site.role}</td>
+                  <td className="text-xs">{get_users.UUID}</td>
+                  <td>{get_users.email}</td>
+                  <td>{`${get_users.last_name} ${get_users.suffix ? get_users.suffix : ""}, ${
+                    get_users.first_name
+                  } ${get_users.middle_name}`}</td>
+                  <td>{get_users.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/sites/edit/${site.site_id}`}
+                      href={`/dashboard/edituser/${get_users.UUID }`}
                       className="flex flex-row gap-x-2 link"
                     >
                       <Pencil className="text-warning" /> Edit

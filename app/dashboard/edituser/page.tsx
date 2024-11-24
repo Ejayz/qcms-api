@@ -7,7 +7,7 @@
 // import SideBar from "@/components/UI/SideBar";
 
 import EditUserList from "@/components/VIEW/EditUserList";
-export default function AddOrder() {
+export default function EditUser() {
   return (
     <EditUserList></EditUserList>
   );

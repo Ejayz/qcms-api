@@ -8,19 +8,21 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
+import { useState, useEffect } from "react";
 export default function AddOrderList() {
   const navigator = useRouter();
 
   const Add_Order_Validator = Yup.object().shape({
-    customerName: Yup.string().required("Customer Name is required"),
-    articleName: Yup.string().required("Article Name is required"),
-    palleteCount: Yup.string().required("Pallete Count is required"),
+    CustomerName: Yup.string().required("Customer Name is required"),
+    ArticleName: Yup.string().required("Article Name is required"),
+    PalleteCount: Yup.string().required("Pallete Count is required"),
+    AssigneeName: Yup.string().required("Assignee Name is required"),
     
   });
 
-  const mutateNewSite = useMutation({
+  const AddOrderMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch("/api/v1/ops/createsite", {
+      const response = await fetch("/api/v1/create_order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,16 +32,98 @@ export default function AddOrderList() {
       return response.json();
     },
     onError: (error) => { 
-      toast.error("Failed to add site");
+      toast.error("Failed to add order");
+      console.error(error);
     },
     onSuccess: (data) => {
-      toast.success("Site Added Successfully");
-      navigator.push("/dashboard/sites");
+      toast.success("Order Added Successfully");
+      navigator.push("/dashboard/order_management");
     },
     onMutate: (data) => {
       return data;
     },
   });
+
+  const [customers, setCustomers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await fetch(`/api/v1/get_customer?page=1&limit=10`); // Adjust endpoint URL
+        const data = await response.json();
+        if (response.ok) {
+          const options = data.map((customer:any) => ({
+            value: customer.id,
+            label: `${customer.first_name} ${customer.last_name}`,
+          }));
+          setCustomers(options);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch customers.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+
+  const [articles, setarticles] = useState([]);
+
+  useEffect(() => {
+    const fetchArticle = async () => {
+      try {
+        const response = await fetch(`/api/v1/get_article?page=1&limit=10`); // Adjust endpoint URL
+        const data = await response.json();
+        if (response.ok) {
+          const options = data.map((article:any) => ({
+            value: article.id,
+            label: `${article.article_name}`,
+          }));
+          setarticles(options);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch customers.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticle();
+  }, []);
+
+  const [assignees, setassignees] = useState([]);
+
+  useEffect(() => {
+    const fetchAssignee = async () => {
+      try {
+        const response = await fetch(`/api/v1/get_user_select?page=1&limit=10`); // Adjust endpoint URL
+        const data = await response.json();
+        if (response.ok) {
+          const options = data.map((assignees:any) => ({
+            value: assignees.uuid,
+            label: `${assignees.first_name} ${assignees.last_name}`,
+          }));
+          setassignees(options);
+        } else {
+          setError(data.error);
+        }
+      } catch (err) {
+        setError("Failed to fetch customers.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAssignee();
+  }, []);
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
@@ -57,14 +141,16 @@ export default function AddOrderList() {
         initialValues={{
           CustomerName: "",
           ArticleName: "",
+          // AssigneeName: "",
           PalleteCount: "",
         }}
         validationSchema={Add_Order_Validator}
         onSubmit={async (e, actions) => {
-          mutateNewSite.mutate({
+          AddOrderMutation.mutate({
             customer_id: e.CustomerName,
             article_id: e.ArticleName,
-            palletecount: e.PalleteCount,
+            // assignee: e.AssigneeName,
+            pallete_count: e.PalleteCount,
           });
         }}
       >
@@ -74,41 +160,47 @@ export default function AddOrderList() {
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-2 gap-6 w-full">
-                 <div>
-                 <FormSelect
-       
+                <div>
+      <FormSelect
         tooltip="Select the customer's name from the dropdown"
-        name="customerName"
+        name="CustomerName"
         placeholder="Choose a customer"
         label="Customer Name"
-        options={[
-          { value: "1", label: "Customer 1" },
-          { value: "2", label: "Customer 2" },
-          { value: "3", label: "Customer 3" },
-        ]}
-        errors={errors.CustomerName ? errors.CustomerName : ""}
-        touched={touched.CustomerName ? "true" : ""}
+        options={customers}
+        errors={error ? error : ""}
+        touched="true" // Adjust as needed
       />
-                  </div>
-                <div>
-                 <FormSelect
-       
-        tooltip="Select the articles name from the dropdown"
-        name="articleName"
+      {isLoading && <p>Loading customers...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+    </div>
+    <div>
+      <FormSelect
+        tooltip="Select the article's name from the dropdown"
+        name="ArticleName"
         placeholder="Choose a Article"
         label="Article Name"
-        options={[
-          { value: "1", label: "article 1" },
-          { value: "2", label: "article 2" },
-          { value: "3", label: "article 3" },
-        ]}
-        errors={errors.ArticleName ? errors.ArticleName : ""}
-        touched={touched.ArticleName ? "true" : ""}
+        options={articles}
+        errors={error ? error : ""}
+        touched="true" // Adjust as needed
       />
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-6 w-full">
-                  <div>
+      {isLoading && <p>Loading article...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+    </div>
+
+    <div>
+      <FormSelect
+        tooltip="Select the assignee's name from the dropdown"
+        name="AssigneeName"
+        placeholder="Choose a Assignee"
+        label="Assignee Name"
+        options={assignees}
+        errors={error ? error : ""}
+        touched="true" // Adjust as needed
+      />
+      {isLoading && <p>Loading assignee...</p>}
+      {error && <p className="text-red-500">{error}</p>}
+    </div>
+    <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
@@ -128,7 +220,7 @@ export default function AddOrderList() {
                       <Field
                         type="text"
                         placeholder="Site Name: Example: EzMiner"
-                        name="site_name"
+                        name="PalleteCount"
                         className={`input input-bordered w-full max-w-md ${
                           errors.PalleteCount && touched.PalleteCount
                             ? "input-error"
@@ -146,17 +238,16 @@ export default function AddOrderList() {
                 
                 
               </div>
-            
-            </div>
+                </div>
             </div>
             <div className="modal-action p-6">
               <button
                 type="submit"
                 className={`btn btn-outline ${
-                  mutateNewSite.isPending ? "btn-disabled" : "btn-primary"
+                  AddOrderMutation.isPending ? "btn-disabled" : "btn-primary"
                 } btn-md`}
               >
-                {mutateNewSite.isPending ? (
+                {AddOrderMutation.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
                     Adding Site...

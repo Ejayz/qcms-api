@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState } from "react";
+import router from "next/router";
 export default function EditUserList() {
 
   const [showPassword, setShowPassword] = useState(false);
@@ -35,33 +36,37 @@ export default function EditUserList() {
     confirmpassword: Yup.string()
   .oneOf([Yup.ref('password'), undefined], 'Passwords must match')
   .required("Confirm Password is required"),
-
-
-    
 });
 
-  const mutateNewSite = useMutation({
+const { UUID } = router.query;
+ const { data: userData, isLoading } = useQuery({
+   queryKey: ["fetchUser", UUID],
+   queryFn: async () => {
+     const response = await fetch(`/api/v1/get_users/${UUID}`);
+     if (!response.ok) throw new Error("Failed to fetch user data");
+     return response.json();
+   }
+});
+ // Mutation for updating user details
+ const updateUserMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch("/api/v1/ops/createsite", {
-        method: "POST",
+      const response = await fetch(`/api/v1/get_users/${UUID}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
+      if (!response.ok) throw new Error("Failed to update user");
       return response.json();
     },
-    onError: (error) => { 
-      toast.error("Failed to add site");
+    onError: () => {
+      toast.error("Failed to update user");
     },
-    onSuccess: (data) => {
-      toast.success("Site Added Successfully");
-      navigator.push("/dashboard/sites");
+    onSuccess: () => {
+      toast.success("User updated successfully");
+      router.push("/dashboard/user_management");
     },
-    onMutate: (data) => {
-      return data;
-    },
-    
   });
   
 
@@ -376,10 +381,10 @@ export default function EditUserList() {
               <button
                 type="submit"
                 className={`btn btn-outline ${
-                  mutateNewSite.isPending ? "btn-disabled" : "btn-primary"
+                  updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
                 } btn-md`}
               >
-                {mutateNewSite.isPending ? (
+                {updateUserMutation.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
                     Adding Site...
