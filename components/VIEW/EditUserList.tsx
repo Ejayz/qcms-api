@@ -1,4 +1,5 @@
 "use client";
+
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,9 +10,7 @@ import { useEffect, useState } from "react";
 export default function EditUserList() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const uuid = searchParams.get("uuid")?.trim();
-  console.log("Formatted UUID:", uuid?.trim());
-
+  const uuid = searchParams.get("uuid");
 
   const [initialValues, setInitialValues] = useState({
     firstname: "",
@@ -24,22 +23,23 @@ export default function EditUserList() {
     confirmpassword: "",
   });
 
-  console.log("The UUID is:", uuid); // Make sure UUID is correct
-
-  
-  const { data: userData, isLoading, isSuccess, error } = useQuery({
+  const {
+    data: userData,
+    isLoading,
+    isSuccess,
+    error,
+  } = useQuery({
     queryKey: ["user", uuid],
     queryFn: async () => {
-      console.log("Fetching user with UUID:", uuid);
-      const response = await fetch(`/api/v1/getoneuser/${uuid}`);
+      const response = await fetch(`/api/v1/getoneuser/?uuid=${uuid}`);
       if (!response.ok) {
         console.error("Fetch failed:", response.status, response.statusText);
-        throw new Error(`Failed to fetch user data. Status: ${response.status}`);
+        throw new Error(
+          `Failed to fetch user data. Status: ${response.status}`
+        );
       }
       return response.json();
     },
-    
-   // enabled: !!UUID, // Only runs if UUID is valid
   });
   useEffect(() => {
     if (isSuccess && userData) {
@@ -50,13 +50,11 @@ export default function EditUserList() {
         suffix: userData.suffix || "",
         role: userData.role || "",
         username: userData.username || "",
-        password: "", // Never pre-fill sensitive fields
+        password: "",
         confirmpassword: "",
       });
     }
   }, [isSuccess, userData]);
-  
-  
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -99,7 +97,7 @@ export default function EditUserList() {
     console.error("Invalid UUID:", uuid);
     return <div>Error: Invalid UUID format</div>;
   }
-  
+
   if (isLoading) {
     return <div>Loading...</div>;
   }

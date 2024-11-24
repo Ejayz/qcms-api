@@ -1,19 +1,15 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { uuid: string } }) {
-  console.log("API Route Hit: Fetching user with UUID:", params.uuid);
-
-  if (!params.uuid || params.uuid.trim() === "") {
-    return NextResponse.json({ error: "UUID is required" }, { status: 400 });
-  }
+export async function GET(req: NextRequest) {
+  const uuid = await req.nextUrl.searchParams.get("uuid");
 
   const supabase = await createClient();
+
   const { data, error } = await supabase
     .from("tbl_users")
-    .select("*")
-    .eq("uuid", params.uuid.trim())
-    .single();
+    .select()
+    .eq("uuid", uuid);
 
   if (error) {
     console.error("Error fetching user:", error.message);
