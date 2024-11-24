@@ -20,7 +20,12 @@ export default function Navigation() {
     return (
 
       
-<div className="navbar bg-transparent border-b-2 border-black">
+<div className="navbar border-b-2 border-black"  style={{
+      backgroundImage: "url('/Img/4.png')",
+
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}>
   <div className="flex-1">
   <Image
                 src="/Img/logo1.png"

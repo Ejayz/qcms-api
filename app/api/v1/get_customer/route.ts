@@ -10,13 +10,10 @@ export async function GET(req: NextRequest) {
   console.log(limit);
   const supabase = await createClient();
   const { data, error } = await supabase
-    .from("tbl_users")
-    .select("uuid,email,first_name,middle_name,last_name,role,suffix")
+    .from("tbl_customer")
+    .select("*")
     .eq("is_exist", true)
-    .or(
-      `email.ilike.%${search}%,first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%`
-    )
-    .order("created_at", { ascending: false })
+
     .range(
       (parseInt(page) - 1) * parseInt(limit),
       parseInt(page) * parseInt(limit) - 1

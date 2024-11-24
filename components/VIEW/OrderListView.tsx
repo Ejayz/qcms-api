@@ -12,10 +12,10 @@ export default function OrderListView() {
   const [search, setSearch] = useState("");
 
   const { data, isFetching, isLoading, isError } = useQuery({
-    queryKey: ["site_list", page, search, limit],
+    queryKey: ["get_order", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_order?page=${page}&search=${search}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -35,6 +35,7 @@ export default function OrderListView() {
     },
     retry: 1,
   });
+
 
   return (
     
@@ -81,10 +82,9 @@ export default function OrderListView() {
           <thead>
             <tr className="">
               <th></th>
-              <th>UUID</th>
-              <th>Email</th>
-              <th>Name</th>
-              <th>Role</th>
+              <th>Customer Name</th>
+              <th>Article Name</th>
+              <th>Pallete Count</th>
               <th>OPTIONS</th>
             </tr>
           </thead>
@@ -98,19 +98,18 @@ export default function OrderListView() {
             ) : isError ? (
               <tr>
                 <td className="text-error font-bold" colSpan={7}>
-                  Something went wrong while fetching site list.
+                  Something went wrong while fetching orders list.
                 </td>
               </tr>
             ) : data.length > 0 ? (
-              data?.map((site: any, index: any) => (
+              data?.map((orders: any, index: any) => (
+
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{site.id}</td>
-                  <td>{site.email}</td>
-                  <td>{`${site.last_name} ${site.suffix ? site.suffix : ""}, ${
-                    site.first_name
-                  } ${site.middle_name}`}</td>
-                  <td>{site.role}</td>
+                  <td className="text-xs">{orders.id}</td>
+                  <td>{orders.customer_id}</td>
+                  <td>{orders.article_id}</td>
+                  <td>{orders.pallete_count}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
                       href={`/dashboard/editorder`}
