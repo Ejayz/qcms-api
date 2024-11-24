@@ -6,7 +6,7 @@ import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Boxes, FileChartColumnIncreasing, LayoutDashboard, Microscope, ShoppingCart, User } from "lucide-react";
+import { Boxes, FileChartColumnIncreasing, LayoutDashboard, Microscope, ShoppingCart, User, Users } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function IndexHeader({
@@ -100,26 +100,90 @@ export default function IndexHeader({
                 <LayoutDashboard></LayoutDashboard> Dashboard{" "}
               </Link>
             </li>
-            <li>
-              <Link
-                href="/dashboard/user_management"
-                className={`${
-                  query=="/dashboard/user_management"? "bg-primary" : ""
-                }`}
-              >
-                <User></User> User Management
-              </Link>
+            <ul className="menu bg-base-200 rounded-box w-56">
+
+<li>
+  <details open>
+    <summary>User Management</summary>
+    <ul>
+      <li>
+            <Link
+              href="/dashboard/user_management"
+              className={`${
+                query=="/dashboard/user_management"? "bg-primary" : ""
+              }`}
+            >
+              <Users></Users>Manage Users
+            </Link>
             </li>
-            <li>
+      <li>
+            <Link
+              href="/dashboard/customer_management"
+              className={`${
+                query=="/dashboard/customer_management"? "bg-primary" : ""
+              }`}
+            >
+              <ShoppingCart></ShoppingCart>Manage Customer
+            </Link> 
+            </li>
+    </ul>
+  </details>
+</li>
+</ul>
+
+            <ul className="menu bg-base-200 rounded-box w-56">
+
+  <li>
+    <details open>
+      <summary>Order Management</summary>
+      <ul>
+        <li>
               <Link
                 href="/dashboard/order_management"
                 className={`${
                   query=="/dashboard/order_management"? "bg-primary" : ""
                 }`}
               >
-                <ShoppingCart></ShoppingCart>Order Management
+                <ShoppingCart></ShoppingCart>Manage Order
               </Link>
-            </li>
+              </li>
+        <li>
+              <Link
+                href="/dashboard/production_management"
+                className={`${
+                  query=="/dashboard/production_management"? "bg-primary" : ""
+                }`}
+              >
+                <ShoppingCart></ShoppingCart>Manage Production
+              </Link>
+              </li>
+              <li>
+              <Link
+                href="/dashboard/proofing_management"
+                className={`${
+                  query=="/dashboard/profing_management"? "bg-primary" : ""
+                }`}
+              >
+                <ShoppingCart></ShoppingCart>Manage Proofing
+              </Link>
+              </li>
+              <li>
+              <Link
+                href="/dashboard/measurement_management"
+                className={`${
+                  query=="/dashboard/measurement_management"? "bg-primary" : ""
+                }`}
+              >
+                <ShoppingCart></ShoppingCart>Manage Measurement
+              </Link>
+              </li>
+      </ul>
+    </details>
+  </li>
+</ul>
+              
+
+
             <li>
               <Link
                 href="/dashboard/laboratory_management"
@@ -148,6 +212,16 @@ export default function IndexHeader({
                 }`}
               >
                 <FileChartColumnIncreasing color="#000000" />Analytical Report
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/dashboard/report_management"
+                className={`${
+                  query=="/dashboard/report_management"? "bg-primary" : ""
+                }`}
+              >
+                <FileChartColumnIncreasing color="#000000" />Report
               </Link>
             </li>
             
