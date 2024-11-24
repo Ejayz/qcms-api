@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState } from "react";
-export default function AddUserList() {
+export default function EditUserList() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -73,7 +73,7 @@ export default function AddUserList() {
             <Link href="/dashbaord/user_management">User Management</Link>
           </li>
           <li>
-            <span>Add User</span>
+            <span>Edit User</span>
           </li>
         </ul>
       </div>
@@ -386,7 +386,7 @@ export default function AddUserList() {
                   </>
                 ) : (
                   <>
-                    <Plus /> Add User
+                    <Plus /> Edit User
                   </>
                 )}
               </button>
