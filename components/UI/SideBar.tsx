@@ -6,7 +6,17 @@ import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Boxes, FileChartColumnIncreasing, LayoutDashboard, Microscope, ShoppingCart, User, Users } from "lucide-react";
+import {
+  BookText,
+  BookUser,
+  Boxes,
+  FileChartColumnIncreasing,
+  LayoutDashboard,
+  Microscope,
+  ShoppingCart,
+  User,
+  Users,
+} from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 export default function IndexHeader({
@@ -16,7 +26,7 @@ export default function IndexHeader({
 }>) {
   const queryClient = new QueryClient();
   const query = usePathname();
-  console.log(query)
+  console.log(query);
   return (
     <QueryClientProvider client={queryClient}>
       <div className="drawer lg:drawer-open bg-white">
@@ -87,144 +97,169 @@ export default function IndexHeader({
             aria-label="close sidebar"
             className="drawer-overlay"
           ></label>
-         
+
           <ul className="menu bg-white text-black min-h-full w-80 p-4">
             {/* Sidebar content here */}
             <li>
               <Link
                 href="dashboard"
-                className={`${
-                  query=="/dashboard" ? "bg-primary" : ""
-                }`}
+                className={`${query == "/dashboard" ? "bg-primary" : ""}`}
               >
                 <LayoutDashboard></LayoutDashboard> Dashboard{" "}
               </Link>
             </li>
-            <ul className="menu bg-base-200 rounded-box w-56">
-
-<li>
-  <details open>
-    <summary>User Management</summary>
-    <ul>
-      <li>
-            <Link
-              href="/dashboard/user_management"
-              className={`${
-                query=="/dashboard/user_management"? "bg-primary" : ""
-              }`}
-            >
-              <Users></Users>Manage Users
-            </Link>
-            </li>
-      <li>
-            <Link
-              href="/dashboard/customer_management"
-              className={`${
-                query=="/dashboard/customer_management"? "bg-primary" : ""
-              }`}
-            >
-              <ShoppingCart></ShoppingCart>Manage Customer
-            </Link> 
-            </li>
-    </ul>
-  </details>
-</li>
-</ul>
-
-            <ul className="menu bg-base-200 rounded-box w-56">
-
-  <li>
-    <details open>
-      <summary>Order Management</summary>
-      <ul>
-        <li>
-              <Link
-                href="/dashboard/order_management"
-                className={`${
-                  query=="/dashboard/order_management"? "bg-primary" : ""
-                }`}
-              >
-                <ShoppingCart></ShoppingCart>Manage Order
-              </Link>
-              </li>
-        <li>
-              <Link
-                href="/dashboard/production_management"
-                className={`${
-                  query=="/dashboard/production_management"? "bg-primary" : ""
-                }`}
-              >
-                <ShoppingCart></ShoppingCart>Manage Production
-              </Link>
-              </li>
-              <li>
-              <Link
-                href="/dashboard/proofing_management"
-                className={`${
-                  query=="/dashboard/profing_management"? "bg-primary" : ""
-                }`}
-              >
-                <ShoppingCart></ShoppingCart>Manage Proofing
-              </Link>
-              </li>
-              <li>
-              <Link
-                href="/dashboard/measurement_management"
-                className={`${
-                  query=="/dashboard/measurement_management"? "bg-primary" : ""
-                }`}
-              >
-                <ShoppingCart></ShoppingCart>Manage Measurement
-              </Link>
-              </li>
-      </ul>
-    </details>
-  </li>
-</ul>
+            <li className="rounded collapse collapse-arrow">
               
+                <details  open={query === "/dashboard/user_management" || query ==="/dashboard/customer_management"}>
+                  <summary  className={`${
+                          query == "/dashboard/user_management"
+                            ? "bg-primary"
+                            : ""
+                        }`}>
+                    <BookUser />
+                    User Management
+                  </summary>
+                  <ul>
+                    <li>
+                      <Link
+                        href="/dashboard/user_management"
+                        className={`${
+                          query == "/dashboard/user_management"
+                            ? "bg-orange-700"
+                            : ""
+                        }`}
+                      >
+                        Manage Users
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/dashboard/customer_management"
+                        className={`${
+                          query == "/dashboard/customer_management"
+                            ? "bg-primary"
+                            : ""
+                        }`}
+                      >
+                        Manage Customer
+                      </Link>
+                    </li>
+                  </ul>
+                </details>
+              </li>
+            
 
+            <li className="rounded collapse collapse-arrow">
+              
+                <details>
+                  <summary>
+                    <BookText />
+                    Order Management
+                  </summary>
+                  <ul>
+                    <li>
+                      <Link
+                        href="/dashboard/order_management"
+                        className={`${
+                          query == "/dashboard/order_management"
+                            ? "bg-primary"
+                            : ""
+                        }`}
+                      >
+                        Manage Order
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/dashboard/production_management"
+                        className={`${
+                          query == "/dashboard/production_management"
+                            ? "bg-primary"
+                            : ""
+                        }`}
+                      >
+                        Manage Production
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/dashboard/proofing_management"
+                        className={`${
+                          query == "/dashboard/profing_management"
+                            ? "bg-primary"
+                            : ""
+                        }`}
+                      >
+                        Manage Proofing
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/dashboard/measurement_management"
+                        className={`${
+                          query == "/dashboard/measurement_management"
+                            ? "bg-primary"
+                            : ""
+                        }`}
+                      >
+                        Manage Measurement
+                      </Link>
+                    </li>
+                  </ul>
+                </details>
+              </li>
+            
 
             <li>
               <Link
                 href="/dashboard/laboratory_management"
                 className={`${
-                  query=="/dashboard/laboratory_management"? "bg-primary" : ""
+                  query == "/dashboard/laboratory_management"
+                    ? "bg-primary"
+                    : ""
                 }`}
               >
-                <Microscope color="#000000" />Laboratory Management
+                <Microscope color="#000000" />
+                Laboratory Management
               </Link>
             </li>
             <li>
               <Link
                 href="/dashboard/production_management"
                 className={`${
-                  query=="/dashboard/production_management"? "bg-primary" : ""
+                  query == "/dashboard/production_management"
+                    ? "bg-primary"
+                    : ""
                 }`}
               >
-                <Boxes color="#000000" />Production Management
+                <Boxes color="#000000" />
+                Production Management
               </Link>
             </li>
             <li>
               <Link
                 href="/dashboard/analytical_management"
                 className={`${
-                  query=="/dashboard/analytical_management"? "bg-primary" : ""
+                  query == "/dashboard/analytical_management"
+                    ? "bg-primary"
+                    : ""
                 }`}
               >
-                <FileChartColumnIncreasing color="#000000" />Analytical Report
+                <FileChartColumnIncreasing color="#000000" />
+                Analytical Report
               </Link>
             </li>
             <li>
               <Link
                 href="/dashboard/report_management"
                 className={`${
-                  query=="/dashboard/report_management"? "bg-primary" : ""
+                  query == "/dashboard/report_management" ? "bg-primary" : ""
                 }`}
               >
-                <FileChartColumnIncreasing color="#000000" />Report
+                <FileChartColumnIncreasing color="#000000" />
+                Report
               </Link>
             </li>
-            
           </ul>
         </div>
       </div>

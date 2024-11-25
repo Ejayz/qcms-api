@@ -12,7 +12,7 @@ export default function RootLayout({
   return (
 <QueryClientProvider client={queryClient}>
     <html lang="en" data-theme="light">
-      <body className={` antialiased`}>{children}</body>
+      <body>{children}</body>
     </html></QueryClientProvider>
   );
 }
