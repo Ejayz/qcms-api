@@ -17,7 +17,8 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
 
 export default function IndexHeader({
   children,
@@ -27,14 +28,30 @@ export default function IndexHeader({
   const queryClient = new QueryClient();
   const query = usePathname();
   console.log(query);
+
+  const router = useRouter();
+  const supabase = createClient(); // Create the Supabase client instance
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error during logout:", error.message);
+    } else {
+      // Clear additional client-side data if needed
+      localStorage.removeItem("customUserData"); // Example for custom storage
+      // Redirect to the login page or another route
+      router.push("/login");
+    }
+  };
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="drawer lg:drawer-open bg-white">
-        <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content flex flex-col">
-          {/* Navbar */}
-          <div className="navbar bg-white w-full shadow-md lg:hidden text-black glass">
-            <div className="flex-none lg:hidden">
+      <div className="navbar border-b-2 border-black text-black"  style={{
+      backgroundImage: "url('/Img/4.png')",
+
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}><div className="flex-1">
+            <div className="flex-none lg:hidden ">
               <label
                 htmlFor="my-drawer-3"
                 aria-label="open sidebar"
@@ -43,8 +60,8 @@ export default function IndexHeader({
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
-                  viewBox="0 0 24 24"
-                  className="inline-block h-6 w-6 stroke-current"
+                  viewBox="0 0 20 20"
+                  className="inline-block h-20 w-20 stroke-current"
                 >
                   <path
                     strokeLinecap="round"
@@ -55,36 +72,54 @@ export default function IndexHeader({
                 </svg>
               </label>
             </div>
-            <div className="mx-2 flex-1 px-2">
-              <Image
-                src="/Img/logo.png"
-                className=""
-                alt="logo"
-                width={214}
-                height={85}
-              />
-            </div>
-            <div className="hidden flex-none lg:block">
-              <ul className="menu menu-horizontal text-black">
-                {/* Navbar menu content here */}
-                <li>
-                  <Link href="/dashboard"> Dashboard </Link>
-                </li>
-                <li>
-                  <Link href="#contactus"> Contact </Link>
-                </li>
-                <li>
-                  <Link href="#services"> Services </Link>
-                </li>
-                <li>
-                  <Link href="#team"> Team </Link>
-                </li>
-                <li>
-                  <Link href="#productgallery"> Product Gallery </Link>
-                </li>
-              </ul>
-            </div>
+            <Image
+              src="/Img/logo1.png"
+              className=""
+              alt="logo"
+              width={214}
+              height={85}
+            />
           </div>
+        <div className="flex-none gap-2">
+          
+          <div className="form-control ">
+            <input
+              type="text"
+              placeholder="Search"
+              className="input input-bordered w-24 md:w-auto"
+            />
+          </div>
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle avatar"
+            >
+              <div className="w-10 rounded-full">
+                <img
+                  alt="Tailwind CSS Navbar component"
+                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                />
+              </div>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <a className="text-black" onClick={handleLogout}>
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div className="drawer lg:drawer-open bg-white">
+        <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
+        <div className="drawer-content flex flex-col ">
+          {/* Navbar */}
+
           <Toaster position="top-right" reverseOrder={false} />
 
           {/* Page content here */}
@@ -109,106 +144,107 @@ export default function IndexHeader({
               </Link>
             </li>
             <li className="rounded collapse collapse-arrow">
-              
-                <details  open={query === "/dashboard/user_management" || query ==="/dashboard/customer_management"}>
-                  <summary  className={`${
-                          query == "/dashboard/user_management"
-                            ? "bg-primary"
-                            : ""
-                        }`}>
-                    <BookUser />
-                    User Management
-                  </summary>
-                  <ul>
-                    <li>
-                      <Link
-                        href="/dashboard/user_management"
-                        className={`${
-                          query == "/dashboard/user_management"
-                            ? "bg-orange-700"
-                            : ""
-                        }`}
-                      >
-                        Manage Users
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/customer_management"
-                        className={`${
-                          query == "/dashboard/customer_management"
-                            ? "bg-primary"
-                            : ""
-                        }`}
-                      >
-                        Manage Customer
-                      </Link>
-                    </li>
-                  </ul>
-                </details>
-              </li>
-            
+              <details
+                open={
+                  query === "/dashboard/user_management" ||
+                  query === "/dashboard/customer_management"
+                }
+              >
+                <summary
+                  className={`${
+                    query == "/dashboard/user_management" ? "bg-primary" : ""
+                  }`}
+                >
+                  <BookUser />
+                  User Management
+                </summary>
+                <ul>
+                  <li>
+                    <Link
+                      href="/dashboard/user_management"
+                      className={`${
+                        query == "/dashboard/user_management"
+                          ? "bg-orange-700"
+                          : ""
+                      }`}
+                    >
+                      Manage Users
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/customer_management"
+                      className={`${
+                        query == "/dashboard/customer_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Customer
+                    </Link>
+                  </li>
+                </ul>
+              </details>
+            </li>
 
             <li className="rounded collapse collapse-arrow">
-              
-                <details>
-                  <summary>
-                    <BookText />
-                    Order Management
-                  </summary>
-                  <ul>
-                    <li>
-                      <Link
-                        href="/dashboard/order_management"
-                        className={`${
-                          query == "/dashboard/order_management"
-                            ? "bg-primary"
-                            : ""
-                        }`}
-                      >
-                        Manage Order
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/production_management"
-                        className={`${
-                          query == "/dashboard/production_management"
-                            ? "bg-primary"
-                            : ""
-                        }`}
-                      >
-                        Manage Production
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/proofing_management"
-                        className={`${
-                          query == "/dashboard/profing_management"
-                            ? "bg-primary"
-                            : ""
-                        }`}
-                      >
-                        Manage Proofing
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/measurement_management"
-                        className={`${
-                          query == "/dashboard/measurement_management"
-                            ? "bg-primary"
-                            : ""
-                        }`}
-                      >
-                        Manage Measurement
-                      </Link>
-                    </li>
-                  </ul>
-                </details>
-              </li>
-            
+              <details>
+                <summary>
+                  <BookText />
+                  Order Management
+                </summary>
+                <ul>
+                  <li>
+                    <Link
+                      href="/dashboard/order_management"
+                      className={`${
+                        query == "/dashboard/order_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Order
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/production_management"
+                      className={`${
+                        query == "/dashboard/production_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Production
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/proofing_management"
+                      className={`${
+                        query == "/dashboard/profing_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Proofing
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/measurement_management"
+                      className={`${
+                        query == "/dashboard/measurement_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Measurement
+                    </Link>
+                  </li>
+                </ul>
+              </details>
+            </li>
 
             <li>
               <Link

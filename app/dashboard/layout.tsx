@@ -12,12 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light">
-      <body className={` antialiased `} style={{
-      backgroundImage: "url('/Img/4.png')",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}>{children}</body>
+    <html lang="en"className="bg-white" data-theme="light">
+      <body>{children}</body>
     </html>
   );
 }

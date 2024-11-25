@@ -5,7 +5,7 @@
 // import UserListView from "@/components/VIEW/UserListView";
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
-
+"use client";
 import EditProductionList from "@/components/VIEW/EditProductionList";
 export default function EditProduction() {
   return (

@@ -12,10 +12,10 @@ export default function UserListView() {
   const [search, setSearch] = useState("");
 
   const { data, isFetching, isLoading, isError } = useQuery({
-    queryKey: ["get_users", page, search, limit],
+    queryKey: ["get_customer", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_customer?page=${page}&search=${search}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -44,7 +44,7 @@ export default function UserListView() {
             <Link href="/"> </Link>
           </li>
           <li>  
-            <span>User Management</span>
+            <span>Customer Management</span>
           </li>
         </ul>
       </div>
@@ -69,10 +69,10 @@ export default function UserListView() {
           </label>
 
           <Link
-            href="/dashboard/adduser"
+            href="/dashboard/addcustomer"
             className="btn btn-primary text-black"
           >
-            Add User
+            Add Customer
           </Link>
         </div>
 
@@ -80,10 +80,10 @@ export default function UserListView() {
           <thead>
             <tr className="">
               <th></th>
-              <th>UUID</th>
+              <th>First Name</th>
+              <th>Middle Name</th>
+              <th>Last Name</th>
               <th>Email</th>
-              <th>Name</th>
-              <th>Role</th>
               <th>OPTIONS</th>
             </tr>
           </thead>
@@ -106,11 +106,10 @@ export default function UserListView() {
                 <tr key={index}>
                   <th>{index + 1}</th>
                   <td className="text-xs">{get_users.uuid}</td>
-                  <td>{get_users.email}</td>
-                  <td>{`${get_users.last_name} ${get_users.suffix ? get_users.suffix : ""}, ${
-                    get_users.first_name
-                  } ${get_users.middle_name}`}</td>
-                  <td>{get_users.role}</td>
+                  <td>{get_users.first}</td>
+                    <td>{get_users.middle}</td>
+                    <td>{get_users.last}</td>
+                    <td>{get_users.email}</td>
                   <td className="justify-center items-center flex gap-4">
                   <Link href={`/dashboard/edituser?uuid=${get_users.uuid}`} className="link">
   <Pencil className="text-warning" /> Edit
