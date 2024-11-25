@@ -9,17 +9,10 @@ export default function RootLayout({
 }>) {
   const queryClient = new QueryClient();
   return (
-<<<<<<< Updated upstream
     <QueryClientProvider client={queryClient}>
       <html lang="en" data-theme="light">
         <body>{children}</body>
       </html>
     </QueryClientProvider>
-=======
-<QueryClientProvider client={queryClient}>
-    <html lang="en" data-theme="light">
-      <body>{children}</body>
-    </html></QueryClientProvider>
->>>>>>> Stashed changes
   );
 }
