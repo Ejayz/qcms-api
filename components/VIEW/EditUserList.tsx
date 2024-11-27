@@ -14,7 +14,6 @@ export default function EditUserList() {
   const uuid = searchParams.get("uuid");
 
   const [initialValues, setInitialValues] = useState({
-    uuid:"",
     firstname: "",
     middlename: "",
     lastname: "",
@@ -48,7 +47,6 @@ export default function EditUserList() {
       const user = userData[0]; // Get the first user object
       setInitialValues((prev) => ({
         ...prev,
-        uuid:user.uuid||"",
         firstname: user.first_name || "",
         middlename: user.middle_name || "",
         lastname: user.last_name || "",
@@ -63,27 +61,34 @@ export default function EditUserList() {
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: any) => {
-      console.log("Data to be updated:", data);
-      const response = await fetch(`/api/v1/edit_user/${uuid}`, {
-        method: "POST",
+      const response = await fetch(`/api/v1/edit_user?uuid=${uuid}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) throw new Error("Failed to update user");
+        body: JSON.stringify({
+          email: data.email,
+          first_name: data.firstname,
+          middle_name: data.middlename,
+          last_name: data.lastname,
+          role: data.role,
+          suffix: data.suffix,
+      }),
+    });
       return response.json();
     },
-    onError: () => {
-      toast.error("Failed to update user");
+    onError: (error) => { 
+      toast.error("Failed to add site");
     },
-    onSuccess: () => {
-      toast.success("User updated successfully");
+    onSuccess: (data) => {
+      toast.success("Site Added Successfully");
       router.push("/dashboard/user_management");
     },
+    onMutate: (data) => {
+      return data;
+    },
+    
   });
-
   const Add_User_Validator = Yup.object().shape({
     firstname: Yup.string().required("First Name is required"),
     middlename: Yup.string().required("Middle Name is required"),

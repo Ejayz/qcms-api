@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/UI/Footer";
@@ -28,10 +28,27 @@ export default function IndexHeader({
   const queryClient = new QueryClient();
   const query = usePathname();
   console.log(query);
-
+  
   const router = useRouter();
   const supabase = createClient(); // Create the Supabase client instance
 
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [userid, setuserid] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Retrieve the role from localStorage
+    const role = localStorage.getItem("userRole");
+    const susername = localStorage.getItem("username");
+    const userid=localStorage.getItem("userid");
+    setuserid(userid);
+    setUserRole(role);
+    setUsername(susername);
+  }, []);
+  console.log("Username:", username);
+  console.log("User ID:", userid);
+
+  console.log("User role:", userRole);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -106,11 +123,15 @@ export default function IndexHeader({
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
+                 <li>
+                  <span className="text-black">{username}</span>
+              </li>
               <li>
                 <a className="text-black" onClick={handleLogout}>
                   Logout
                 </a>
               </li>
+
             </ul>
           </div>
         </div>
@@ -143,55 +164,133 @@ export default function IndexHeader({
                 <LayoutDashboard></LayoutDashboard> Dashboard{" "}
               </Link>
             </li>
-            <li className="rounded collapse collapse-arrow">
-              <details
-                open={
-                  query === "/dashboard/user_management" ||
-                  query === "/dashboard/customer_management"
-                }
-              >
-                <summary
+            {userRole === "Super Admin" ? (
+              <li className="rounded collapse collapse-arrow">
+                <details
+                  open={
+                    query === "/dashboard/user_management" ||
+                    query === "/dashboard/customer_management"
+                  }
+                >
+                  <summary
+                    className={`${
+                      query == "/dashboard/user_management" ? "bg-primary" : ""
+                    } ${
+                      query == "/dashboard/customer_management"
+                        ? "bg-primary"
+                        : ""
+                    }`}
+                  >
+                    <BookUser />
+                    User Management
+                  </summary>
+                  <ul>
+                    <li>
+                      <Link
+                        href="/dashboard/user_management"
+                        className={`${
+                          query == "/dashboard/user_management"
+                            ? "bg-orange-700"
+                            : ""
+                        }`}
+                      >
+                        Manage Users
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        href="/dashboard/customer_management"
+                        className={`${
+                          query == "/dashboard/customer_management"
+                            ? "bg-orange-700"
+                            : ""
+                        }`}
+                      >
+                        Manage Customer
+                      </Link>
+                    </li>
+                  </ul>
+                </details>
+              </li>
+            ) : (
+              <li>
+                <Link
+                  href="/dashboard/user_management"
                   className={`${
                     query == "/dashboard/user_management" ? "bg-primary" : ""
                   }`}
                 >
-                  <BookUser />
+                  <Microscope color="#000000" />
                   User Management
-                </summary>
-                <ul>
-                  <li>
-                    <Link
-                      href="/dashboard/user_management"
-                      className={`${
-                        query == "/dashboard/user_management"
-                          ? "bg-orange-700"
-                          : ""
-                      }`}
-                    >
-                      Manage Users
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard/customer_management"
-                      className={`${
-                        query == "/dashboard/customer_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Customer
-                    </Link>
-                  </li>
-                </ul>
-              </details>
-            </li>
+                </Link>
+              </li>
+            )}
+
 
             <li className="rounded collapse collapse-arrow">
               <details>
                 <summary>
                   <BookText />
-                  Order Management
+                  Article Management
+                </summary>
+                <ul>
+                  <li>
+                    <Link
+                      href="/dashboard/article_management"
+                      className={`${
+                        query == "/dashboard/article_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Article
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/article_nominal_management"
+                      className={`${
+                        query == "/dashboard/article_nominal_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Article Nominal
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/article_min_management"
+                      className={`${
+                        query == "/dashboard/article_min_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Article Min
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/dashboard/article_max_management"
+                      className={`${
+                        query == "/dashboard/article_max_management"
+                          ? "bg-primary"
+                          : ""
+                      }`}
+                    >
+                      Manage Article Max
+                    </Link>
+                  </li>
+                 
+                </ul>
+              </details>
+            </li>
+            <li className="rounded collapse collapse-arrow">
+              <details>
+                <summary>
+                  <BookText />
+                  Order Form Management
                 </summary>
                 <ul>
                   <li>

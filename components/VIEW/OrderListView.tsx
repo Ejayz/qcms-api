@@ -11,7 +11,8 @@ export default function OrderListView() {
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
 
-  const { data, isFetching, isLoading, isError } = useQuery({
+  // Fetch orders
+  const { data: ordersData, isFetching, isLoading, isError } = useQuery({
     queryKey: ["get_order", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
@@ -26,32 +27,59 @@ export default function OrderListView() {
         }
       );
       const result = await response.json();
-
       if (response.ok) {
         return result;
       } else {
-        throw new Error("Something went wrong while fetching site list.");
+        throw new Error("Something went wrong while fetching orders.");
       }
     },
     retry: 1,
   });
 
+  // Fetch customers
+  const { data: customersData } = useQuery({
+    queryKey: ["get_customer"],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/get_customer`, {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+        },
+      });
+      const result = await response.json();
+      if (response.ok) {
+        return result;
+      } else {
+        throw new Error("Something went wrong while fetching customers.");
+      }
+    },
+    retry: 1,
+    enabled: !!ordersData, // Only fetch customers if orders data is available
+  });
+
+  // Map customer names to orders
+  const ordersWithCustomerNames =
+    ordersData?.map((order: any) => {
+      const customerName = customersData?.find(
+        (customer: any) => customer.id === order.customer_id
+      )?.name;
+      return { ...order, customer_name: customerName || "Unknown" };
+    }) || [];
 
   return (
-    
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
-           <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
+      <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/"> </Link>
           </li>
-          <li>  
+          <li>
             <span>Order Management</span>
           </li>
         </ul>
       </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
-        <div className="w-full flex flex-row  justify-between items-center">
+        <div className="w-full flex flex-row justify-between items-center">
           <label className="input pr-0 input-bordered flex flex-row justify-center items-center">
             <input
               type="text"
@@ -80,7 +108,7 @@ export default function OrderListView() {
 
         <table className="table text-center">
           <thead>
-            <tr className="">
+            <tr>
               <th></th>
               <th>Customer Name</th>
               <th>Article Name</th>
@@ -101,21 +129,18 @@ export default function OrderListView() {
                   Something went wrong while fetching orders list.
                 </td>
               </tr>
-            ) : data.length > 0 ? (
-              data?.map((orders: any, index: any) => (
-
+            ) : ordersWithCustomerNames.length > 0 ? (
+              ordersWithCustomerNames.map((order: any, index: number) => (
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{orders.id}</td>
-                  <td>{orders.customer_id}</td>
-                  <td>{orders.article_id}</td>
-                  <td>{orders.pallete_count}</td>
+                  <td className="text-xs">{order.customer_id}</td>
+                  <td>{order.article_id}</td>
+                  <td>{order.pallete_count}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/editorder`}
+                      href={`/dashboard/editorder?id=${order.id}`}
                       className="flex flex-row gap-x-2 link"
                     >
-                      {/* /${site.site_id} */}
                       <Pencil className="text-warning" /> Edit
                     </Link>
                   </td>
@@ -144,12 +169,12 @@ export default function OrderListView() {
           <button className="join-item btn">Page {page}</button>
           <button
             onClick={() => {
-              if (!isLoading && !isFetching && data?.length == limit) {
+              if (!isLoading && !isFetching && ordersData?.length === limit) {
                 setPage(page + 1);
               }
             }}
             className={`join-item btn ${
-              data?.length != limit ? "disabled" : ""
+              ordersData?.length !== limit ? "disabled" : ""
             }`}
           >
             »

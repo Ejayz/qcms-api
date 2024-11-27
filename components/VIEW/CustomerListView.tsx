@@ -101,17 +101,17 @@ export default function UserListView() {
                 </td>
               </tr>
             ) : data.length > 0 ? (
-              data?.map((get_users: any, index: any) => (
+              data?.map((get_customer: any, index: any) => (
                 
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{get_users.uuid}</td>
-                  <td>{get_users.first}</td>
-                    <td>{get_users.middle}</td>
-                    <td>{get_users.last}</td>
-                    <td>{get_users.email}</td>
+                 
+                  <td>{get_customer.first_name}</td>
+                    <td>{get_customer.middle_name}</td>
+                    <td>{get_customer.last_name}</td>
+                    <td>{get_customer.email}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edituser?uuid=${get_users.uuid}`} className="link">
+                  <Link href={`/dashboard/edit_customer?id=${get_customer.id}`} className="link">
   <Pencil className="text-warning" /> Edit
 </Link>
 

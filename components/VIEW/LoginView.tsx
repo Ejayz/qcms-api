@@ -39,7 +39,14 @@ export default function LoginView() {
       toast.error("Invalid email or password");
       //toast.error(error?.message || "An unknown error occurred");
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Save the user's role in localStorage
+      const userRole = data.user.user_metadata?.role; 
+      localStorage.setItem("userRole", userRole);
+
+      const userid=data.user.id;
+      localStorage.setItem("userid", userid);
+    
       toast.success("Login Successful");
       route.push("/dashboard");
     },

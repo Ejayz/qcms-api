@@ -16,8 +16,6 @@ export default function AddOrderList() {
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
-    AssigneeName: Yup.string().required("Assignee Name is required"),
-    
   });
 
   const AddOrderMutation = useMutation({
@@ -31,7 +29,7 @@ export default function AddOrderList() {
       });
       return response.json();
     },
-    onError: (error) => { 
+    onError: (error) => {
       toast.error("Failed to add order");
       console.error(error);
     },
@@ -54,7 +52,7 @@ export default function AddOrderList() {
         const response = await fetch(`/api/v1/get_customer?page=1&limit=10`); // Adjust endpoint URL
         const data = await response.json();
         if (response.ok) {
-          const options = data.map((customer:any) => ({
+          const options = data.map((customer: any) => ({
             value: customer.id,
             label: `${customer.first_name} ${customer.last_name}`,
           }));
@@ -72,7 +70,6 @@ export default function AddOrderList() {
     fetchCustomers();
   }, []);
 
-
   const [articles, setarticles] = useState([]);
 
   useEffect(() => {
@@ -81,7 +78,7 @@ export default function AddOrderList() {
         const response = await fetch(`/api/v1/get_article?page=1&limit=10`); // Adjust endpoint URL
         const data = await response.json();
         if (response.ok) {
-          const options = data.map((article:any) => ({
+          const options = data.map((article: any) => ({
             value: article.id,
             label: `${article.article_name}`,
           }));
@@ -99,35 +96,9 @@ export default function AddOrderList() {
     fetchArticle();
   }, []);
 
-  const [assignees, setassignees] = useState([]);
-
-  useEffect(() => {
-    const fetchAssignee = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_user_select?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((assignees:any) => ({
-            value: assignees.uuid,
-            label: `${assignees.first_name} ${assignees.last_name}`,
-          }));
-          setassignees(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAssignee();
-  }, []);
-
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
-       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
+      <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/dashboard/order_management">Order Management</Link>
@@ -160,47 +131,34 @@ export default function AddOrderList() {
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-2 gap-6 w-full">
-                <div>
-      <FormSelect
-        tooltip="Select the customer's name from the dropdown"
-        name="CustomerName"
-        placeholder="Choose a customer"
-        label="Customer Name"
-        options={customers}
-        errors={error ? error : ""}
-        touched="true" // Adjust as needed
-      />
-      {isLoading && <p>Loading customers...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-    </div>
-    <div>
-      <FormSelect
-        tooltip="Select the article's name from the dropdown"
-        name="ArticleName"
-        placeholder="Choose a Article"
-        label="Article Name"
-        options={articles}
-        errors={error ? error : ""}
-        touched="true" // Adjust as needed
-      />
-      {isLoading && <p>Loading article...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-    </div>
+                  <div>
+                    <FormSelect
+                      tooltip="Select the customer's name from the dropdown"
+                      name="CustomerName"
+                      placeholder="Choose a customer"
+                      label="Customer Name"
+                      options={customers}
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                    />
+                    {isLoading && <p>Loading customers...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                  </div>
+                  <div>
+                    <FormSelect
+                      tooltip="Select the article's name from the dropdown"
+                      name="ArticleName"
+                      placeholder="Choose a Article"
+                      label="Article Name"
+                      options={articles}
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                    />
+                    {isLoading && <p>Loading article...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                  </div>
 
-    <div>
-      <FormSelect
-        tooltip="Select the assignee's name from the dropdown"
-        name="AssigneeName"
-        placeholder="Choose a Assignee"
-        label="Assignee Name"
-        options={assignees}
-        errors={error ? error : ""}
-        touched="true" // Adjust as needed
-      />
-      {isLoading && <p>Loading assignee...</p>}
-      {error && <p className="text-red-500">{error}</p>}
-    </div>
-    <div>
+                  <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
@@ -235,10 +193,8 @@ export default function AddOrderList() {
                       </span>
                     ) : null}
                   </div>
-                
-                
-              </div>
                 </div>
+              </div>
             </div>
             <div className="modal-action p-6">
               <button
@@ -258,7 +214,10 @@ export default function AddOrderList() {
                   </>
                 )}
               </button>
-              <Link className="btn btn-ghost btn-md " href="/dashboard/order_management">
+              <Link
+                className="btn btn-ghost btn-md "
+                href="/dashboard/order_management"
+              >
                 BACK
               </Link>
             </div>
