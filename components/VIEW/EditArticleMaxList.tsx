@@ -329,7 +329,7 @@ export default function AddOrderList() {
               </button>
               <Link
                 className="btn btn-ghost btn-md "
-                href="/dashboard/article__max_management"
+                href="/dashboard/article_max_management"
               >
                 BACK
               </Link>

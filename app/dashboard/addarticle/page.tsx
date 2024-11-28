@@ -9,6 +9,7 @@
 import AddArticleList from "@/components/VIEW/AddArticleList";
 export default function AddArticle() {
   return (
+    
     <AddArticleList></AddArticleList>
   );
 }

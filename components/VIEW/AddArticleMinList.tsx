@@ -1,5 +1,5 @@
 "use client";
-
+import React, { Suspense } from 'react';
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";

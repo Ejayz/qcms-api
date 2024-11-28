@@ -2,16 +2,14 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
+import { CircleHelp, Plus,} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
-import Order from "@/app/dashboard/laboratory_management/page";
-import AddOrder from "@/app/dashboard/addorder/page";
-export default function AddOrderList() {
+export default function AddArticleList() {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
@@ -25,7 +23,7 @@ export default function AddOrderList() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  const Add_Order_Validator = Yup.object().shape({
+  const Add_Article_Validator = Yup.object().shape({
     ArticleNominal: Yup.string().required("Article Nominal is required"),
     ArticleMin: Yup.string().required("Article Min is required"),
     ArticleMax: Yup.string().required("Article Max is required"),
@@ -40,38 +38,8 @@ export default function AddOrderList() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const {
-    data: userData,
-    isLoading: isUserLoading,
-    isSuccess,
-    isError,
-    error: userError,
-  } = useQuery({
-    queryKey: ["customer", id],
-    queryFn: async () => {
-      const response = await fetch(`/api/v1/getoneproofing/?id=${id}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user data: ${response.status}`);
-      }
-      return response.json(); // Expecting an array
-    },
-    enabled: !!id, // Only fetch data if id exists
-  });
-  console.log("Gatherd data:",userData);
-  useEffect(() => {
-    if (isSuccess && userData && userData.length > 0) {
-      const user = userData[0]; // Get the first user object
-      setInitialValues((prev) => ({
-        ...prev,
-        ArticleNominal: user.article_nominal,
-        ArticleMin: user.article_min,
-        ArticleMax: user.article_max,
-        NumberControl: user.number_control,
-      }));
-    }
-  }, [isSuccess, userData]);
 
-  const AddOrderMutation = useMutation({
+  const AddArticleMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/v1/create_article", {
         method: "POST",
@@ -83,11 +51,11 @@ export default function AddOrderList() {
       return response.json();
     },
     onError: (error) => {
-      toast.error("Failed to add order");
+      toast.error("Failed to add article");
       console.error(error);
     },
     onSuccess: (data) => {
-      toast.success("Proofing Added Successfully");
+      toast.success("Article Added Successfully");
       navigator.push("/dashboard/article_management");
     },
     onMutate: (data) => {
@@ -107,16 +75,16 @@ export default function AddOrderList() {
         const response = await fetch(`/api/v1/get_article_nominal?page=1&limit=10`); // Adjust endpoint URL
         const data = await response.json();
         if (response.ok) {
-          const options = data.map((order: any) => ({
-            value: order.id,
-            label: `${order.id}`,
+          const options = data.map((nominal: any) => ({
+            value: nominal.id,
+            label: `${nominal.id}`,
           }));
           setarticlenominal(options);
         } else {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch Order.");
+        setError("Failed to fetch Nominal.");
       } finally {
         setIsLoading(false);
       }
@@ -131,16 +99,16 @@ export default function AddOrderList() {
         const response = await fetch(`/api/v1/get_article_min?page=1&limit=10`); // Adjust endpoint URL
         const data = await response.json();
         if (response.ok) {
-          const options = data.map((order: any) => ({
-            value: order.id,
-            label: `${order.id}`,
+          const options = data.map((min: any) => ({
+            value: min.id,
+            label: `${min.id}`,
           }));
           setarticlemin(options);
         } else {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch Order.");
+        setError("Failed to fetch Min.");
       } finally {
         setIsLoading(false);
       }
@@ -156,16 +124,16 @@ export default function AddOrderList() {
         const response = await fetch(`/api/v1/get_article_max?page=1&limit=10`); // Adjust endpoint URL
         const data = await response.json();
         if (response.ok) {
-          const options = data.map((order: any) => ({
-            value: order.id,
-            label: `${order.id}`,
+          const options = data.map((max: any) => ({
+            value: max.id,
+            label: `${max.id}`,
           }));
           setarticlemax(options);
         } else {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch Order.");
+        setError("Failed to fetch Max.");
       } finally {
         setIsLoading(false);
       }
@@ -188,10 +156,10 @@ export default function AddOrderList() {
       </div>
       <Formik
         initialValues={initialValues}
-        validationSchema={Add_Order_Validator}
+        validationSchema={Add_Article_Validator}
         enableReinitialize={true}
         onSubmit={async (e, actions) => {
-          AddOrderMutation.mutate({
+          AddArticleMutation.mutate({
             article_nominal: e.ArticleNominal,
             article_min: e.ArticleMin,
             article_max: e.ArticleMax,
@@ -204,7 +172,7 @@ export default function AddOrderList() {
           <Form>
             <div className="flex flex-col gap-y-6">
               <div className="border p-12 rounded-md bg-white">
-                <h1 className="text-xl font-bold py-4">Order Details</h1>
+                <h1 className="text-xl font-bold py-4">Article Details</h1>
                 <div className="grid grid-cols-3 gap-6 w-full">
                  
                   <div>
@@ -267,8 +235,8 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
+                        type="number"
+                        placeholder="Enter Number Of Control"
                         name="NumberControl"
                         className={`input input-bordered w-full max-w-md ${
                           errors.NumberControl && touched.NumberControl
@@ -291,13 +259,13 @@ export default function AddOrderList() {
               <button
                 type="submit"
                 className={`btn btn-outline ${
-                  AddOrderMutation.isPending ? "btn-disabled" : "btn-primary"
+                  AddArticleMutation.isPending ? "btn-disabled" : "btn-primary"
                 } btn-md`}
               >
-                {AddOrderMutation.isPending ? (
+                {AddArticleMutation.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
+                    Adding Article...
                   </>
                 ) : (
                   <>

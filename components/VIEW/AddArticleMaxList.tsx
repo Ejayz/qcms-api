@@ -7,11 +7,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
-import Order from "@/app/dashboard/laboratory_management/page";
-import AddOrder from "@/app/dashboard/addorder/page";
-export default function AddOrderList() {
+export default function AddArticleMaxList() {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
@@ -25,7 +22,7 @@ export default function AddOrderList() {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
 
-  const Add_Order_Validator = Yup.object().shape({
+  const Add_ArticleMax_Validator = Yup.object().shape({
     length: Yup.string().required("Length is required"),
     inside_diameter: Yup.string().required("Inside Diameter is required"),
     outside_diameter: Yup.string().required("Outside Diameter is required"),
@@ -40,11 +37,8 @@ export default function AddOrderList() {
     flat_crush: "",
     h20: "",
   });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
- 
 
-  const AddOrderMutation = useMutation({
+  const AddArticleMaxMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/v1/create_article_max", {
         method: "POST",
@@ -56,11 +50,11 @@ export default function AddOrderList() {
       return response.json();
     },
     onError: (error) => {
-      toast.error("Failed to add order");
+      toast.error("Failed to add article max");
       console.error(error);
     },
     onSuccess: (data) => {
-      toast.success("Proofing Added Successfully");
+      toast.success("Article Max Added Successfully");
       navigator.push("/dashboard/article_max_management");
     },
     onMutate: (data) => {
@@ -83,10 +77,10 @@ export default function AddOrderList() {
       </div>
       <Formik
         initialValues={initialValues}
-        validationSchema={Add_Order_Validator}
+        validationSchema={Add_ArticleMax_Validator}
         enableReinitialize={true}
         onSubmit={async (e, actions) => {
-          AddOrderMutation.mutate({
+          AddArticleMaxMutation.mutate({
             length: e.length,
             inside_diameter: e.inside_diameter,
             outside_diameter: e.outside_diameter,
@@ -120,8 +114,8 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
-                        placeholder="Length"
+                        type="number"
+                        placeholder="Enter the Length"
                         name="length"
                         className={`input input-bordered w-full max-w-md ${
                           errors.length && touched.length ? "input-error" : ""
@@ -154,8 +148,8 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
-                        placeholder="Inside Diameter"
+                        type="number"
+                        placeholder="Enter the Inside Diameter"
                         name="inside_diameter"
                         className={`input input-bordered w-full max-w-md ${
                           errors.inside_diameter && touched.inside_diameter
@@ -190,8 +184,8 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
-                        placeholder="Outside Diameter"
+                        type="number"
+                        placeholder="Enter the Outside Diameter"
                         name="outside_diameter"
                         className={`input input-bordered w-full max-w-md ${
                           errors.outside_diameter && touched.outside_diameter
@@ -226,8 +220,8 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
-                        placeholder="Flat Crush"
+                        type="number"
+                        placeholder="Enter the Flat Crush"
                         name="flat_crush"
                         className={`input input-bordered w-full max-w-md ${
                           errors.flat_crush && touched.flat_crush
@@ -262,8 +256,8 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
-                        placeholder="H20"
+                        type="number"
+                        placeholder="Enter the H20"
                         name="h20"
                         className={`input input-bordered w-full max-w-md ${
                           errors.h20 && touched.h20 ? "input-error" : ""
@@ -284,13 +278,13 @@ export default function AddOrderList() {
               <button
                 type="submit"
                 className={`btn btn-outline ${
-                  AddOrderMutation.isPending ? "btn-disabled" : "btn-primary"
+                  AddArticleMaxMutation.isPending ? "btn-disabled" : "btn-primary"
                 } btn-md`}
               >
-                {AddOrderMutation.isPending ? (
+                {AddArticleMaxMutation.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
+                    Adding Article Max...
                   </>
                 ) : (
                   <>

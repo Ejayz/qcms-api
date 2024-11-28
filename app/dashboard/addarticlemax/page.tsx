@@ -6,7 +6,7 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import AddArticleMaxList from "@/components/VIEW/ArticleMaxListView";
+import AddArticleMaxList from "@/components/VIEW/AddArticleMaxList";
 export default function AddArticleNominal() {
   return (
     <AddArticleMaxList></AddArticleMaxList>
