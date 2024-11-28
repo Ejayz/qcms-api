@@ -11,7 +11,7 @@ import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
 import Order from "@/app/dashboard/laboratory_management/page";
 import AddOrder from "@/app/dashboard/addorder/page";
-export default function AddOrderList() {
+export default function AddArticleMinList() {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
