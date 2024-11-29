@@ -15,14 +15,13 @@ export default function AddOrderList() {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
-    const userid=localStorage.getItem("userid");
+    const userid = localStorage.getItem("userid");
     setuserid(userid);
   }, []);
 
-  console.log("the current user:",userid);
-  
-  const router = useRouter();
+  console.log("the current user:", userid);
 
+  const router = useRouter();
 
   const Add_Order_Validator = Yup.object().shape({
     order_id: Yup.string().required("Order ID is required"),
@@ -63,7 +62,7 @@ export default function AddOrderList() {
 
     fetchorder();
   }, []);
-  
+
   const AddOrderMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/v1/create_measurement", {
@@ -88,13 +87,14 @@ export default function AddOrderList() {
     },
   });
 
-  
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/article_max_management">Measurement Management</Link>
+            <Link href="/dashboard/article_max_management">
+              Measurement Management
+            </Link>
           </li>
           <li>
             <span>Add Measurement</span>
@@ -117,16 +117,16 @@ export default function AddOrderList() {
         enableReinitialize={true}
         onSubmit={async (e, actions) => {
           AddOrderMutation.mutate({
-            order_id:e.order_id,
+            order_id: e.order_id,
             length: e.lengths,
             inside_diameter: e.inside_diameter,
-            outside_diameter:e.outside_diameter,
-            flat_crush:e.flat_crush,
-            h20:e.h20,
-            radial:e.radial,
-            number_control:e.number_control,
-            remarks:e.remarks,
-            user_id:userid,
+            outside_diameter: e.outside_diameter,
+            flat_crush: e.flat_crush,
+            h20: e.h20,
+            radial: e.radial,
+            number_control: e.number_control,
+            remarks: e.remarks,
+            user_id: userid,
           });
         }}
       >
@@ -136,7 +136,7 @@ export default function AddOrderList() {
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-3 gap-6 w-full">
-                <div>
+                  <div>
                     <FormSelect
                       tooltip="Select the order's ID from the dropdown"
                       name="order_id"
@@ -187,7 +187,7 @@ export default function AddOrderList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Inside Diameter
+                          Inside Diameter(mm)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Inside Diameter Field. This is required."
@@ -223,7 +223,7 @@ export default function AddOrderList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Outside Diameter
+                          Outside Diameter (mm)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Outside Diameter Field. This is required."
@@ -259,7 +259,7 @@ export default function AddOrderList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Flat Crush
+                          Flat Crush (kN)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Flat Crush Field. This is required."
@@ -295,7 +295,7 @@ export default function AddOrderList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          H20
+                          H20 (%)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="H20 Field. This is required."
@@ -392,23 +392,21 @@ export default function AddOrderList() {
                         {errors.number_control}
                       </span>
                     ) : null}
-                    </div>
+                  </div>
 
-                    <div>
-                      <FormTextArea
-      name="remarks"
-      placeholder="Remarks"
-      tooltip="Remarks Field. This is required."
-      label="Remarks"
-      errors={errors.remarks}
-      touched={touched.remarks ? "true" : undefined}
-      readonly={false} // Optional, based on your logic
-    />
-</div>
+                  <div>
+                    <FormTextArea
+                      name="remarks"
+                      placeholder="Remarks"
+                      tooltip="Remarks Field. This is required."
+                      label="Remarks"
+                      errors={errors.remarks}
+                      touched={touched.remarks ? "true" : undefined}
+                      readonly={false} // Optional, based on your logic
+                    />
+                  </div>
+                </div>
               </div>
-
-              </div>
-              
             </div>
             <div className="modal-action p-6">
               <button
@@ -420,7 +418,7 @@ export default function AddOrderList() {
                 {AddOrderMutation.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
+                    Adding Measurement
                   </>
                 ) : (
                   <>

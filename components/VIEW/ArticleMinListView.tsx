@@ -43,7 +43,7 @@ export default function UserListView() {
           <li>
             <Link href="/"> </Link>
           </li>
-          <li>  
+          <li>
             <span>Article Min Management</span>
           </li>
         </ul>
@@ -103,21 +103,21 @@ export default function UserListView() {
               </tr>
             ) : data.length > 0 ? (
               data?.map((get_users: any, index: any) => (
-                
                 <tr key={index}>
                   <th>{index + 1}</th>
                   {/* <td className="text-xs">{get_users.id}</td> */}
                   <td>{get_users.length}</td>
-                  <td>{`${get_users.inside_diameter}`}</td>
-                  <td>{get_users.outside_diameter}</td>
-                  <td>{get_users.flat_crush}</td>
-                  <td>{get_users.h20}</td>
+                  <td>{`${get_users.inside_diameter} mm`}</td>
+                  <td>{get_users.outside_diameter} mm</td>
+                  <td>{get_users.flat_crush} kN</td>
+                  <td>{get_users.h20} %</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edit_article_min?id=${get_users.id}`} className="link">
-  <Pencil className="text-warning" /> Edit
-</Link>
-
-
+                    <Link
+                      href={`/dashboard/edit_article_min?id=${get_users.id}`}
+                      className="link"
+                    >
+                      <Pencil className="text-warning" /> Edit
+                    </Link>
                   </td>
                 </tr>
               ))

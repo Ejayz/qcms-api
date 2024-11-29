@@ -134,7 +134,7 @@ export default function AddArticleMaxList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Inside Diameter
+                          Inside Diameter (mm)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Inside Diameter Field. This is required."
@@ -170,7 +170,7 @@ export default function AddArticleMaxList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Outside Diameter
+                          Outside Diameter (mm)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Outside Diameter Field. This is required."
@@ -206,7 +206,7 @@ export default function AddArticleMaxList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Flat Crush
+                          Flat Crush (kN)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="Flat Crush Field. This is required."
@@ -242,7 +242,7 @@ export default function AddArticleMaxList() {
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
                         <span className="label-text font-bold gap-x-2 flex flex-row">
-                          H20
+                          H20 (%)
                           <span
                             className="tooltip tooltip-right"
                             data-tip="H20 Field. This is required."

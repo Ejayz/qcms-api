@@ -110,10 +110,10 @@ export default function UserListView() {
                 <tr key={index}>
                   <th>{index + 1}</th>
                   {/* <td className="text-xs">{get_users.id}</td> */}
-                  <td>{get_users.length}</td>
-                  <td>{`${get_users.inside_diameter}`}</td>
-                  <td>{get_users.outside_diameter}</td>
-                  <td>{get_users.flat_crush}</td>
+                  <td>{get_users.length} mm</td>
+                  <td>{`${get_users.inside_diameter} mm`}</td>
+                  <td>{get_users.outside_diameter} mm</td>
+                  <td>{get_users.flat_crush} kN</td>
                   <td>{get_users.h20}</td>
                   <td>{get_users.radial}</td>
                   <td>{get_users.number_control}</td>

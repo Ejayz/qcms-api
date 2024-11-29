@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("tbl_orders_form")
-    .select("*")
+    .select("* ,tbl_customer(*),tbl_article(*)")
     .eq("is_exist", true)
     
     .order("created_at", { ascending: false })

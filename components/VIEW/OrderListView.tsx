@@ -12,7 +12,12 @@ export default function OrderListView() {
   const [search, setSearch] = useState("");
 
   // Fetch orders
-  const { data: ordersData, isFetching, isLoading, isError } = useQuery({
+  const {
+    data: ordersData,
+    isFetching,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["get_order", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
@@ -110,6 +115,7 @@ export default function OrderListView() {
           <thead>
             <tr>
               <th></th>
+              <th>Order ID</th>
               <th>Customer Name</th>
               <th>Article Name</th>
               <th>Pallete Count</th>
@@ -133,8 +139,14 @@ export default function OrderListView() {
               ordersWithCustomerNames.map((order: any, index: number) => (
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{order.customer_id}</td>
-                  <td>{order.article_id}</td>
+                  <td className="text-xs">{order.id}</td>
+                  <td className="text-xs">
+                    {order.tbl_customer.last_name}{" "}
+                    {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "}
+                    , {order.tbl_customer.first_name}{" "}
+                    {order.tbl_customer.middle_name}
+                  </td>
+                  <td>{order.tbl_article.article_name}</td>
                   <td>{order.pallete_count}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
