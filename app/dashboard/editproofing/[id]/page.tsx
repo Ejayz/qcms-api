@@ -5,11 +5,11 @@
 // import UserListView from "@/components/VIEW/UserListView";
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
-
-import EditOrderList from "@/components/VIEW/EditOrderList";
-export default function EditOrder() {
+"use client";
+import EditProofingList from "@/components/VIEW/EditProofingList";
+export default function EditProofing({params}: {params:any}) {
   return (
-    <EditOrderList></EditOrderList>
+    <EditProofingList params={params.id}></EditProofingList>
   );
 }
 

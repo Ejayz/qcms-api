@@ -2,13 +2,21 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
+import {
+  CircleCheckBig,
+  CircleHelp,
+  Pencil,
+  Plus,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-export default function AddProductioList() {
+export default function AddProductioList(params: any) {
   const navigator = useRouter();
+
+  const id = params.params;
 
   const Add_Site_Validator = Yup.object().shape({
     site_name: Yup.string().required("Site Name is required"),
@@ -31,7 +39,7 @@ export default function AddProductioList() {
       });
       return response.json();
     },
-    onError: (error) => { 
+    onError: (error) => {
       toast.error("Failed to add site");
     },
     onSuccess: (data) => {
@@ -45,10 +53,12 @@ export default function AddProductioList() {
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
-       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
+      <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashbaord/production_management">Production Management</Link>
+            <Link href="/dashbaord/production_management">
+              Production Management
+            </Link>
           </li>
           <li>
             <span>Edit Production</span>
@@ -115,7 +125,7 @@ export default function AddProductioList() {
                       </span>
                     ) : null}
                   </div>
-                
+
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
@@ -223,7 +233,7 @@ export default function AddProductioList() {
                       </span>
                     ) : null}
                   </div>
-                
+
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
@@ -259,10 +269,8 @@ export default function AddProductioList() {
                       </span>
                     ) : null}
                   </div>
-                
                 </div>
               </div>
-            
             </div>
             <div className="modal-action p-6">
               <button
@@ -282,7 +290,10 @@ export default function AddProductioList() {
                   </>
                 )}
               </button>
-              <Link className="btn btn-ghost btn-md " href="/dashboard/production_management">
+              <Link
+                className="btn btn-ghost btn-md "
+                href="/dashboard/production_management"
+              >
                 BACK
               </Link>
             </div>

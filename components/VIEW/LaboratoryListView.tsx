@@ -113,7 +113,7 @@ export default function LaboratoryListView() {
                   <td>{site.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/editorder`}
+                      href={`/dashboard/editorder/${site.id}`}
                       className="flex flex-row gap-x-2 link"
                     >
                       {/* /${site.site_id} */}

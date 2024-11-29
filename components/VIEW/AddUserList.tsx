@@ -67,7 +67,7 @@
     
 
     return (
-      <div className="flex flex-col w-11/12 mx-auto text-black">
+      <div className="flex flex-col w-11/12 mx-auto bg-white text-black">
         <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
           <ul>
             <li>
@@ -99,7 +99,7 @@
               role: e.role,
               email: e.email,
               password: e.password,
-              // confirmpassword: e.confirmpassword,
+              confirmpassword: e.confirmpassword,
             });
           }}
         >
@@ -219,38 +219,24 @@
 
                     <div>
                       <label className="form-control w-96 max-w-lg">
-                        <div className="label">
-                          <span className="label-text font-bold gap-x-2 flex flex-row">
-                              Suffix
-                            <span
-                              className="tooltip tooltip-right"
-                              data-tip="Input of the Suffix. This is required."
-                            >
-                              <CircleHelp
-                                className=" my-auto"
-                                size={20}
-                                strokeWidth={0.75}
-                              />
-                            </span>
-                          </span>
-                        </div>
-                        <Field
-                          type="text"
-                          placeholder=""
-                          name="suffix"
-                          className={`input input-bordered w-full max-w-md ${
-                            errors.suffix && touched.suffix
-                              ? "input-error"
-                              : ""
-                          }`}
-                        />
+                        <FormSelect
+        
+        tooltip="Select the Suffix name from the dropdown"
+        name="suffix"
+        placeholder="Choose a Suffix"
+        label="Suffix Name"
+        options={[
+          { value: "Jr", label: "Jr" },
+          { value: "Sr", label: "Sr" },
+          { value: "II", label: "II" },
+          { value: "III", label: "III" },
+          { value: "IV", label: "IV" },
+          { value: "N/A", label: "N/A" },
+        ]}
+        errors={errors.role ? errors.role : ""}
+        touched={touched.role ? "true" : ""}
+      />
                       </label>
-
-                      {errors.suffix && touched.suffix ? (
-                        <span className="text-error  flex flex-row">
-                          {errors.suffix}
-                        </span>
-                      ) : null}
                     </div>
 
                     <div>
