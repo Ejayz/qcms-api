@@ -112,7 +112,7 @@ export default function ProductionListView() {
                   <td>{site.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/editproduction`}
+                      href={`/dashboard/editproduction/${site.id}`}
                       className="flex flex-row gap-x-2 link"
                     >
                       {/* /${site.site_id} */}

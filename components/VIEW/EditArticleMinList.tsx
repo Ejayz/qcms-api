@@ -2,27 +2,32 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
+import {
+  CircleCheckBig,
+  CircleHelp,
+  Pencil,
+  Plus,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
 import Order from "@/app/dashboard/laboratory_management/page";
-export default function AddOrderList() {
+export default function AddOrderList(params: any) {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
-    const userid=localStorage.getItem("userid");
+    const userid = localStorage.getItem("userid");
     setuserid(userid);
   }, []);
 
-  console.log("the current user:",userid);
-  
+  console.log("the current user:", userid);
+
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const id = params.params;
 
   const [initialValues, setInitialValues] = useState({
     length: "",
@@ -50,7 +55,7 @@ export default function AddOrderList() {
     },
     enabled: !!id, // Only fetch data if id exists
   });
-  console.log("Gatherd data:",userData);
+  console.log("Gatherd data:", userData);
   useEffect(() => {
     if (isSuccess && userData && userData.length > 0) {
       const user = userData[0]; // Get the first user object
@@ -78,12 +83,11 @@ export default function AddOrderList() {
           outside_diameter: data.outside_diameter,
           flat_crush: data.flat_crush,
           h20: data.h20,
-                    
         }),
       });
       return response.json();
     },
-    onError: (error) => { 
+    onError: (error) => {
       toast.error("Failed to add site");
     },
     onSuccess: (data) => {
@@ -95,7 +99,6 @@ export default function AddOrderList() {
     },
   });
 
-
   const Add_Order_Validator = Yup.object().shape({
     length: Yup.string().required("Length is required"),
     inside_diameter: Yup.string().required("Inside Diameter is required"),
@@ -104,13 +107,14 @@ export default function AddOrderList() {
     h20: Yup.string().required("H20 is required"),
   });
 
-  
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/article_min_management">Article Min Management</Link>
+            <Link href="/dashboard/article_min_management">
+              Article Min Management
+            </Link>
           </li>
           <li>
             <span>Edit Article Min</span>

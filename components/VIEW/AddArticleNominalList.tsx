@@ -1,29 +1,28 @@
 "use client";
-import React, { Suspense } from 'react';
+import React, { Suspense } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
 import Order from "@/app/dashboard/laboratory_management/page";
 import AddOrder from "@/app/dashboard/addorder/page";
-export default function AddOrderList() {
+export default function AddOrderList(params: any) {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
-    const userid=localStorage.getItem("userid");
+    const userid = localStorage.getItem("userid");
     setuserid(userid);
   }, []);
 
-  console.log("the current user:",userid);
-  
+  console.log("the current user:", userid);
+
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const id = params.params;
 
   const Add_Order_Validator = Yup.object().shape({
     length: Yup.string().required("Length is required"),
@@ -59,7 +58,7 @@ export default function AddOrderList() {
     },
     enabled: !!id, // Only fetch data if id exists
   });
-  console.log("Gatherd data:",userData);
+  console.log("Gatherd data:", userData);
   useEffect(() => {
     if (isSuccess && userData && userData.length > 0) {
       const user = userData[0]; // Get the first user object
@@ -98,13 +97,14 @@ export default function AddOrderList() {
     },
   });
 
-  
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/article_nominal_management">Article Nominal Management</Link>
+            <Link href="/dashboard/article_nominal_management">
+              Article Nominal Management
+            </Link>
           </li>
           <li>
             <span>Add Article Nominal</span>

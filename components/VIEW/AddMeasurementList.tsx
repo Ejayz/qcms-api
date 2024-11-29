@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect, FormTextArea } from "../UI/FormInput";
@@ -22,8 +22,7 @@ export default function AddOrderList() {
   console.log("the current user:",userid);
   
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+
 
   const Add_Order_Validator = Yup.object().shape({
     order_id: Yup.string().required("Order ID is required"),

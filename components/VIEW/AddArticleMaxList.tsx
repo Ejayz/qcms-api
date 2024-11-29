@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { useState, useEffect, use } from "react";
@@ -19,8 +19,8 @@ export default function AddArticleMaxList() {
   console.log("the current user:",userid);
   
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  
+
 
   const Add_ArticleMax_Validator = Yup.object().shape({
     length: Yup.string().required("Length is required"),

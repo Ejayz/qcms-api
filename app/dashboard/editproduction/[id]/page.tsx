@@ -6,10 +6,10 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import EditProofingList from "@/components/VIEW/EditProofingList";
-export default function EditProofing() {
+import EditProductionList from "@/components/VIEW/EditProductionList";
+export default function EditProduction({params}: {params:any}) {
   return (
-    <EditProofingList></EditProofingList>
+    <EditProductionList params={params.id}></EditProductionList>
   );
 }
 

@@ -138,7 +138,7 @@ export default function OrderListView() {
                   <td>{order.pallete_count}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/editorder?id=${order.id}`}
+                      href={`/dashboard/editorder/${order.id}`}
                       className="flex flex-row gap-x-2 link"
                     >
                       <Pencil className="text-warning" /> Edit

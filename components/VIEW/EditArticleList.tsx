@@ -2,33 +2,38 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
+import {
+  CircleCheckBig,
+  CircleHelp,
+  Pencil,
+  Plus,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
 import Order from "@/app/dashboard/laboratory_management/page";
-export default function AddOrderList() {
+export default function AddOrderList(params: any) {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
-    const userid=localStorage.getItem("userid");
+    const userid = localStorage.getItem("userid");
     setuserid(userid);
   }, []);
 
-  console.log("the current user:",userid);
-  
+  console.log("the current user:", userid);
+
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  const id = params.params;
 
   const [initialValues, setInitialValues] = useState({
-    ArticleNominal:"",
-    ArticleMin:"",
-    ArticleMax:"",
-    NumberControl:"",
+    ArticleNominal: "",
+    ArticleMin: "",
+    ArticleMax: "",
+    NumberControl: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +54,7 @@ export default function AddOrderList() {
     },
     enabled: !!id, // Only fetch data if id exists
   });
-  console.log("Gatherd data:",userData);
+  console.log("Gatherd data:", userData);
   useEffect(() => {
     if (isSuccess && userData && userData.length > 0) {
       const user = userData[0]; // Get the first user object
@@ -75,12 +80,11 @@ export default function AddOrderList() {
           article_min: data.ArticleMin,
           article_max: data.ArticleMax,
           number_control: data.NumberControl,
-          
         }),
       });
       return response.json();
     },
-    onError: (error) => { 
+    onError: (error) => {
       toast.error("Failed to add site");
     },
     onSuccess: (data) => {
@@ -91,7 +95,6 @@ export default function AddOrderList() {
       return data;
     },
   });
-
 
   const Add_Order_Validator = Yup.object().shape({
     ArticleNominal: Yup.string().required("Article Nominal is required"),
@@ -107,7 +110,9 @@ export default function AddOrderList() {
   useEffect(() => {
     const fetcharticlenominal = async () => {
       try {
-        const response = await fetch(`/api/v1/get_article_nominal?page=1&limit=10`); // Adjust endpoint URL
+        const response = await fetch(
+          `/api/v1/get_article_nominal?page=1&limit=10`
+        ); // Adjust endpoint URL
         const data = await response.json();
         if (response.ok) {
           const options = data.map((order: any) => ({
@@ -150,8 +155,7 @@ export default function AddOrderList() {
     };
 
     fetcharticlemin();
-  }
-  , []);
+  }, []);
 
   useEffect(() => {
     const fetcharticlemax = async () => {
@@ -176,7 +180,7 @@ export default function AddOrderList() {
 
     fetcharticlemax();
   }, []);
-  
+
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
@@ -203,7 +207,6 @@ export default function AddOrderList() {
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-3 gap-6 w-full">
-                 
                   <div>
                     <FormSelect
                       tooltip="Select the article nominal's ID from the dropdown"

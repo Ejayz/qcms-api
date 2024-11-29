@@ -4,25 +4,24 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
 import Order from "@/app/dashboard/laboratory_management/page";
-export default function AddOrderList() {
+export default function AddOrderList(params:any) {
   const navigator = useRouter();
   const [userid, setuserid] = useState<string | null>(null);
   useEffect(() => {
     const userid=localStorage.getItem("userid");
     setuserid(userid);
   }, []);
-
+  const id=params.params;
   console.log("the current user:",userid);
   
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  
 
   const [initialValues, setInitialValues] = useState({
     length: "",

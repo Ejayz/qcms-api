@@ -6,10 +6,10 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import EditOrderList from "@/components/VIEW/EditOrderList";
-export default function EditOrder() {
+import AddArticleNominalList from "@/components/VIEW/AddArticleNominalList";
+export default function AddArticleNominal({params}: {params:any}) {
   return (
-    <EditOrderList></EditOrderList>
+    <AddArticleNominalList params={params.id}></AddArticleNominalList>
   );
 }
 

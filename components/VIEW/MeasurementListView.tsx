@@ -119,7 +119,7 @@ export default function UserListView() {
                   <td>{get_users.number_control}</td>
                   <td>{get_users.remarks}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edit_measurement?id=${get_users.id}`} className="link">
+                  <Link href={`/dashboard/edit_measurement/${get_users.id}`} className="link">
   <Pencil className="text-warning" /> Edit
 </Link>
 

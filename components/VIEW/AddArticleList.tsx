@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleHelp, Plus,} from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
@@ -20,8 +20,7 @@ export default function AddArticleList() {
   console.log("the current user:",userid);
   
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  
 
   const Add_Article_Validator = Yup.object().shape({
     ArticleNominal: Yup.string().required("Article Nominal is required"),

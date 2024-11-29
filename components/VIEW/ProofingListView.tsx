@@ -143,7 +143,7 @@ export default function ProofingListView() {
                   <td>{order.user_id}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
-                      href={`/dashboard/editproofing?id=${order.id}`}
+                      href={`/dashboard/editproofing/${order.id}`}
                       className="flex flex-row gap-x-2 link"
                     >
                       <Pencil className="text-warning" /> Edit

@@ -17,7 +17,7 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
 export default function IndexHeader({
