@@ -141,7 +141,23 @@ export default function IndexHeader({
         <div className="drawer-content flex flex-col ">
           {/* Navbar */}
 
-          <Toaster position="top-right" reverseOrder={false} />
+          <Toaster
+  position="top-center"
+  reverseOrder={false}
+  gutter={8}
+  containerClassName=""
+  containerStyle={{}}
+  toastOptions={{
+    // Define default options
+    className: '',
+    duration: 5010,
+    style: {
+      background: '#fff',
+      color: '#363636',
+    }
+  }}
+
+/>
 
           {/* Page content here */}
           {children}

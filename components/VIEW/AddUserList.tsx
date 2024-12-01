@@ -128,7 +128,7 @@
                         </div>
                         <Field
                           type="text"
-                          placeholder=""
+                          placeholder="Enter First Name"
                           name="firstname"
                           className={`input input-bordered w-full max-w-md ${
                             errors.firstname && touched.firstname
@@ -164,7 +164,7 @@
                         </div>
                         <Field
                           type="text"
-                          placeholder=""
+                          placeholder="Enter Middle Name"
                           name="middlename"
                           className={`input input-bordered w-full max-w-md ${
                             errors.middlename && touched.middlename
@@ -200,7 +200,7 @@
                         </div>
                         <Field
                           type="text"
-                          placeholder=""
+                          placeholder="Enter Last Name"
                           name="lastname"
                           className={`input input-bordered w-full max-w-md ${
                             errors.lastname && touched.lastname
@@ -277,6 +277,7 @@
                         </div>
                         <Field
                           type="text"
+                          placeholder="Enter Email"
                           name="email"
                           className={`input input-bordered w-full max-w-md ${
                             errors.email && touched.email
@@ -312,6 +313,7 @@
                         </div>
                         <Field
                           type="password"
+                          placeholder="Enter Password"
                           name="password"
                           className={`input input-bordered w-full max-w-md ${
                             errors.password && touched.password
@@ -346,6 +348,7 @@
       </div>
       <Field
         type="password"
+        placeholder="Enter Confirm Password"
         name="confirmpassword"
         className={`input input-bordered w-full max-w-md ${
           errors.confirmpassword && touched.confirmpassword

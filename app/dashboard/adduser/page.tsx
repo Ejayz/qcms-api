@@ -9,7 +9,7 @@
 import AddUserList from "@/components/VIEW/AddUserList";
 export default function AddOrder() {
   return (
-    <AddUserList></AddUserList>
+    <AddUserList/>
   );
 }
 

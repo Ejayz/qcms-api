@@ -17,7 +17,7 @@ export default function IndexWithoutHeader({
       <div className="drawer bg-red-700">
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col">
-          <Toaster position="top-right" reverseOrder={false} />
+          <Toaster position="top-center" reverseOrder={false} />
           {children}
         </div>
         <div className="drawer-side"></div>
