@@ -9,6 +9,10 @@ export async function GET(req: NextRequest) {
   console.log(page);
   console.log(limit);
   const supabase = await createClient();
+
+
+
+
   const { data, error } = await supabase
     .from("tbl_users")
     .select("uuid,email,first_name,middle_name,last_name,role,suffix")

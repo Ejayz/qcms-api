@@ -7,10 +7,17 @@ import * as Yup from "yup";
 import { useEffect, useState } from "react";
 import { CircleHelp, Pencil } from "lucide-react";
 import { FormSelect } from "../UI/FormInput";
+import { createClient } from "@/utils/supabase/client";
 
 export default function EditUserList(params: any) {
   const router = useRouter();
   const uuid = params.params;
+
+
+ 
+
+
+  console.log(uuid);
 
   const [initialValues, setInitialValues] = useState({
     firstname: "",
@@ -127,7 +134,8 @@ export default function EditUserList(params: any) {
     >
       {({ errors, touched, values }) => (
         <Form>
-          <div className="flex flex-col gap-y-6 bg-white">
+    
+          <div className="flex flex-col gap-y-6 bg-base-200">
             <div className="border p-12 rounded-md bg-white text-black">
               <h1 className="text-xl font-bold py-4">User Details</h1>
               <div className="grid grid-cols-3 gap-6 w-full">
