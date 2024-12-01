@@ -10,7 +10,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // Parse request body
-    const { email, first_name, middle_name, last_name, role, suffix } =
+    const { email, first_name, middle_name, last_name, role, suffix} =
       await req.json();
 
     // Check required fields
@@ -43,10 +43,10 @@ export async function PUT(req: NextRequest) {
         last_name,
         role,
         suffix,
+        
         updated_at: new Date(),
       })
       .eq("uuid", uuid);
-
     if (userUpdateError) {
       console.error("Supabase Update Error:", userUpdateError);
       return NextResponse.json(
