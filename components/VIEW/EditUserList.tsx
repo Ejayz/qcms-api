@@ -455,7 +455,7 @@ export default function EditUserList(params: any) {
       {/* Remove User Modal */}
       {isRemoveModalOpen && (
   <div className="modal modal-open">
-    <div className="modal-box w-11/12 max-w-5xl">
+    <div className="modal-box">
       <h3 className="text-lg font-bold">Confirm Removal</h3>
       <p>Are you sure you want to remove this user? This action cannot be undone.</p>
       <div className="modal-action">

@@ -30,15 +30,11 @@ export async function POST(req: NextRequest) {
       .from("tbl_customer")
       .insert([
         {
-          // customer_id: customer_id || null,
-          // article_id: article_id || null,
-          // assignee: assignee || null,
-          // pallete_count: pallete_count || 0, // Default to 0 if not provided
           first_name: first_name || null,
           last_name: last_name || null,
           email: email || null,
           middle_name: middle_name || null,
-          user_id: user_id || null,
+          user_id: user_id,
           is_exist: true, // Always true
         },
       ]);

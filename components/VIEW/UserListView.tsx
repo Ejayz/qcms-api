@@ -43,7 +43,7 @@ export default function UserListView() {
           <li>
             <Link href="/"> </Link>
           </li>
-          <li>  
+          <li>
             <span>User Management</span>
           </li>
         </ul>
@@ -102,28 +102,21 @@ export default function UserListView() {
               </tr>
             ) : data.length > 0 ? (
               data?.map((get_users: any, index: any) => (
-                
                 <tr key={index}>
                   <th>{index + 1}</th>
                   <td className="text-xs">{get_users.uuid}</td>
                   <td>{get_users.email}</td>
-                  <td>{`${get_users.last_name} ${get_users.suffix ? get_users.suffix : ""}, ${
-                    get_users.first_name
-                  } ${get_users.middle_name}`}</td>
+                  <td>{`${get_users.last_name} ${
+                    get_users.suffix ? get_users.suffix : ""
+                  }, ${get_users.first_name} ${get_users.middle_name}`}</td>
                   <td>{get_users.role}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edituser/${get_users.uuid}`} className="link">
-  <Pencil className="text-warning" /> Edit
-</Link>
-
-
-                  </td>
-                  <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edituser/${get_users.uuid}`} className="link">
-  <Trash2 className="text-error" /> Remove
-</Link>
-
-
+                    <Link
+                      href={`/dashboard/edituser/${get_users.uuid}`}
+                      className="link"
+                    >
+                      <Pencil className="text-warning" /> Edit
+                    </Link>
                   </td>
                 </tr>
               ))
@@ -150,13 +143,16 @@ export default function UserListView() {
           <button className="join-item btn">Page {page}</button>
           <button
             onClick={() => {
-              if (!isLoading && !isFetching && data?.length == limit) {
+              if (!isLoading && !isFetching && data?.length === limit) {
                 setPage(page + 1);
               }
             }}
             className={`join-item btn ${
-              data?.length != limit ? "disabled" : ""
+              !isLoading && !isFetching && data?.length < limit
+                ? "disabled"
+                : ""
             }`}
+            disabled={!isLoading && !isFetching && data?.length < limit}
           >
             »
           </button>
