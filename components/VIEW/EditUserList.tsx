@@ -11,7 +11,7 @@ import { FormSelect } from "../UI/FormInput";
 import Link from "next/link";
 
 export default function EditUserList(params: any) {
-  const router = useRouter();
+  const navigator = useRouter();
   const uuid = params.params;
 
   const [initialValues, setInitialValues] = useState({
@@ -73,14 +73,33 @@ export default function EditUserList(params: any) {
           suffix: data.suffix,
         }),
       });
-      return response.json();
+      const responseData = await response.json();
+  
+      // Return status and response data
+      return {
+        status: response.status,
+        data: responseData,
+      };
     },
     onError: (error) => {
       toast.error("Failed to edit user");
     },
-    onSuccess: (data) => {
-      toast.success("User edited successfully");
-      router.push("/dashboard/user_management");
+    onSuccess: ({ status, data }) => {
+      if (status === 200) {
+        // Handle success for user creation
+        toast.success("User editted successfully");
+  
+        // Delay navigation by 2 seconds (2000 milliseconds)
+        setTimeout(() => {
+          navigator.push("/dashboard/user_management");
+        }, 2000);
+      } else if (status === 409) {
+        // Handle conflict (e.g., user already exists)
+        toast.error("The email is currently used. Please use a different email and try again.");
+      } else {
+        // Handle other non-success statuses
+        toast.error("An unexpected error occur  red. Please try again.");
+      }
     },
     onMutate: (data) => {
       return data;
@@ -110,20 +129,32 @@ export default function EditUserList(params: any) {
     },
     onSuccess: (data) => {
       toast.success("User removed successfully");
-      router.push("/dashboard/user_management");
+      navigator.push("/dashboard/user_management");
     },
   });
   
   
 
   const Add_User_Validator = Yup.object().shape({
-    firstname: Yup.string().required("First Name is required"),
-    middlename: Yup.string().required("Middle Name is required"),
-    lastname: Yup.string().required("Last Name is required"),
-    suffix: Yup.string().required("Suffix is required"),
-    role: Yup.string().required("Role is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-  });
+    firstname: Yup.string()
+        .required("First Name is required")
+        .matches(/^[a-zA-Z ]*$/, 'First Name cannot contain special characters or any numbers'), // Regex for no special characters
+    
+      middlename: Yup.string()
+        .required("Middle Name is required")
+        .matches(/^[a-zA-Z ]*$/, 'Middle Name cannot contain special characters'), // Regex for no special characters
+    
+      lastname: Yup.string()
+        .required("Last Name is required")
+        .matches(/^[a-zA-Z ]*$/, 'Last Name cannot contain special characters'), // Regex for no special characters
+    
+      suffix: Yup.string()
+        .required("Suffix is required"),
+    
+      role: Yup.string().required("Role is required"),
+    
+      email: Yup.string().email("Invalid email").required("Email is required"),
+    });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -441,7 +472,7 @@ export default function EditUserList(params: any) {
           </button>
           <button
             type="button"
-            onClick={() => router.push("/dashboard/user_management")}
+            onClick={() => navigator.push("/dashboard/user_management")}
             className="btn btn-accent btn-md"
           >
             BACK

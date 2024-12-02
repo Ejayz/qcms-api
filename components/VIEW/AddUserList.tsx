@@ -21,55 +21,77 @@
     const navigator = useRouter();
 
     const Add_User_Validator = Yup.object().shape({
-      firstname: Yup.string().required("First Name is required"),
-      middlename: Yup.string().required("Middle Name is required"),
-      lastname: Yup.string().required("Last Name is required"),
-      suffix: Yup.string().required("Suffix is required"),
+      firstname: Yup.string()
+        .required("First Name is required")
+        .matches(/^[a-zA-Z ]*$/, 'First Name cannot contain special characters or any numbers'), // Regex for no special characters
+    
+      middlename: Yup.string()
+        .required("Middle Name is required")
+        .matches(/^[a-zA-Z ]*$/, 'Middle Name cannot contain special characters'), // Regex for no special characters
+    
+      lastname: Yup.string()
+        .required("Last Name is required")
+        .matches(/^[a-zA-Z ]*$/, 'Last Name cannot contain special characters'), // Regex for no special characters
+    
+      suffix: Yup.string()
+        .required("Suffix is required"),
+    
       role: Yup.string().required("Role is required"),
+    
       email: Yup.string().email("Invalid email").required("Email is required"),
-      //username: Yup.string().required("Username is required"),
+    
       password: Yup.string()
-      .min(8, 'Password must be 8 characters long')
-      .matches(/[0-9]/, 'Password requires a number')
-      .matches(/[a-z]/, 'Password requires a lowercase letter')
-      .matches(/[A-Z]/, 'Password requires an uppercase letter'),
+        .min(8, 'Password must be 8 characters long')
+        .matches(/[0-9]/, 'Password requires a number')
+        .matches(/[a-z]/, 'Password requires a lowercase letter')
+        .matches(/[A-Z]/, 'Password requires an uppercase letter'),
+    
       confirmpassword: Yup.string()
-    .oneOf([Yup.ref('password'), undefined], 'Passwords must match')
-    .required("Confirm Password is required"),
-
-
-      
-  });
-
-    const mutateNewSite = useMutation({
-      mutationFn: async (data: any) => {
-        const response = await fetch("/api/v1/create_user", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-        return response.json();
-      },
-      onError: (error) => { 
-        toast.error("Failed to add user");
-      },
-      onSuccess: (data) => {
-        toast.success("User added successfully");
-    
-        // Delay navigation by 2 seconds (2000 milliseconds)
-        setTimeout(() => {
-            navigator.push("/dashboard/user_management");
-        }, 2000);
-    },
-    
-      onMutate: (data) => {
-        return data;
-      },
-      
+        .oneOf([Yup.ref('password'), undefined], 'Passwords must match')
+        .required("Confirm Password is required"),
     });
     
+
+  const mutateNewSite = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/v1/create_user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      const responseData = await response.json();
+  
+      // Return status and response data
+      return {
+        status: response.status,
+        data: responseData,
+      };
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to add user");
+    },
+    onSuccess: ({ status, data }) => {
+      if (status === 200) {
+        // Handle success for user creation
+        toast.success("User added successfully");
+  
+        // Delay navigation by 2 seconds (2000 milliseconds)
+        setTimeout(() => {
+          navigator.push("/dashboard/user_management");
+        }, 2000);
+      } else if (status === 409) {
+        // Handle conflict (e.g., user already exists)
+        toast.error("The email is already registered. Please use a different email and try again.");
+      } else {
+        // Handle other non-success statuses
+        toast.error("An unexpected error occur  red. Please try again.");
+      }
+    },
+  });
+  
 
     return (
       <div className="flex flex-col w-11/12 mx-auto bg-base-200 text-black">

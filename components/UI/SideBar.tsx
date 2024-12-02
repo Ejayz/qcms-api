@@ -31,24 +31,19 @@ export default function IndexHeader({
   
   const router = useRouter();
   const supabase = createClient(); // Create the Supabase client instance
-
+  
+  const [useremail, setUseremail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
-  const [userid, setuserid] = useState<string | null>(null);
-
   useEffect(() => {
-    // Retrieve the role from localStorage
-    const role = localStorage.getItem("userRole");
-    const susername = localStorage.getItem("username");
-    const userid=localStorage.getItem("userid");
-    setuserid(userid);
-    setUserRole(role);
-    setUsername(susername);
-  }, []);
-  console.log("Username:", username);
-  console.log("User ID:", userid);
+    const fetchUserEmail = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUseremail(data.user?.user_metadata.email || null);
+      setUserRole(data.user?.user_metadata.role || null);
+    };
 
-  console.log("User role:", userRole);
+    fetchUserEmail();
+  }, []);
+console.log("User Email:", useremail);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -117,7 +112,7 @@ export default function IndexHeader({
               className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
                  <li>
-                  <span className="text-black">{username}</span>
+                  <span className="text-black">{useremail}</span>
               </li>
               <li>
                 <a className="text-black" onClick={handleLogout}>

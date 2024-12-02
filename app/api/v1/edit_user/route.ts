@@ -1,4 +1,5 @@
 import { createClient, roleExtractor } from "@/utils/supabase/server";
+import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PUT(req: NextRequest) {
@@ -32,6 +33,37 @@ export async function PUT(req: NextRequest) {
         { status: 401 }
       );
     }
+
+      // Check if the email is already in use
+      const { data: existingEmailData, error } = await supabase
+      .from("tbl_users")
+      .select("uuid")
+      .eq("email", email)
+      .single();
+      if (existingEmailData && existingEmailData.uuid !== uuid) {
+        // Email is in use by another UUID
+        return NextResponse.json(
+          { error: "Email is already in use by another user" },
+          { status: 409 }
+          
+        );
+      
+
+      }
+      console.log("Errors are",);
+      if(error){
+        if(error.message.includes("409")){
+          return NextResponse.json(
+            { error: "Email is already in use by another user" }, 
+            { status: 409 }
+          );
+      }}else{
+        return NextResponse.json(
+          { error:"An unexpected error occurred"  },
+          { status: 500 }
+        );
+      }
+      
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
