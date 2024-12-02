@@ -99,13 +99,6 @@ export default function IndexHeader({
           </div>
         <div className="flex-none gap-2">
           
-          <div className="form-control ">
-            <input
-              type="text"
-              placeholder="Search"
-              className="input input-bordered w-24 md:w-auto"
-            />
-          </div>
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}
@@ -150,7 +143,7 @@ export default function IndexHeader({
   toastOptions={{
     // Define default options
     className: '',
-    duration: 5010,
+    duration: 5000,
     style: {
       background: '#fff',
       color: '#363636',

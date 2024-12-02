@@ -1,4 +1,4 @@
-
+"use client";
 import ProofingListView from "@/components/VIEW/ProofingListView";
 import SideBar from "@/components/UI/SideBar";
 

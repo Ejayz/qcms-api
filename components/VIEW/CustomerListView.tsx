@@ -111,7 +111,7 @@ export default function UserListView() {
                     <td>{get_customer.last_name}</td>
                     <td>{get_customer.email}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edit_customer?id=${get_customer.id}`} className="link">
+                  <Link href={`/dashboard/edit_customer/${get_customer.id}`} className="link">
   <Pencil className="text-warning" /> Edit
 </Link>
 
@@ -142,13 +142,16 @@ export default function UserListView() {
           <button className="join-item btn">Page {page}</button>
           <button
             onClick={() => {
-              if (!isLoading && !isFetching && data?.length == limit) {
+              if (!isLoading && !isFetching && data?.length === limit) {
                 setPage(page + 1);
               }
             }}
             className={`join-item btn ${
-              data?.length != limit ? "disabled" : ""
+              !isLoading && !isFetching && data?.length < limit
+                ? "disabled"
+                : ""
             }`}
+            disabled={!isLoading && !isFetching && data?.length < limit}
           >
             »
           </button>

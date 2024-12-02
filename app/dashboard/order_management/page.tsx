@@ -1,4 +1,4 @@
-
+"use client";
 import SideBar from "@/components/UI/SideBar";
 import OrderListView from "@/components/VIEW/OrderListView";
 

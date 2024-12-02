@@ -53,12 +53,17 @@
         return response.json();
       },
       onError: (error) => { 
-        toast.error("Failed to add site");
+        toast.error("Failed to add user");
       },
       onSuccess: (data) => {
-        toast.success("Site Added Successfully");
-        navigator.push("/dashboard/user_management");
-      },
+        toast.success("User added successfully");
+    
+        // Delay navigation by 2 seconds (2000 milliseconds)
+        setTimeout(() => {
+            navigator.push("/dashboard/user_management");
+        }, 2000);
+    },
+    
       onMutate: (data) => {
         return data;
       },
@@ -67,7 +72,7 @@
     
 
     return (
-      <div className="flex flex-col w-11/12 mx-auto bg-white text-black">
+      <div className="flex flex-col w-11/12 mx-auto bg-base-200 text-black">
         <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
           <ul>
             <li>
@@ -105,10 +110,10 @@
         >
           {({ errors, touched, values }) => (
             <Form>
-              <div className="flex flex-col gap-y-6">
+              <div className="place-content-center flex flex-col gap-y-6">
                 <div className="border p-12 rounded-md bg-white">
                   <h1 className="text-xl font-bold py-4">User Details</h1>
-                  <div className="grid grid-cols-3 gap-6 w-full">
+                  <div className="grid lg:grid-cols-3 gap-6 w-full place-content-center grid-col-1">
                     <div>
                       <label className="form-control w-96 max-w-lg">
                         <div className="label">
@@ -257,7 +262,7 @@
                     </div>
 
                   </div>
-                  <div className="grid grid-cols-3 gap-6 w-full">
+                  <div className="grid lg:grid-cols-3 gap-6 w-full grid-col-1">
                     <div>
                       <label className="form-control w-96 max-w-lg">
                         <div className="label">
@@ -374,24 +379,28 @@
               <div className="modal-action p-6">
                 <button
                   type="submit"
-                  className={`btn btn-outline ${
+                  className={`btn ${
                     mutateNewSite.isPending ? "btn-disabled" : "btn-primary"
                   } btn-md`}
                 >
                   {mutateNewSite.isPending ? (
                     <>
                       <span className="loading loading-dots loading-sm"></span>{" "}
-                      Adding Site...
+                      Adding User...
                     </>
                   ) : (
                     <>
-                      <Plus /> Add User
+                      <Plus /> ADD USER
                     </>
                   )}
                 </button>
-                <Link className="btn btn-ghost btn-md " href="/dashboard/user_management">
-                  BACK
-                </Link>
+                <button
+            type="button"
+            onClick={() => navigator.push("/dashboard/user_management")}
+            className="btn btn-accent btn-md"
+          >
+            BACK
+          </button>
               </div>
             </Form>
           )}

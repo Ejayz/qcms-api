@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -10,16 +10,14 @@ import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
 import { useEffect, useState } from "react";
 import { create } from "domain";
-export default function AddUserList(params:any) {
+export default function EditCustomerList(params:any) {
   const router = useRouter();
-
 const id=params.params;
   const [initialValues, setInitialValues] = useState({
     firstname: "",
     middlename: "",
     lastname: "",
     email: "",
-    user: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,12 +48,11 @@ const id=params.params;
         middlename: user.middle_name || "",
         lastname: user.last_name || "",
         email: user.email || "",
-        user: user.user_id || "",
       }));
     }
   }, [isSuccess, userData]);
 
-  const updateUserMutation = useMutation({
+  const updateCustomerMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch(`/api/v1/edit_customer?id=${id}`, {
         method: "PUT",
@@ -67,16 +64,15 @@ const id=params.params;
           first_name: data.firstname,
           middle_name: data.middlename,
           last_name: data.lastname,
-          user_id: data.user,
       }),
     });
       return response.json();
     },
     onError: (error) => { 
-      toast.error("Failed to add site");
+      toast.error("Failed to edit customer");
     },
     onSuccess: (data) => {
-      toast.success("Site Added Successfully");
+      toast.success("Customer edited successfully");
       router.push("/dashboard/customer_management");
     },
     onMutate: (data) => {
@@ -90,45 +86,12 @@ const id=params.params;
     lastname: Yup.string().required("Last Name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
     user: Yup.string().required("Created By is required"),
-    
 });
 
-  const [createdby, setcreatedby] = useState([]);
-
-  useEffect(() => {
-    const fetchuser = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_user_select?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((createdby:any) => ({
-            value: createdby.uuid,
-            label: `${createdby.first_name} ${createdby.last_name}`,
-          }));
-          setcreatedby(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchuser();
-  }, []);
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  
-  if (isError) {
-    return <div>Error: {error}</div>;
-  }
-  
+ 
   
   return (
-    <div className="flex flex-col w-11/12 mx-auto bg-white text-black">
+    <div className="flex flex-col w-11/12 mx-auto bg-base-200 text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
@@ -144,7 +107,7 @@ const id=params.params;
         enableReinitialize={true}
         validationSchema={Add_Customer_Validator}
         onSubmit={(values) => {
-          updateUserMutation.mutate(values);
+          updateCustomerMutation.mutate(values);
         }}
       >
         {({ errors, touched, values }) => (
@@ -297,17 +260,6 @@ const id=params.params;
                       </span>
                     ) : null}
                   </div>
-                  <FormSelect
-      tooltip="Select the created by name from the dropdown"
-      name="user"
-      placeholder="Choose a Created By"
-      label="Created By"
-      options={createdby}
-      errors={error ? error : ""}
-      touched="true" // Adjust as needed
-    />
-    {isLoading && <p>Loading users...</p>}
-    {error && <p className="text-red-500">{error}</p>}
   </div>
   <div>
                   
@@ -318,26 +270,30 @@ const id=params.params;
         
             </div>
             <div className="modal-action p-6">
-              <button
-                type="submit"
-                className={`btn btn-outline ${
-                  updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
-                } btn-md`}
-              >
-                {updateUserMutation.isPending ? (
-                  <>
-                    <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
-                  </>
-                ) : (
-                  <>
-                    <Plus /> Edit Customer
-                  </>
-                )}
-              </button>
-              <Link className="btn btn-ghost btn-md " href="/dashboard/customer_management">
-                BACK
-              </Link>
+            <button
+            type="submit"
+            className={`btn ${
+              updateCustomerMutation.isPending ? "btn-disabled" : "btn-primary"
+            } btn-md`}
+          >
+            {updateCustomerMutation.isPending ? (
+              <>
+                <span className="loading loading-dots loading-sm"></span>{" "}
+                Editing Site...
+              </>
+            ) : (
+              <>
+                <Pencil /> EDIT USER
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => router.push("/dashboard/user_management")}
+            className="btn btn-accent btn-md"
+          >
+            BACK
+          </button>
             </div>
           </Form>
         )}

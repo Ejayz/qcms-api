@@ -146,7 +146,7 @@ export default function EditUserList(params: any) {
           </li>
         </ul>
       </div>
-      <div className="flex flex-row justify-end items-center">
+      <div className="flex flex-row justify-end items-center m-4">
       {/* Remove User Button */}
       <button
         className="btn btn-error btn-md"
@@ -166,7 +166,7 @@ export default function EditUserList(params: any) {
       >
         {({ errors, touched }) => (
       <Form>
-      <div className="flex flex-col gap-y-6 bg-white">
+      <div className="flex flex-col gap-y-6 bg-base-200">
        
         <div className="border p-12 rounded-md bg-white text-black">
         <div className="flex flex-row justify-end items-center">
@@ -174,7 +174,7 @@ export default function EditUserList(params: any) {
         
         </div>
           <h1 className="text-xl font-bold py-4">User Details</h1>
-          <div className="grid grid-cols-3 gap-6 w-full">
+          <div className="grid lg:grid-cols-3 gap-6 w-full place-items-center grid-cols-1">
             
             <div>
               <label className="form-control w-96 max-w-lg">
@@ -424,7 +424,7 @@ export default function EditUserList(params: any) {
         <div className="modal-action p-6">
           <button
             type="submit"
-            className={`btn btn-outline ${
+            className={`btn ${
               updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
             } btn-md`}
           >
@@ -435,16 +435,16 @@ export default function EditUserList(params: any) {
               </>
             ) : (
               <>
-                <Pencil /> Edit User
+                <Pencil /> EDIT USER
               </>
             )}
           </button>
           <button
             type="button"
             onClick={() => router.push("/dashboard/user_management")}
-            className="btn btn-outline btn-md"
+            className="btn btn-accent btn-md"
           >
-            Back
+            BACK
           </button>
         </div>
       </div>

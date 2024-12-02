@@ -7,7 +7,7 @@
 // import SideBar from "@/components/UI/SideBar";
 "use client";
 import AddUserList from "@/components/VIEW/AddUserList";
-export default function AddOrder() {
+export default function AddUser() {
   return (
     <AddUserList/>
   );
