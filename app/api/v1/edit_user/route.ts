@@ -7,17 +7,23 @@ export async function PUT(req: NextRequest) {
     // Extract UUID from the request query
     const uuid = req.nextUrl.searchParams.get("uuid");
     if (!uuid || uuid.length !== 36) {
-      return NextResponse.json({ error: "Invalid or missing UUID" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid or missing UUID" },
+        { status: 400 }
+      );
     }
 
     // Parse request body
-    const { email, first_name, middle_name, last_name, role, suffix} =
+    const { email, first_name, middle_name, last_name, role, suffix } =
       await req.json();
 
     // Check required fields
     if (!email || !first_name || !last_name || !role) {
       return NextResponse.json(
-        { error: "Missing required fields: email, first_name, last_name, or role" },
+        {
+          error:
+            "Missing required fields: email, first_name, last_name, or role",
+        },
         { status: 400 }
       );
     }
@@ -34,36 +40,21 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-      // Check if the email is already in use
-      const { data: existingEmailData, error } = await supabase
+    // Check if the email is already in use
+    const { data: existingEmailData, error } = await supabase
       .from("tbl_users")
-      .select("uuid")
+      .select("uuid,email")
       .eq("email", email)
       .single();
-      if (existingEmailData && existingEmailData.uuid !== uuid) {
-        // Email is in use by another UUID
-        return NextResponse.json(
-          { error: "Email is already in use by another user" },
-          { status: 409 }
-          
-        );
-      
+    if (existingEmailData && existingEmailData.uuid !== uuid) {
+      // Email is in use by another UUID
 
-      }
-      console.log("Errors are",);
-      if(error){
-        if(error.message.includes("409")){
-          return NextResponse.json(
-            { error: "Email is already in use by another user" }, 
-            { status: 409 }
-          );
-      }}else{
-        return NextResponse.json(
-          { error:"An unexpected error occurred"  },
-          { status: 500 }
-        );
-      }
-      
+      console.log("Email already exists:", email);
+      return NextResponse.json(
+        { error: "Email is already in use by another user" },
+        { status: 409 }
+      );
+    }
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
@@ -75,7 +66,7 @@ export async function PUT(req: NextRequest) {
         last_name,
         role,
         suffix,
-        
+
         updated_at: new Date(),
       })
       .eq("uuid", uuid);
