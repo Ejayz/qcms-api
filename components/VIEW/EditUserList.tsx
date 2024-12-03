@@ -98,7 +98,7 @@ export default function EditUserList(params: any) {
         toast.error("The email is currently used. Please use a different email and try again.");
       } else {
         // Handle other non-success statuses
-        toast.error("An unexpected error occur  red. Please try again.");
+        toast.error("An unexpected error occur  red. Please try again or reload the page.");
       }
     },
     onMutate: (data) => {
