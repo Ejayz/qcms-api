@@ -6,7 +6,7 @@ import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
+import {                                                                                                                                                           
   BookText,
   BookUser,
   Boxes,
@@ -19,8 +19,9 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import IndexHeader from "./IndexHeader";
 
-export default function IndexHeader({
+export default function Sidebar({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -28,10 +29,10 @@ export default function IndexHeader({
   const queryClient = new QueryClient();
   const query = usePathname();
   console.log(query);
-  
+
   const router = useRouter();
   const supabase = createClient(); // Create the Supabase client instance
-  
+
   const [useremail, setUseremail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function IndexHeader({
 
     fetchUserEmail();
   }, []);
-console.log("User Email:", useremail);
+  console.log("User Email:", useremail);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -57,43 +58,46 @@ console.log("User Email:", useremail);
   };
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="navbar border-b-2 border-black text-black"  style={{
-      backgroundImage: "url('/Img/4.png')",
+      {/* <div
+        className="navbar border-b-2 border-black text-black lg:hidden "
+        style={{
+          backgroundImage: "url('/Img/4.png')",
 
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}><div className="flex-1">
-            <div className="flex-none lg:hidden ">
-              <label
-                htmlFor="my-drawer-3"
-                aria-label="open sidebar"
-                className="btn btn-square btn-ghost"
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="flex-1">
+          <div className="flex-none lg:hidden ">
+            <label
+              htmlFor="my-drawer-3"
+              aria-label="open sidebar"
+              className="btn btn-square btn-ghost"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+                className="inline-block h-20 w-20 stroke-current"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 20 20"
-                  className="inline-block h-20 w-20 stroke-current"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  ></path>
-                </svg>
-              </label>
-            </div>
-            <Image
-              src="/Img/logo1.png"
-              className=""
-              alt="logo"
-              width={214}
-              height={85}
-            />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </label>
           </div>
+          <Image
+            src="/Img/logo1.png"
+            className=""
+            alt="logo"
+            width={214}
+            height={85}
+          />
+        </div>
         <div className="flex-none gap-2">
-          
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}
@@ -111,41 +115,41 @@ console.log("User Email:", useremail);
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
-                 <li>
-                  <span className="text-black">{useremail}</span>
+              <li>
+                <span className="text-black">{useremail}</span>
               </li>
               <li>
                 <a className="text-black" onClick={handleLogout}>
                   Logout
                 </a>
               </li>
-
             </ul>
           </div>
         </div>
-      </div>
+      </div> */}
+
+      {/* <IndexHeader></IndexHeader> */}
       <div className="drawer lg:drawer-open bg-white">
         <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
         <div className="drawer-content flex flex-col ">
           {/* Navbar */}
 
           <Toaster
-  position="top-center"
-  reverseOrder={false}
-  gutter={8}
-  containerClassName=""
-  containerStyle={{}}
-  toastOptions={{
-    // Define default options
-    className: '',
-    duration: 5000,
-    style: {
-      background: '#fff',
-      color: '#363636',
-    }
-  }}
-
-/>
+            position="top-center"
+            reverseOrder={false}
+            gutter={8}
+            containerClassName=""
+            containerStyle={{}}
+            toastOptions={{
+              // Define default options
+              className: "",
+              duration: 5000,
+              style: {
+                background: "#fff",
+                color: "#363636",
+              },
+            }}
+          />
 
           {/* Page content here */}
           {children}
@@ -230,7 +234,6 @@ console.log("User Email:", useremail);
               </li>
             )}
 
-
             <li className="rounded collapse collapse-arrow">
               <details>
                 <summary>
@@ -286,7 +289,6 @@ console.log("User Email:", useremail);
                       Manage Article Max
                     </Link>
                   </li>
-                 
                 </ul>
               </details>
             </li>
