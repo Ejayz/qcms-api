@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -113,6 +113,13 @@ export default function UserListView() {
                   <td className="justify-center items-center flex gap-4">
                   <Link href={`/dashboard/edit_customer/${get_customer.id}`} className="link">
   <Pencil className="text-warning" /> Edit
+</Link>
+
+
+                  </td>
+                  <td className="justify-center items-center flex gap-4">
+                  <Link href={`/dashboard/view_customer/${get_customer.id}`} className="link">
+  <Eye className="text-info" /> View
 </Link>
 
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search, Trash2 } from "lucide-react";
+import { Eye, Pencil, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -81,7 +81,7 @@ export default function UserListView() {
           <thead>
             <tr className="">
               <th></th>
-              <th>UUID</th>
+              {/* <th>UUID</th> */}
               <th>Email</th>
               <th>Name</th>
               <th>Role</th>
@@ -105,7 +105,7 @@ export default function UserListView() {
               data?.map((get_users: any, index: any) => (
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{get_users.uuid}</td>
+                  {/* <td className="text-xs">{get_users.uuid}</td> */}
                   <td>{get_users.email}</td>
                   <td>{`${get_users.last_name} ${
                     get_users.suffix ? get_users.suffix : ""
@@ -117,6 +117,14 @@ export default function UserListView() {
                       className="link"
                     >
                       <Pencil className="text-warning" /> Edit
+                    </Link>
+                  </td>
+                  <td className="justify-center items-center flex gap-4">
+                    <Link
+                      href={`/dashboard/viewuser/${get_users.uuid}`}
+                      className="link"
+                    >
+                      <Eye className="text-info" /> view
                     </Link>
                   </td>
                 </tr>

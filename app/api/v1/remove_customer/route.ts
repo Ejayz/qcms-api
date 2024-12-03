@@ -5,8 +5,10 @@ export async function PUT(req: NextRequest) {
   try {
     // Extract UUID from the request query
     const id = req.nextUrl.searchParams.get("id");
+   
+
     // Parse request body
-    const { email, first_name, middle_name, last_name,user_id } =
+    const { is_exist } =
       await req.json();
 
     // Initialize Supabase client
@@ -20,33 +22,11 @@ export async function PUT(req: NextRequest) {
         { status: 401 }
       );
     }
-// Check if the email already exists
-const { data: existingEmail, error: fetchError } = await supabase
-.from("tbl_customer")
-.select("email,id")
-.eq("email", email)
-.single();
-
-if (existingEmail && existingEmail.id !== id) {
-console.log("Email already exists:", email);
-return NextResponse.json(
-  { message: "Email already exists" },
-  { status: 409 } // Conflict status code
-);
-}
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
       .from("tbl_customer")
-      .update({
-        email,
-        first_name,
-        middle_name,
-        last_name,
-        user_id,
-        updated_at: new Date(),
-      })
-      .eq("id", id);
+      .update({ is_exist, updated_at: new Date() }).eq("id", id);
 
     if (userUpdateError) {
       console.error("Supabase Update Error:", userUpdateError);
@@ -55,22 +35,6 @@ return NextResponse.json(
         { status: 500 }
       );
     }
-
-    // Optional: Update Auth if password is provided
-    // if (password) {
-    //   const { error: authError } = await supabase.auth.updateUser({
-    //     email,
-    //     password,
-    //   });
-
-    //   if (authError) {
-    //     console.error("Auth Update Error:", authError);
-    //     return NextResponse.json(
-    //       { error: `Failed to update authentication: ${authError.message}` },
-    //       { status: 500 }
-    //     );
-    //   }
-    // }
 
     // Return success response
     return NextResponse.json(

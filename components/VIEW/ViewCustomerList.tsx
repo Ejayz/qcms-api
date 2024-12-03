@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, Trash2, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -11,7 +11,7 @@ import { FormInput, FormSelect } from "../UI/FormInput";
 import { useEffect, useState } from "react";
 import { create } from "domain";
 export default function EditCustomerList(params:any) {
-  const navigator = useRouter();
+  const router = useRouter();
 const id=params.params;
   const [initialValues, setInitialValues] = useState({
     firstname: "",
@@ -66,33 +66,14 @@ const id=params.params;
           last_name: data.lastname,
       }),
     });
-    const responseData = await response.json();
-  
-    // Return status and response data
-    return {
-      status: response.status,
-      data: responseData,
-    };
+      return response.json();
     },
     onError: (error) => { 
       toast.error("Failed to edit customer");
     },
-    onSuccess: ({ status, data }) => {
-      if (status === 200) {
-        // Handle success for user creation
-        toast.success("Customer editted successfully");
-  
-        // Delay navigation by 2 seconds (2000 milliseconds)
-        setTimeout(() => {
-          navigator.push("/dashboard/customer_management");
-        }, 2000);
-      } else if (status === 409) {
-        // Handle conflict (e.g., user already exists)
-        toast.error("The email is currently used. Please use a different email and try again.");
-      } else {
-        // Handle other non-success statuses
-        toast.error("An unexpected error occur  red. Please try again.");
-      }
+    onSuccess: (data) => {
+      toast.success("Customer edited successfully");
+      router.push("/dashboard/customer_management");
     },
     onMutate: (data) => {
       return data;
@@ -106,35 +87,7 @@ const id=params.params;
     email: Yup.string().email("Invalid email").required("Email is required"),
 });
 
-const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-
-const removeCustomerMutation = useMutation({
-  mutationFn: async (data: any) => {
-    const response = await fetch(`/api/v1/remove_customer?id=${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        is_exist: data.is_exist,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error((await response.json())?.error || "Failed to remove user");
-    }
-
-    return response.json();
-  },
-  onError: (error: any) => {
-    toast.error(error.message || "Failed to remove user");
-  },
-  onSuccess: (data) => {
-    toast.success("User removed successfully");
-    navigator.push("/dashboard/customer_management");
-  },
-});
-
+ 
   
   return (
     <div className="flex flex-col w-11/12 mx-auto bg-base-200 text-black">
@@ -144,19 +97,10 @@ const removeCustomerMutation = useMutation({
             <Link href="/dashbaord/user_management">Customer Management</Link>
           </li>
           <li>
-            <span>Edit Customer</span>
+            <span>View Customer</span>
           </li>
         </ul>
       </div>
-      <div className="flex flex-row justify-end items-center m-4">
-      {/* Remove User Button */}
-      <button
-        className="btn btn-error btn-md"
-        onClick={() => setIsRemoveModalOpen(true)}
-      >
-        <Trash2 /> Remove Customer
-      </button>
-</div>
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
@@ -235,26 +179,10 @@ const removeCustomerMutation = useMutation({
         
             </div>
             <div className="modal-action p-6">
-            <button
-            type="submit"
-            className={`btn ${
-              updateCustomerMutation.isPending ? "btn-disabled" : "btn-primary"
-            } btn-md`}
-          >
-            {updateCustomerMutation.isPending ? (
-              <>
-                <span className="loading loading-dots loading-sm"></span>{" "}
-                Editing Site...
-              </>
-            ) : (
-              <>
-                <Pencil /> EDIT CUSTOMER
-              </>
-            )}
-          </button>
+        
           <button
             type="button"
-            onClick={() => navigator.push("/dashboard/customer_management")}
+            onClick={() => router.push("/dashboard/user_management")}
             className="btn btn-accent btn-md"
           >
             BACK
@@ -263,35 +191,6 @@ const removeCustomerMutation = useMutation({
           </Form>
         )}
       </Formik>
-      {/* Remove User Modal */}
-      {isRemoveModalOpen && (
-  <div className="modal modal-open">
-    <div className="modal-box">
-      <h3 className="text-lg font-bold">Confirm Removal</h3>
-      <p>Are you sure you want to remove this user? This action cannot be undone.</p>
-      <div className="modal-action">
-        <button
-          onClick={() => {
-            removeCustomerMutation.mutate(
-              {is_exist: false},
-            );
-          }}
-          className={`btn btn-error ${
-            removeCustomerMutation.isPending ? "loading" : ""
-          }`}
-        >
-          Confirm
-        </button>
-        <button
-          onClick={() => setIsRemoveModalOpen(false)}
-          className="btn btn-outline"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
     </div>
 
     );

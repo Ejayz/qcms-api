@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
 import { CircleHelp, Pencil, Trash2 } from "lucide-react";
-import { FormSelect } from "../UI/FormInput";
+import { FormInput, FormSelect } from "../UI/FormInput";
 import Link from "next/link";
 
 export default function EditUserList(params: any) {
@@ -137,16 +137,13 @@ export default function EditUserList(params: any) {
 
   const Add_User_Validator = Yup.object().shape({
     firstname: Yup.string()
-        .required("First Name is required")
-        .matches(/^[a-zA-Z ]*$/, 'First Name cannot contain special characters or any numbers'), // Regex for no special characters
+        .required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
     
       middlename: Yup.string()
-        .required("Middle Name is required")
-        .matches(/^[a-zA-Z ]*$/, 'Middle Name cannot contain special characters'), // Regex for no special characters
+        .required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
     
       lastname: Yup.string()
-        .required("Last Name is required")
-        .matches(/^[a-zA-Z ]*$/, 'Last Name cannot contain special characters'), // Regex for no special characters
+        .required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
     
       suffix: Yup.string()
         .required("Suffix is required"),
@@ -209,108 +206,43 @@ export default function EditUserList(params: any) {
             
             <div>
               <label className="form-control w-96 max-w-lg">
-                <div className="label">
-                  <span className="label-text font-bold gap-x-2 flex flex-row">
-                    First Name
-                    <span
-                      className="tooltip tooltip-right"
-                      data-tip="Input of the First Name. This is required."
-                    >
-                      <CircleHelp
-                        className=" my-auto"
-                        size={20}
-                        strokeWidth={0.75}
-                      />
-                    </span>
-                  </span>
-                </div>
-                <Field
-                  type="text"
-                  placeholder=""
+               <FormInput
+                  tooltip="Input of the First Name. This is required."
                   name="firstname"
-                  className={`input input-bordered w-full max-w-md ${
-                    errors.firstname && touched.firstname
-                      ? "input-error"
-                      : ""
-                  }`}
+                  placeholder="First Name"
+                  label="First Name"
+                  errors={errors.firstname ? errors.firstname : ""}
+                  touched={touched.firstname ? "true" : ""}
                 />
               </label>
 
-              {errors.firstname && touched.firstname ? (
-                <span className="text-error  flex flex-row">
-                  {errors.firstname}
-                </span>
-              ) : null}
+             
             </div>
 
             <div>
               <label className="form-control w-96 max-w-lg">
-                <div className="label">
-                  <span className="label-text font-bold gap-x-2 flex flex-row">
-                    Middle Name
-                    <span
-                      className="tooltip tooltip-right"
-                      data-tip="Input of the Middle Name. This is required."
-                    >
-                      <CircleHelp
-                        className=" my-auto"
-                        size={20}
-                        strokeWidth={0.75}
-                      />
-                    </span>
-                  </span>
-                </div>
-                <Field
-                  type="text"
-                  placeholder=""
+               <FormInput
+                  tooltip="Input of the Middle Name. This is required."
                   name="middlename"
-                  className={`input input-bordered w-full max-w-md ${
-                    errors.middlename && touched.middlename
-                      ? "input-error"
-                      : ""
-                  }`}
+                  placeholder="Middle Name"
+                  label="Middle Name"
+                  errors={errors.middlename ? errors.middlename : ""}
+                  touched={touched.middlename ? "true" : ""}
                 />
               </label>
-
-              {errors.middlename && touched.middlename ? (
-                <span className="text-error  flex flex-row">
-                  {errors.middlename}
-                </span>
-              ) : null}
             </div>
 
             <div>
               <label className="form-control w-96 max-w-lg">
-                <div className="label">
-                  <span className="label-text font-bold gap-x-2 flex flex-row">
-                    Last Name
-                    <span
-                      className="tooltip tooltip-right"
-                      data-tip="Input of the Last Name. This is required."
-                    >
-                      <CircleHelp
-                        className=" my-auto"
-                        size={20}
-                        strokeWidth={0.75}
-                      />
-                    </span>
-                  </span>
-                </div>
-                <Field
-                  type="text"
-                  placeholder=""
-                  name="lastname"
-                  className={`input input-bordered w-full max-w-md ${
-                    errors.lastname && touched.lastname ? "input-error" : ""
-                  }`}
-                />
+                <FormInput
+                    tooltip="Input of the Last Name. This is required."
+                    name="lastname"
+                    placeholder="Last Name"
+                    label="Last Name"
+                    errors={errors.lastname ? errors.lastname : ""}
+                    touched={touched.lastname ? "true" : ""}
+                  />
               </label>
-
-              {errors.lastname && touched.lastname ? (
-                <span className="text-error  flex flex-row">
-                  {errors.lastname}
-                </span>
-              ) : null}
             </div>
 
             <div>
@@ -347,109 +279,20 @@ export default function EditUserList(params: any) {
                 />
               </label>
             </div>
-          </div>
-          <div className="grid grid-cols-3 gap-6 w-full">
             <div>
               <label className="form-control w-96 max-w-lg">
-                <div className="label">
-                  <span className="label-text font-bold gap-x-2 flex flex-row">
-                    Email
-                    <span
-                      className="tooltip tooltip-right"
-                      data-tip="Input of the email. This is required."
-                    >
-                      <CircleHelp
-                        className=" my-auto"
-                        size={20}
-                        strokeWidth={0.75}
-                      />
-                    </span>
-                  </span>
-                </div>
-                <Field
-                  type="text"
+                <FormInput
+                  tooltip="Input of the Email. This is required."
                   name="email"
-                  className={`input input-bordered w-full max-w-md ${
-                    errors.email && touched.email ? "input-error" : ""
-                  }`}
+                  placeholder="Email"
+                  label="Email"
+                  errors={errors.email ? errors.email : ""}
+                  touched={touched.email ? "true" : ""}
                 />
               </label>
-
-              {errors.email && touched.email ? (
-                <span className="text-error  flex flex-row">
-                  {errors.email}
-                </span>
-              ) : null}
             </div>
-            {/* 
-                <div>
-                  <label className="form-control w-96 max-w-lg">
-                    <div className="label">
-                      <span className="label-text font-bold gap-x-2 flex flex-row">
-                        Password
-                        <span
-                          className="tooltip tooltip-right"
-                          data-tip="Input of the Password. This is required."
-                        >
-                          <CircleHelp
-                            className=" my-auto"
-                            size={20}
-                            strokeWidth={0.75}
-                          />
-                        </span>
-                      </span>
-                    </div>
-                    <Field
-                      type="password"
-                      name="password"
-                      className={`input input-bordered w-full max-w-md ${
-                        errors.password && touched.password
-                          ? "input-error"
-                          : ""
-                      }`}
-                    />
-                  </label>
-
-                  {errors.password && touched.password ? (
-                    <span className="text-error  flex flex-row">
-                      {errors.password}
-                    </span>
-                  ) : null}
-                </div>
-                <div>
-<label className="form-control w-96 max-w-lg">
-  <div className="label">
-    <span className="label-text font-bold gap-x-2 flex flex-row">
-      Confirm Password
-      <span
-        className="tooltip tooltip-right"
-        data-tip="Input of the Confirm Password. This is required."
-      >
-        <CircleHelp
-          className=" my-auto"
-          size={20}
-          strokeWidth={0.75}
-        />
-      </span>
-    </span>
-  </div>
-  <Field
-    type="password"
-    name="confirmpassword"
-    className={`input input-bordered w-full max-w-md ${
-      errors.confirmpassword && touched.confirmpassword
-        ? 'input-error'
-        : ''
-    }`}
-  />
-</label>
-{errors.confirmpassword && touched.confirmpassword ? (
-  <span className="text-error flex flex-row">
-    {errors.confirmpassword}
-  </span>
-) : null}
-</div> */}
           </div>
+         
         </div>
 
         <div className="modal-action p-6">
