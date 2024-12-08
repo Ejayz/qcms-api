@@ -61,11 +61,11 @@ export default function MeasurementListViewCopy(params: any) {
       return response.json();
     },
     onError: (error) => {
-      toast.error("Failed to add order");
+      toast.error("Fialed to add Measurement"); 
       console.error(error);
     },
     onSuccess: (data) => {
-      toast.success("Proofing Added Successfully");
+      toast.success("Measurement Added Successfully");
       navigator.push("/dashboard/order_management");
     },
     onMutate: (data) => {
@@ -88,19 +88,21 @@ export default function MeasurementListViewCopy(params: any) {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values) => {
-          AddOrderMutation.mutate({
-            order_id: id,
-            length: values.rows[0].length,
-            inside_diameter: values.rows[0].inside_diameter,
-            outside_diameter: values.rows[0].outside_diameter,
-            flat_crush: values.rows[0].flat_crush,
-            h20: values.rows[0].h20,
-            radial: values.rows[0].radial,
-            number_control: values.rows[0].number_of_control,
-            remarks: "",
-            pallete_count: values.rows[0].pallete_count,
-            user_id: userID,
-          });
+          for (const row of values.rows) {
+            AddOrderMutation.mutate({
+              order_id: id,
+              length: row.length,
+              inside_diameter: row.inside_diameter,
+              outside_diameter: row.outside_diameter,
+              flat_crush: row.flat_crush,
+              h20: row.h20,
+              radial: row.radial,
+              number_control: row.number_of_control,
+              remarks: row.remarks,
+              pallete_count: row.pallete_count,
+              user_id: userID,
+            });
+          }
           await new Promise((r) => setTimeout(r, 500));
           alert(JSON.stringify(values, null, 2));
         }}
@@ -133,7 +135,12 @@ export default function MeasurementListViewCopy(params: any) {
                       >
                         Add Row
                       </button>
-                    
+                      <button
+                                    className="btn btn-primary"
+                                    type="submit"
+                                  >
+                                    Add Measurement
+                                  </button>
                     </div>
                     <div className="text-black overflow-auto">
                       <table className="table relative text-center overflow-auto">
@@ -148,7 +155,7 @@ export default function MeasurementListViewCopy(params: any) {
                             <th>H20</th>
                             <th>Radial </th>
                             <th>Remarks</th>
-                            <th>Action</th>
+                          
                           </tr>
                         </thead>
                         <tbody>
@@ -193,7 +200,7 @@ export default function MeasurementListViewCopy(params: any) {
 
                                       if (rowsToAdjust > 0) {
                                         // Add rows if the number increased
-                                        for (let i = 0; i < rowsToAdjust; i++) {
+                                        for (let i = 0;  i < rowsToAdjust; i++) {
                                           arrayHelpers.insert(index + 1, {
                                             pallete_count: currentPallete,
                                             number_of_control: "",
@@ -284,12 +291,12 @@ export default function MeasurementListViewCopy(params: any) {
                                   />
                                 </td>
                                 <td>
-                                  <button
+                                  {/* <button
                                     className="btn btn-primary"
                                     type="submit"
                                   >
                                     Submit
-                                  </button>
+                                  </button> */}
                                 </td>
                               </tr>
                             </React.Fragment>
