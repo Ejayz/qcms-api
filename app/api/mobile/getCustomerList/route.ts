@@ -7,7 +7,6 @@ export async function GET(req: NextRequest) {
     .from("tbl_customer")
     .select("*")
     .eq("is_exist", true)
-    .order("customer_id", { ascending: true });
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
