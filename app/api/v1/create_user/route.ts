@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
     },
   ]);
 
+  console.log("User details inserted:", insertUserDetails);
   if (insertUserDetails.error) {
     return NextResponse.json(
       { error: insertUserDetails.error.message },
