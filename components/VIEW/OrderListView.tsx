@@ -174,7 +174,7 @@ export default function OrderListView() {
             )}
           </tbody>
         </table>
-        <div className="join mx-auto">
+         <div className="join mx-auto">
           <button
             onClick={() => {
               if (page !== 1) {
@@ -193,8 +193,11 @@ export default function OrderListView() {
               }
             }}
             className={`join-item btn ${
-              ordersData?.length !== limit ? "disabled" : ""
+              !isLoading && !isFetching && ordersData?.length < limit
+                ? "disabled"
+                : ""
             }`}
+            disabled={!isLoading && !isFetching && ordersData?.length < limit}
           >
             »
           </button>
