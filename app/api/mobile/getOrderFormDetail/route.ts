@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   const order_id = req.nextUrl.searchParams.get("order_id");
@@ -10,13 +10,7 @@ export async function GET(req: NextRequest) {
     .eq("order_id", order_id)
     .eq("is_exist", true);
   if (error) {
-    return {
-      status: 500,
-      data: { error: error.message },
-    };
+ return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return {
-    status: 200,
-    data: data,
-  };
+  return NextResponse.json({ data: data, error: error }, { status: 200 });
 }
