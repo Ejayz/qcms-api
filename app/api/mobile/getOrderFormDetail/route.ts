@@ -9,8 +9,10 @@ export async function GET(req: NextRequest) {
     .select("*")
     .eq("order_id", order_id)
     .eq("is_exist", true);
+
   if (error) {
- return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ code: 500, error: error.message }, { status: 500 });
   }
-  return NextResponse.json({ data: data, error: error }, { status: 200 });
+
+  return NextResponse.json({ code: 200, data: data }, { status: 200 });
 }
