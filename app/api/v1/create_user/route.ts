@@ -23,15 +23,19 @@ export async function POST(req: NextRequest) {
   }
 
   // Sign up the user with Supabase
-  const { data, error } = await supabase.auth.signUp({
+  const {data,error}=await supabase.auth.admin.createUser({
     email: email,
     password: password,
-    options: {
-      data: {
-        role: role,
-      },
-    },
+    role: role,
+    user_metadata:{
+      first_name: first_name,
+      middle_name: middle_name,
+      last_name: last_name,
+      suffix: suffix,
+      role: role,
+    }
   });
+
 
   // Handle the error if it exists
   if (error) {
