@@ -1,4 +1,5 @@
-import { createClient, roleExtractor } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/admin";
+import { roleExtractor } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -35,6 +36,9 @@ export async function POST(req: NextRequest) {
       role: role,
     }
   });
+
+
+  console.log(error,data)
 
 
   // Handle the error if it exists
