@@ -35,16 +35,19 @@ export default function Sidebar({
 
   const [useremail, setUseremail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
+  const [userID, setUserID] = useState<string | null>(null);
   useEffect(() => {
     const fetchUserEmail = async () => {
       const { data } = await supabase.auth.getUser();
       setUseremail(data.user?.user_metadata.email || null);
       setUserRole(data.user?.user_metadata.role || null);
+      setUserID(data.user?.user_metadata.sub || null);
     };
 
     fetchUserEmail();
   }, []);
   console.log("User Email:", useremail);
+
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {

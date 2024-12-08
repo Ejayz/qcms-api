@@ -6,15 +6,15 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import AddArticleList from "@/components/VIEW/AddArticleList";
+import AddArticleListCopy from "@/components/VIEW/AddArticleList";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
-export default function AddArticle() {
+export default function AddArticle() {  
   const queryClient = new QueryClient();
   return (
     <QueryClientProvider client={queryClient}>
 <Toaster position="top-center" reverseOrder={false} />
-    <AddArticleList></AddArticleList>
+    <AddArticleListCopy></AddArticleListCopy>
     </QueryClientProvider>
   );
 }

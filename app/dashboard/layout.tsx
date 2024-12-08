@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-base-200 overflow-hidden" data-theme="light">
+    <html lang="en" className="bg-base-200 overflow-x-hidden" data-theme="light">
       <body>
         <IndexHeader />
         {children}</body>
