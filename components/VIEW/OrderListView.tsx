@@ -147,7 +147,14 @@ export default function OrderListView() {
                     {order.tbl_customer.middle_name}
                   </td>
                   <td>{order.tbl_article.article_name}</td>
-                  <td>{order.pallete_count}</td>
+                 
+                  <td>{order.pallete_count}</td> 
+                  <td>
+                    <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
+                    className="link">
+                    Measurement
+                    </Link>
+                  </td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
                       href={`/dashboard/editorder/${order.id}`}
