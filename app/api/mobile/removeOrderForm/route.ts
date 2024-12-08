@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   const { data, error } = await supabase
     .from("tbl_orders_form")
     .update({ is_exist: false })
-    .eq("order_id", order_id);
+    .eq("id", order_id);
     
   if (error) {
   return NextResponse.json({code:500, error: error.message }, { status: 500 });
