@@ -51,13 +51,13 @@ export async function POST(req: NextRequest) {
 
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted successfully", data: insertResult },
+      { message: "Data inserted successfully",code:200, data: insertResult },
       { status: 200 }
     );
   } catch (err) {
     console.error("Unexpected Error:", err);
     return NextResponse.json(
-      { error: "An unexpected error occurred" },
+      {code:500, error: "An unexpected error occurred" },
       { status: 500 }
     );
   }
