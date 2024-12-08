@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       customer_id,
       article_id,
       assignee,
-      pallete_count,
+      pallete_count
     );
 
     // Create Supabase client
@@ -41,23 +41,20 @@ export async function POST(req: NextRequest) {
     // Handle errors
     if (error) {
       console.error("Error inserting data:", error.message);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     console.log("Insert Result:", insertResult);
 
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted successfully",code:200, data: insertResult },
+      { message: "Data inserted successfully", code: 200, data: insertResult },
       { status: 200 }
     );
   } catch (err) {
     console.error("Unexpected Error:", err);
     return NextResponse.json(
-      {code:500, error: "An unexpected error occurred" },
+      { code: 500, error: "An unexpected error occurred" },
       { status: 500 }
     );
   }

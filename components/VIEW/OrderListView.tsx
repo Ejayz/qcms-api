@@ -33,6 +33,7 @@ export default function OrderListView() {
       );
       const result = await response.json();
       if (response.ok) {
+        console.log(result);
         return result;
       } else {
         throw new Error("Something went wrong while fetching orders.");
@@ -135,36 +136,44 @@ export default function OrderListView() {
                   Something went wrong while fetching orders list.
                 </td>
               </tr>
-            ) : ordersWithCustomerNames.length > 0 ? (
-              ordersWithCustomerNames.map((order: any, index: number) => (
-                <tr key={index}>
-                  <th>{index + 1}</th>
-                  <td className="text-xs">{order.id}</td>
-                  <td className="text-xs">
-                    {order.tbl_customer.last_name}{" "}
-                    {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "}
-                    , {order.tbl_customer.first_name}{" "}
-                    {order.tbl_customer.middle_name}
-                  </td>
-                  <td>{order.tbl_article.article_name}</td>
-                 
-                  <td>{order.pallete_count}</td> 
-                  <td>
-                    <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
-                    className="link">
-                    Measurement
-                    </Link>
-                  </td>
-                  <td className="justify-center items-center flex gap-4">
-                    <Link
-                      href={`/dashboard/editorder/${order.id}`}
-                      className="flex flex-row gap-x-2 link"
-                    >
-                      <Pencil className="text-warning" /> Edit
-                    </Link>
-                  </td>
-                </tr>
-              ))
+            ) : ordersData.length != 0 ? (
+              ordersData.map((order: any, index: number) => {
+                const customer = order.tbl_customer || {}; 
+                return (
+                  <tr key={index}>
+                    <th>{index + 1}</th>
+                    <td className="text-xs">{order.id}</td>
+                    <td className="text-xs">
+                      {customer.last_name || "Unknown"}
+                      {customer.suffix ? ` ${customer.suffix}` : ""},{" "}
+                      {customer.first_name || "Unknown"}{" "}
+                      {customer.middle_name || ""}
+                    </td>
+                    <td>
+                      {order.tbl_article
+                        ? order.tbl_article.article_name
+                        : "N/A"}
+                    </td>
+                    <td>{order.pallete_count || 0}</td>
+                    <td>
+                      <Link
+                        href={`/dashboard/edit_measurementCopy/${order.id}`}
+                        className="link"
+                      >
+                        Measurement
+                      </Link>
+                    </td>
+                    <td className="justify-center items-center flex gap-4">
+                      <Link
+                        href={`/dashboard/editorder/${order.id}`}
+                        className="flex flex-row gap-x-2 link"
+                      >
+                        <Pencil className="text-warning" /> Edit
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })
             ) : (
               <tr>
                 <td className="font-bold" colSpan={7}>
@@ -174,7 +183,7 @@ export default function OrderListView() {
             )}
           </tbody>
         </table>
-         <div className="join mx-auto">
+        <div className="join mx-auto">
           <button
             onClick={() => {
               if (page !== 1) {
