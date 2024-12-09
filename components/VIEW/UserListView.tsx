@@ -114,15 +114,14 @@ export default function UserListView() {
                   <td className="justify-center items-center flex gap-4">
                     <Link
                       href={`/dashboard/edituser/${get_users.uuid}`}
-                      className="link"
+                      className="link flex"
                     >
                       <Pencil className="text-warning" /> Edit
                     </Link>
-                  </td>
-                  <td className="justify-center items-center flex gap-4">
+                  
                     <Link
                       href={`/dashboard/viewuser/${get_users.uuid}`}
-                      className="link"
+                      className="link flex"
                     >
                       <Eye className="text-info" /> view
                     </Link>

@@ -13,7 +13,10 @@ export async function GET(req: NextRequest) {
     .from("tbl_article")
     .select("*")
     .eq("is_exist", true)
-
+    .or(
+      `article_name.ilike.%${search}%`
+    )
+    .order("created_at", { ascending: false })
     .range(
       (parseInt(page) - 1) * parseInt(limit),
       parseInt(page) * parseInt(limit) - 1

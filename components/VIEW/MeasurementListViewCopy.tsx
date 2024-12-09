@@ -1,12 +1,13 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Field, FieldArray, Form, Formik } from "formik";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
-import { QueryClient, useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Pencil } from "lucide-react";
 
 export default function MeasurementListViewCopy(params: any) {
 
@@ -73,7 +74,32 @@ export default function MeasurementListViewCopy(params: any) {
     },
   });
 
-
+  const { data: measurementsData, isFetching, isError } = useQuery({
+    queryKey: id ? ["get_measurement", id] : ["get_measurement"], // Always provide an array for queryKey
+    queryFn: async () => {
+      try {
+        const response = await fetch(`/api/v1/get_measurement?id=${id}`, {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+          },
+        });
+    
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "Failed to fetch data");
+        return result;
+      } catch (error) {
+        console.error("Error fetching measurements:", error);
+        throw error;
+      }
+    },
+    retry: 1,
+  });
+  
+  
+  
+console.log("orders data  ",measurementsData);  
   return (
     <div className="flex flex-col w-full p-12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
@@ -103,11 +129,13 @@ export default function MeasurementListViewCopy(params: any) {
               user_id: userID,
             });
           }
+          
           await new Promise((r) => setTimeout(r, 500));
           alert(JSON.stringify(values, null, 2));
         }}
       >
         {({ values, setFieldValue }) => (
+          
           <Form>
             <div className="">
               <FieldArray
@@ -141,6 +169,10 @@ export default function MeasurementListViewCopy(params: any) {
                                   >
                                     Add Measurement
                                   </button>
+                                 <Link href="/dashboard/order_management" className="btn btn-accent">
+                                    Back
+                                  </Link> 
+                                    
                     </div>
                     <div className="text-black overflow-auto">
                       <table className="table relative text-center overflow-auto">
@@ -302,6 +334,53 @@ export default function MeasurementListViewCopy(params: any) {
                             </React.Fragment>
                           ))}
                         </tbody>
+                        <tbody>
+  {isFetching ? (
+    <tr>
+      <td colSpan={7}>
+        <span className="loading loading-dots loading-md"></span>
+      </td>
+    </tr>
+  ) : isError ? (
+    <tr>
+      <td className="text-error font-bold" colSpan={7}>
+        Something went wrong while fetching measurement data.
+      </td>
+    </tr>
+  ) : measurementsData && measurementsData.length > 0 ? (
+    measurementsData.map((measurement: any, index: number) => (
+      <tr key={index}>
+        {/* <td>{index + 1}</td> */}
+        <td>{measurement.pallete_count}</td>
+        <td>{measurement.number_control}</td>
+        <td>{measurement.length}</td>
+        <td>{measurement.inside_diameter}</td>
+        <td>{measurement.outside_diameter}</td>
+        <td>{measurement.flat_crush}</td>
+        <td>{measurement.h20}</td>
+        <td>{measurement.radial}</td>
+        <td>{measurement.remarks}</td>
+        <td>
+          <Link
+            href={`/dashboard/edit_measurement/${measurement.id}`}
+            className="btn btn-sm btn-primary"
+          >
+            <Pencil size={16} /> Edit
+          </Link>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td className="font-bold" colSpan={7}>
+        No measurement data found.
+      </td>
+    </tr>
+  )}
+</tbody>
+
+
+
                       </table>
                     </div>
                   </div>

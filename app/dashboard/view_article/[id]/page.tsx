@@ -1,5 +1,5 @@
 
-import EditArticleList from "@/components/VIEW/EditArticleList";
+import EditArticleList from "@/components/VIEW/ViewArticleList";
 import React from "react";
 
 export default async function EditUser({params}: {params:any}) {

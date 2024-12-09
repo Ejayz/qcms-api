@@ -183,33 +183,7 @@ export default function AddOrderList(params: any) {
   }, []);
 
 
-  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
-  const removeUserMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const response = await fetch(`/api/v1/remove_article?id=${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          is_exist: data.is_exist,
-        }),
-      });
-  
-      if (!response.ok) {
-        throw new Error((await response.json())?.error || "Failed to remove article");
-      }
-  
-      return response.json();
-    },
-    onError: (error: any) => {
-      toast.error(error.message || "Failed to remove article");
-    },
-    onSuccess: (data) => {
-      toast.success("Article removed successfully");
-      router.push("/dashboard/article_management");
-    },
-  });
+
   
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
@@ -219,19 +193,11 @@ export default function AddOrderList(params: any) {
             <Link href="/dashboard/article_management">Article Management</Link>
           </li>
           <li>
-            <span>Edit Article</span>
+            <span>View Article</span>
           </li>
         </ul>
       </div>
-      <div className="flex flex-row justify-end items-center m-4">
-      {/* Remove User Button */}
-      <button
-        className="btn btn-error btn-md"
-        onClick={() => setIsRemoveModalOpen(true)}
-      >
-        <Trash2 /> Remove Article
-      </button>
-</div>
+      
       <Formik
         initialValues={initialValues}
         validationSchema={Add_Order_Validator}
@@ -255,6 +221,7 @@ export default function AddOrderList(params: any) {
                       options={articlenominal}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
+                      readonly={true}
                     />
                     {isLoading && <p>Loading article...</p>}
                     {error && <p className="text-red-500">{error}</p>}
@@ -269,6 +236,7 @@ export default function AddOrderList(params: any) {
                       options={articlemin}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
+                      readonly={true}
                     />
                     {isLoading && <p>Loading article...</p>}
                     {error && <p className="text-red-500">{error}</p>}
@@ -283,6 +251,7 @@ export default function AddOrderList(params: any) {
                       options={articlemax}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
+                      readonly={true}
                     />
                     {isLoading && <p>Loading article...</p>}
                     {error && <p className="text-red-500">{error}</p>}
@@ -306,6 +275,7 @@ export default function AddOrderList(params: any) {
                         </span>
                       </div>
                       <Field
+                      readOnly
                         type="text"
                         placeholder="Site Name: Example: EzMiner"
                         name="NumberControl"
@@ -327,7 +297,7 @@ export default function AddOrderList(params: any) {
               </div>
             </div>
             <div className="modal-action p-6">
-              <button
+              {/* <button
                 type="submit"
                 className={`btn btn-outline ${
                   updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
@@ -343,9 +313,9 @@ export default function AddOrderList(params: any) {
                     <Pencil /> Edit Article
                   </>
                 )}
-              </button>
+              </button> */}
               <Link
-                className="btn btn-ghost btn-md "
+                className="btn btn-accent btn-md "
                 href="/dashboard/article_management"
               >
                 BACK
@@ -355,34 +325,7 @@ export default function AddOrderList(params: any) {
         )}
       </Formik>
 
-      {isRemoveModalOpen && (
-  <div className="modal modal-open">
-    <div className="modal-box">
-      <h3 className="text-lg font-bold">Confirm Removal</h3>
-      <p>Are you sure you want to remove this user? This action cannot be undone.</p>
-      <div className="modal-action">
-        <button
-          onClick={() => {
-            removeUserMutation.mutate(
-              {is_exist: false},
-            );
-          }}
-          className={`btn btn-error ${
-            removeUserMutation.isPending ? "loading" : ""
-          }`}
-        >
-          Confirm
-        </button>
-        <button
-          onClick={() => setIsRemoveModalOpen(false)}
-          className="btn btn-outline"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+      
     </div>
   );
 }
