@@ -111,14 +111,10 @@ export default function UserListView() {
                     <td>{get_customer.last_name}</td>
                     <td>{get_customer.email}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edit_customer/${get_customer.id}`} className="link">
+                  <Link href={`/dashboard/edit_customer/${get_customer.id}`} className="link flex">
   <Pencil className="text-warning" /> Edit
 </Link>
-
-
-                  </td>
-                  <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/view_customer/${get_customer.id}`} className="link">
+                  <Link href={`/dashboard/view_customer/${get_customer.id}`} className="link flex">
   <Eye className="text-info" /> View
 </Link>
 

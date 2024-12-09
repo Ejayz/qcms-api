@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -79,7 +79,7 @@ export default function UserListView() {
         <table className="table text-center">
           <thead>
             <tr className="">
-              <th></th>
+              <th>Article Name</th>
               <th>Article Nominal</th>
               <th>Article Min</th>
               <th>Article Max</th>
@@ -104,15 +104,19 @@ export default function UserListView() {
               data?.map((get_users: any, index: any) => (
                 
                 <tr key={index}>
-                  <th>{index + 1}</th>
+                  {/* <th>{index + 1}</th> */}
                   {/* <td className="text-xs">{get_users.id}</td> */}
+                  <td>{get_users.article_name}</td>
                   <td>{get_users.article_nominal}</td>
                   <td>{`${get_users.article_min}`}</td>
                   <td>{get_users.article_max}</td>
                   <td>{get_users.number_control}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edit_article?id=${get_users.id}`} className="link">
+                  <Link href={`/dashboard/edit_article/${get_users.id}`} className="link flex">
   <Pencil className="text-warning" /> Edit
+</Link>
+<Link href={`/dashboard/view_article/${get_users.id}`} className="link flex">
+  <Eye className="text-info" /> View
 </Link>
 
 
@@ -142,13 +146,16 @@ export default function UserListView() {
           <button className="join-item btn">Page {page}</button>
           <button
             onClick={() => {
-              if (!isLoading && !isFetching && data?.length == limit) {
+              if (!isLoading && !isFetching && data?.length === limit) {
                 setPage(page + 1);
               }
             }}
             className={`join-item btn ${
-              data?.length != limit ? "disabled" : ""
+              !isLoading && !isFetching && data?.length < limit
+                ? "disabled"
+                : ""
             }`}
+            disabled={!isLoading && !isFetching && data?.length < limit}
           >
             »
           </button>

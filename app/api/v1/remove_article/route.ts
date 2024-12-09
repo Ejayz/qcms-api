@@ -8,7 +8,7 @@ export async function PUT(req: NextRequest) {
    
 
     // Parse request body
-    const { customer_id,article_id,pallete_count } =
+    const { is_exist } =
       await req.json();
 
     // Initialize Supabase client
@@ -25,14 +25,8 @@ export async function PUT(req: NextRequest) {
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
-      .from("tbl_orders_form")
-      .update({
-        customer_id,
-        article_id,
-        pallete_count,
-        updated_at: new Date(),
-      })
-      .eq("id", id);
+      .from("tbl_article")
+      .update({ is_exist, updated_at: new Date() }).eq("id", id);
 
     if (userUpdateError) {
       console.error("Supabase Update Error:", userUpdateError);
@@ -42,25 +36,9 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Optional: Update Auth if password is provided
-    // if (password) {
-    //   const { error: authError } = await supabase.auth.updateUser({
-    //     email,
-    //     password,
-    //   });
-
-    //   if (authError) {
-    //     console.error("Auth Update Error:", authError);
-    //     return NextResponse.json(
-    //       { error: `Failed to update authentication: ${authError.message}` },
-    //       { status: 500 }
-    //     );
-    //   }
-    // }
-
     // Return success response
     return NextResponse.json(
-      { message: "User updated successfully", data: userUpdateData },
+      { message: "Article updated successfully", data: userUpdateData },
       { status: 200 }
     );
   } catch (err: any) {

@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, Trash2, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Plus, Trash2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -196,15 +196,7 @@ const removeCustomerMutation = useMutation({
           </li>
         </ul>
       </div>
-      <div className="flex flex-row justify-end items-center m-4">
-      {/* Remove User Button */}
-      <button
-        className="btn btn-error btn-md"
-        onClick={() => setIsRemoveModalOpen(true)}
-      >
-        <Trash2 /> Remove Order
-      </button>
-</div>
+      
       <Formik
         initialValues={initialValues}
         validationSchema={Add_Order_Validator}
@@ -229,6 +221,7 @@ const removeCustomerMutation = useMutation({
                       options={customerOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
+                      readonly={true}
                     />
                   </div>
                   <div>
@@ -240,6 +233,7 @@ const removeCustomerMutation = useMutation({
                       options={articleOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
+                      readonly={true}
                     />
                   </div>
 
@@ -261,6 +255,7 @@ const removeCustomerMutation = useMutation({
                         </span>
                       </div>
                       <Field
+                      readOnly
                         type="text"
                         placeholder="Site Name: Example: EzMiner"
                         name="PalleteCount"
@@ -282,23 +277,7 @@ const removeCustomerMutation = useMutation({
               </div>
             </div>
             <div className="modal-action p-6">
-              <button
-                type="submit"
-                className={`btn btn-primary ${
-                  updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
-                } btn-md`}
-              >
-                {updateUserMutation.isPending ? (
-                  <>
-                    <span className="loading loading-dots loading-sm"></span>{" "}
-                    Editing Site...
-                  </>
-                ) : (
-                  <>
-                    <Pencil /> Edit Order
-                  </>
-                )}
-              </button>
+             
               <Link
                 className="btn btn-accent btn-md "
                 href="/dashboard/order_management"
@@ -309,34 +288,7 @@ const removeCustomerMutation = useMutation({
           </Form>
         )}
       </Formik>
-      {isRemoveModalOpen && (
-  <div className="modal modal-open">
-    <div className="modal-box">
-      <h3 className="text-lg font-bold">Confirm Removal</h3>
-      <p>Are you sure you want to remove this order? This action cannot be undone.</p>
-      <div className="modal-action">
-        <button
-          onClick={() => {
-            removeCustomerMutation.mutate(
-              {is_exist: false},
-            );
-          }}
-          className={`btn btn-error ${
-            removeCustomerMutation.isPending ? "loading" : ""
-          }`}
-        >
-          Confirm
-        </button>
-        <button
-          onClick={() => setIsRemoveModalOpen(false)}
-          className="btn btn-outline"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+    
     </div>
   );
 }

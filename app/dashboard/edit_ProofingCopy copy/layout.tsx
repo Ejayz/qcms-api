@@ -4,10 +4,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const queryClient = new QueryClient();return (<QueryClientProvider client={queryClient}>
+  const queryClient = new QueryClient();
+  return (<QueryClientProvider client={queryClient}>
     
-      <main className="bg-white">
-      <Toaster
+      <main className="bg-white"><Toaster
       position="top-center"
       reverseOrder={false}
       gutter={8}
@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           color: "#363636",
         },
       }}
-      />{children}</main>
+    />{children}</main>
     </QueryClientProvider>
   );
 }

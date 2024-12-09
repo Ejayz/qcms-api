@@ -32,7 +32,7 @@ const id=params.params;
     queryFn: async () => {
       const response = await fetch(`/api/v1/getonecustomer/?id=${id}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch user data: ${response.status}`);
+        throw new Error(`Failed to fetch customer data: ${response.status}`);
       }
       return response.json(); // Expecting an array
     },
@@ -121,16 +121,16 @@ const removeCustomerMutation = useMutation({
     });
 
     if (!response.ok) {
-      throw new Error((await response.json())?.error || "Failed to remove user");
+      throw new Error((await response.json())?.error || "Failed to remove customer");
     }
 
     return response.json();
   },
   onError: (error: any) => {
-    toast.error(error.message || "Failed to remove user");
+    toast.error(error.message || "Failed to remove customer");
   },
   onSuccess: (data) => {
-    toast.success("User removed successfully");
+    toast.success("Customer removed successfully");
     navigator.push("/dashboard/customer_management");
   },
 });
@@ -268,7 +268,7 @@ const removeCustomerMutation = useMutation({
   <div className="modal modal-open">
     <div className="modal-box">
       <h3 className="text-lg font-bold">Confirm Removal</h3>
-      <p>Are you sure you want to remove this user? This action cannot be undone.</p>
+      <p>Are you sure you want to remove this customer? This action cannot be undone.</p>
       <div className="modal-action">
         <button
           onClick={() => {

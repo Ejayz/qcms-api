@@ -6,13 +6,10 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import AddArticleListCopy from "@/components/VIEW/AddArticleList";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "react-hot-toast";
-export default function AddArticle() {  
+import EditOrderList from "@/components/VIEW/ViewOrderList";
+export default function EditOrder({params}: {params:any}) {
   return (
-   
-    <AddArticleListCopy/>
+    <EditOrderList params={params.id}></EditOrderList>
   );
 }
 

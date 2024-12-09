@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
     // Create Supabase client
     const supabase = await createClient();
 
-    // Insert data into tbl_orders_form
-    const { data: insertResult, error } = await supabase
+    // Insert data without article_name first
+    const { data: insertResult, error: insertError } = await supabase
       .from("tbl_article")
       .insert([
         {
@@ -37,22 +37,47 @@ export async function POST(req: NextRequest) {
           user_id: user_id || null,
           is_exist: true, // Always true
         },
-      ]);
+      ])
+      .select(); // Ensure we return the inserted row, including its ID
 
-    // Handle errors
-    if (error) {
-      console.error("Error inserting data:", error.message);
+    // Handle insertion errors
+    if (insertError) {
+      console.error("Error inserting data:", insertError.message);
       return NextResponse.json(
-        { error: error.message },
+        { error: insertError.message },
         { status: 500 }
       );
     }
 
     console.log("Insert Result:", insertResult);
 
+    // Retrieve the inserted ID (assuming only one row is inserted)
+    const insertedId = insertResult[0]?.id;
+
+    if (!insertedId) {
+      throw new Error("Failed to retrieve the inserted ID.");
+    }
+
+    // Update the article_name to include the ID
+    const { data: updateResult, error: updateError } = await supabase
+      .from("tbl_article")
+      .update({ article_name: `article ${insertedId}` })
+      .eq("id", insertedId);
+
+    // Handle update errors
+    if (updateError) {
+      console.error("Error updating article_name:", updateError.message);
+      return NextResponse.json(
+        { error: updateError.message },
+        { status: 500 }
+      );
+    }
+
+    console.log("Update Result:", updateResult);
+
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted successfully", data: insertResult },
+      { message: "Data inserted and updated successfully", data: updateResult },
       { status: 200 }
     );
   } catch (err) {

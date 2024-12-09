@@ -1,16 +1,31 @@
 "use client";
-
+import { createClient } from "@/utils/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function OrderListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
+  const supabase = createClient();
+  const [useremail, setUseremail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userID, setUserID] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUseremail(data.user?.user_metadata.email || null);
+      setUserRole(data.user?.user_metadata.role || null);
+      setUserID(data.user?.id || null);
+    };
 
+    fetchUserEmail();
+  }, []);
+
+ console.log("the current user role is:", userRole);
   // Fetch orders
   const {
     data: ordersData,
@@ -106,7 +121,7 @@ export default function OrderListView() {
 
           <Link
             href="/dashboard/addorder"
-            className="btn btn-primary btn-outline"
+            className="btn btn-primary"
           >
             Add Order
           </Link>
@@ -136,44 +151,50 @@ export default function OrderListView() {
                   Something went wrong while fetching orders list.
                 </td>
               </tr>
-            ) : ordersData.length != 0 ? (
-              ordersData.map((order: any, index: number) => {
-                const customer = order.tbl_customer || {}; 
-                return (
-                  <tr key={index}>
-                    <th>{index + 1}</th>
-                    <td className="text-xs">{order.id}</td>
-                    <td className="text-xs">
-                      {customer.last_name || "Unknown"}
-                      {customer.suffix ? ` ${customer.suffix}` : ""},{" "}
-                      {customer.first_name || "Unknown"}{" "}
-                      {customer.middle_name || ""}
-                    </td>
-                    <td>
-                      {order.tbl_article
-                        ? order.tbl_article.article_name
-                        : "N/A"}
-                    </td>
-                    <td>{order.pallete_count || 0}</td>
-                    <td>
-                      <Link
-                        href={`/dashboard/edit_measurementCopy/${order.id}`}
-                        className="link"
-                      >
-                        Measurement
-                      </Link>
-                    </td>
-                    <td className="justify-center items-center flex gap-4">
-                      <Link
-                        href={`/dashboard/editorder/${order.id}`}
-                        className="flex flex-row gap-x-2 link"
-                      >
-                        <Pencil className="text-warning" /> Edit
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })
+            ) : ordersWithCustomerNames.length > 0 ? (
+              ordersWithCustomerNames.map((order: any, index: number) => (
+                <tr key={index}>
+                  <th>{index + 1}</th>
+                  <td className="text-xs">{order.id}</td>
+                  <td className="text-xs">
+                    {order.tbl_customer.last_name}{" "}
+                    {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "}
+                    , {order.tbl_customer.first_name}{" "}
+                    {order.tbl_customer.middle_name}
+                  </td>
+                  <td>{order.tbl_article.article_name}</td>
+                 
+                  <td>{order.pallete_count}</td> 
+                 
+                  <td className="justify-center items-center flex gap-4">
+                   {userRole==="Super Admin" && (
+                    <Link
+                      href={`/dashboard/assignorder/${order.id}`}
+                      className="flex flex-row gap-x-2 link"
+                    >
+                      {/* <Pencil className="text-warning" /> */}
+                       Assign
+                    </Link>
+                    )}  
+                  <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
+                    className="link">
+                    Measurement
+                    </Link>
+                    <Link
+                      href={`/dashboard/editorder/${order.id}`}
+                      className="link flex" 
+                    >
+                      <Pencil className="text-warning" /> Edit
+                    </Link>
+                    <Link
+                      href={`/dashboard/view_order/${order.id}`}
+                      className="link flex"
+                    >
+                      <Eye className="text-info"/>View
+                    </Link>
+                  </td>
+                </tr>
+              ))
             ) : (
               <tr>
                 <td className="font-bold" colSpan={7}>

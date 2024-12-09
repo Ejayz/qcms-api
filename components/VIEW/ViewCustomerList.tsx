@@ -124,6 +124,7 @@ const id=params.params;
                         label="First Name"
                         errors={errors.firstname ? errors.firstname : ""}
                         touched={touched.firstname ? "true" : ""}
+                        readonly={true}
                       />
                     </label>
 
@@ -138,6 +139,7 @@ const id=params.params;
                         label="Middle Name"
                         errors={errors.middlename ? errors.middlename : ""}
                         touched={touched.middlename ? "true" : ""}
+                        readonly={true}
                       />
                     </label>
                   </div>
@@ -151,6 +153,7 @@ const id=params.params;
                         label="Last Name"
                         errors={errors.lastname ? errors.lastname : ""}
                         touched={touched.lastname ? "true" : ""}
+                        readonly={true}
                       />
                     </label>
 
@@ -164,6 +167,7 @@ const id=params.params;
                         label="Email"
                         errors={errors.email ? errors.email : ""}
                         touched={touched.email ? "true" : ""}
+                        readonly={true}
                       />
                     </label>
 
@@ -182,7 +186,7 @@ const id=params.params;
         
           <button
             type="button"
-            onClick={() => router.push("/dashboard/user_management")}
+            onClick={() => router.push("/dashboard/customer_management")}
             className="btn btn-accent btn-md"
           >
             BACK

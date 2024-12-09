@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
 import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
@@ -42,59 +42,76 @@ export default function AddOrderList() {
     },
   });
 
-  const [customers, setCustomers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+ 
+  const [page, setPage] = useState(1); // Pagination support
+  const [search, setSearch] = useState(""); // Search input
+  const limit = 10; // Items per page
 
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_customer?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((customer: any) => ({
-            value: customer.id,
-            label: `${customer.first_name} ${customer.last_name}`,
-          }));
-          setCustomers(options);
-        } else {
-          setError(data.error);
+  const {
+    data: customerData,
+    isFetching: isFetchingCustomers,
+    isError: isErrorCustomers,
+  } = useQuery({
+    queryKey: ["get_customer", page, search, limit],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/v1/get_customer?page=${page}&search=${search}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
         }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
       }
-    };
 
-    fetchCustomers();
-  }, []);
+      return response.json();
+    },
+    staleTime: 5000, // Avoid flickering on refetch
+    retry: 2,
+  });
 
-  const [articles, setarticles] = useState([]);
+  const customerOptions = customerData?.map((customer: any) => ({
+    value: customer.id,
+    label: `${customer.first_name} ${customer.last_name}`,
+  })) || [];
 
-  useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_article?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((article: any) => ({
-            value: article.id,
-            label: `${article.article_name}`,
-          }));
-          setarticles(options);
-        } else {
-          setError(data.error);
+  const {
+    data: articleData,
+    isFetching: isFetchingArticles,
+    isError: isErrorArticles,
+  } = useQuery({
+    queryKey: ["get_article", page, search, limit],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/v1/get_article?page=${page}&search=${search}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
         }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      );
 
-    fetchArticle();
-  }, []);
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
+      }
+
+      return response.json();
+    },
+    staleTime: 5000, // Avoid flickering on refetch
+    retry: 2,
+  });
+
+  const articleOptions = articleData?.map((article: any) => ({
+    value: article.id,
+    label: `${article.article_name}`,
+  })) || [];
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
@@ -137,7 +154,7 @@ export default function AddOrderList() {
                       name="CustomerName"
                       placeholder="Choose a customer"
                       label="Customer Name"
-                      options={customers}
+                      options={customerOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
@@ -150,7 +167,7 @@ export default function AddOrderList() {
                       name="ArticleName"
                       placeholder="Choose a Article"
                       label="Article Name"
-                      options={articles}
+                      options={articleOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
@@ -199,14 +216,14 @@ export default function AddOrderList() {
             <div className="modal-action p-6">
               <button
                 type="submit"
-                className={`btn btn-outline ${
+                className={`btn btn-primary ${
                   AddOrderMutation.isPending ? "btn-disabled" : "btn-primary"
                 } btn-md`}
               >
                 {AddOrderMutation.isPending ? (
                   <>
                     <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
+                    Adding order...
                   </>
                 ) : (
                   <>
@@ -215,7 +232,7 @@ export default function AddOrderList() {
                 )}
               </button>
               <Link
-                className="btn btn-ghost btn-md "
+                className="btn btn-accent btn-md "
                 href="/dashboard/order_management"
               >
                 BACK
