@@ -1,4 +1,4 @@
-
+"use client";
 import SideBar from "@/components/UI/SideBar";
 import ProductionListView from "@/components/VIEW/ProductionListView";
 

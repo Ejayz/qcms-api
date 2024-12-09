@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Pencil, Plus, Trash2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -44,9 +44,9 @@ export default function AddOrderList(params:any) {
       const user = userData[0]; // Get the first user object
       setInitialValues((prev) => ({
         ...prev,
-        CustomerName: user.customer_id,
-        ArticleName: user.article_id,
-        PalleteCount: user.pallete_count
+        CustomerName: user.customer_id || "",
+        ArticleName: user.article_id || "",
+        PalleteCount: user.pallete_count ||"",
       }));
     }
   }, [isSuccess, userData]);
@@ -69,10 +69,10 @@ export default function AddOrderList(params:any) {
       return response.json();
     },
     onError: (error) => { 
-      toast.error("Failed to add site");
+      toast.error("Failed to add order");
     },
     onSuccess: (data) => {
-      toast.success("Site Added Successfully");
+      toast.success("Order Added Successfully");
       router.push("/dashboard/order_management");
     },
     onMutate: (data) => {
@@ -86,59 +86,103 @@ export default function AddOrderList(params:any) {
     PalleteCount: Yup.string().required("Pallete Count is required"),
   });
 
+ 
+  const [page, setPage] = useState(1); // Pagination support
+  const [search, setSearch] = useState(""); // Search input
+  const limit = 10; // Items per page
 
-
-  const [customers, setCustomers] = useState([]);
-
-  useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_customer?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((customer: any) => ({
-            value: customer.id,
-            label: `${customer.first_name} ${customer.last_name}`,
-          }));
-          setCustomers(options);
-        } else {
-          setError(data.error);
+  const {
+    data: customerData,
+    isFetching: isFetchingCustomers,
+    isError: isErrorCustomers,
+  } = useQuery({
+    queryKey: ["get_customer", page, search, limit],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/v1/get_customer?page=${page}&search=${search}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
         }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
       }
-    };
 
-    fetchCustomers();
-  }, []);
+      return response.json();
+    },
+    staleTime: 5000, // Avoid flickering on refetch
+    retry: 2,
+  });
 
-  const [articles, setarticles] = useState([]);
+  const customerOptions = customerData?.map((customer: any) => ({
+    value: customer.id,
+    label: `${customer.first_name} ${customer.last_name}`,
+  })) || [];
 
-  useEffect(() => {
-    const fetchArticle = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_article?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((article: any) => ({
-            value: article.id,
-            label: `${article.article_name}`,
-          }));
-          setarticles(options);
-        } else {
-          setError(data.error);
+  const {
+    data: articleData,
+    isFetching: isFetchingArticles,
+    isError: isErrorArticles,
+  } = useQuery({
+    queryKey: ["get_article", page, search, limit],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/v1/get_article?page=${page}&search=${search}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
         }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      );
 
-    fetchArticle();
-  }, []);
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
+      }
+
+      return response.json();
+    },
+    staleTime: 5000, // Avoid flickering on refetch
+    retry: 2,
+  });
+
+  const articleOptions = articleData?.map((article: any) => ({
+    value: article.id,
+    label: `${article.article_name}`,
+  })) || [];
+
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
+const removeCustomerMutation = useMutation({
+  mutationFn: async (data: any) => {
+    const response = await fetch(`/api/v1/remove_order?id=${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        is_exist: data.is_exist,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error((await response.json())?.error || "Failed to remove customer");
+    }
+
+    return response.json();
+  },
+  onError: (error: any) => {
+    toast.error(error.message || "Failed to remove order");
+  },
+  onSuccess: (data) => {
+    toast.success("Order removed successfully");
+    router.push("/dashboard/order_management");
+  },
+});
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
@@ -152,6 +196,15 @@ export default function AddOrderList(params:any) {
           </li>
         </ul>
       </div>
+      <div className="flex flex-row justify-end items-center m-4">
+      {/* Remove User Button */}
+      <button
+        className="btn btn-error btn-md"
+        onClick={() => setIsRemoveModalOpen(true)}
+      >
+        <Trash2 /> Remove Order
+      </button>
+</div>
       <Formik
         initialValues={initialValues}
         validationSchema={Add_Order_Validator}
@@ -173,12 +226,10 @@ export default function AddOrderList(params:any) {
                       name="CustomerName"
                       placeholder="Choose a customer"
                       label="Customer Name"
-                      options={customers}
+                      options={customerOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
-                    {isLoading && <p>Loading customers...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
                   </div>
                   <div>
                     <FormSelect
@@ -186,12 +237,10 @@ export default function AddOrderList(params:any) {
                       name="ArticleName"
                       placeholder="Choose a Article"
                       label="Article Name"
-                      options={articles}
+                      options={articleOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
-                    {isLoading && <p>Loading article...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
                   </div>
 
                   <div>
@@ -235,7 +284,7 @@ export default function AddOrderList(params:any) {
             <div className="modal-action p-6">
               <button
                 type="submit"
-                className={`btn btn-outline ${
+                className={`btn btn-primary ${
                   updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
                 } btn-md`}
               >
@@ -246,12 +295,12 @@ export default function AddOrderList(params:any) {
                   </>
                 ) : (
                   <>
-                    <Plus /> Edit Order
+                    <Pencil /> Edit Order
                   </>
                 )}
               </button>
               <Link
-                className="btn btn-ghost btn-md "
+                className="btn btn-accent btn-md "
                 href="/dashboard/order_management"
               >
                 BACK
@@ -260,6 +309,34 @@ export default function AddOrderList(params:any) {
           </Form>
         )}
       </Formik>
+      {isRemoveModalOpen && (
+  <div className="modal modal-open">
+    <div className="modal-box">
+      <h3 className="text-lg font-bold">Confirm Removal</h3>
+      <p>Are you sure you want to remove this order? This action cannot be undone.</p>
+      <div className="modal-action">
+        <button
+          onClick={() => {
+            removeCustomerMutation.mutate(
+              {is_exist: false},
+            );
+          }}
+          className={`btn btn-error ${
+            removeCustomerMutation.isPending ? "loading" : ""
+          }`}
+        >
+          Confirm
+        </button>
+        <button
+          onClick={() => setIsRemoveModalOpen(false)}
+          className="btn btn-outline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

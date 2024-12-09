@@ -1,5 +1,5 @@
-
-import MeasurementListView from "@/components/VIEW/MeasurementListView";
+"use client";
+import MeasurementListView from "@/components/VIEW/MeasurementListViewCopy";
 import SideBar from "@/components/UI/SideBar";
 
 export default function Home() {

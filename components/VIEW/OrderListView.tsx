@@ -1,16 +1,31 @@
 "use client";
-
+import { createClient } from "@/utils/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search } from "lucide-react";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function OrderListView() {
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
+  const supabase = createClient();
+  const [useremail, setUseremail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userID, setUserID] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUseremail(data.user?.user_metadata.email || null);
+      setUserRole(data.user?.user_metadata.role || null);
+      setUserID(data.user?.id || null);
+    };
 
+    fetchUserEmail();
+  }, []);
+
+ console.log("the current user role is:", userRole);
   // Fetch orders
   const {
     data: ordersData,
@@ -33,6 +48,7 @@ export default function OrderListView() {
       );
       const result = await response.json();
       if (response.ok) {
+        console.log(result);
         return result;
       } else {
         throw new Error("Something went wrong while fetching orders.");
@@ -105,7 +121,7 @@ export default function OrderListView() {
 
           <Link
             href="/dashboard/addorder"
-            className="btn btn-primary btn-outline"
+            className="btn btn-primary"
           >
             Add Order
           </Link>
@@ -147,13 +163,34 @@ export default function OrderListView() {
                     {order.tbl_customer.middle_name}
                   </td>
                   <td>{order.tbl_article.article_name}</td>
-                  <td>{order.pallete_count}</td>
+                 
+                  <td>{order.pallete_count}</td> 
+                 
                   <td className="justify-center items-center flex gap-4">
+                   {userRole==="Super Admin" && (
                     <Link
-                      href={`/dashboard/editorder/${order.id}`}
+                      href={`/dashboard/assignorder/${order.id}`}
                       className="flex flex-row gap-x-2 link"
                     >
+                      {/* <Pencil className="text-warning" /> */}
+                       Assign
+                    </Link>
+                    )}  
+                  <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
+                    className="link">
+                    Measurement
+                    </Link>
+                    <Link
+                      href={`/dashboard/editorder/${order.id}`}
+                      className="link flex" 
+                    >
                       <Pencil className="text-warning" /> Edit
+                    </Link>
+                    <Link
+                      href={`/dashboard/view_order/${order.id}`}
+                      className="link flex"
+                    >
+                      <Eye className="text-info"/>View
                     </Link>
                   </td>
                 </tr>
@@ -186,8 +223,11 @@ export default function OrderListView() {
               }
             }}
             className={`join-item btn ${
-              ordersData?.length !== limit ? "disabled" : ""
+              !isLoading && !isFetching && ordersData?.length < limit
+                ? "disabled"
+                : ""
             }`}
+            disabled={!isLoading && !isFetching && ordersData?.length < limit}
           >
             »
           </button>

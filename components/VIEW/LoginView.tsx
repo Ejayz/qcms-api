@@ -47,6 +47,8 @@ export default function LoginView() {
       const userid=data.user.id;
       localStorage.setItem("userid", userid);
     
+      const useremail=data.user.email;
+      console.log("emails:",useremail);
       toast.success("Login Successful");
       route.push("/dashboard");
     },

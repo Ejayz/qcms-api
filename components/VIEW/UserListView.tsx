@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
@@ -37,13 +37,14 @@ export default function UserListView() {
   });
 
   return (
+    
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/"> </Link>
           </li>
-          <li>  
+          <li>
             <span>User Management</span>
           </li>
         </ul>
@@ -80,7 +81,7 @@ export default function UserListView() {
           <thead>
             <tr className="">
               <th></th>
-              <th>UUID</th>
+              {/* <th>UUID</th> */}
               <th>Email</th>
               <th>Name</th>
               <th>Role</th>
@@ -102,21 +103,28 @@ export default function UserListView() {
               </tr>
             ) : data.length > 0 ? (
               data?.map((get_users: any, index: any) => (
-                
                 <tr key={index}>
                   <th>{index + 1}</th>
-                  <td className="text-xs">{get_users.uuid}</td>
+                  {/* <td className="text-xs">{get_users.uuid}</td> */}
                   <td>{get_users.email}</td>
-                  <td>{`${get_users.last_name} ${get_users.suffix ? get_users.suffix : ""}, ${
-                    get_users.first_name
-                  } ${get_users.middle_name}`}</td>
+                  <td>{`${get_users.last_name} ${
+                    get_users.suffix ? get_users.suffix : ""
+                  }, ${get_users.first_name} ${get_users.middle_name}`}</td>
                   <td>{get_users.role}</td>
                   <td className="justify-center items-center flex gap-4">
-                  <Link href={`/dashboard/edituser/${get_users.uuid}`} className="link">
-  <Pencil className="text-warning" /> Edit
-</Link>
-
-
+                    <Link
+                      href={`/dashboard/edituser/${get_users.uuid}`}
+                      className="link flex"
+                    >
+                      <Pencil className="text-warning" /> Edit
+                    </Link>
+                  
+                    <Link
+                      href={`/dashboard/viewuser/${get_users.uuid}`}
+                      className="link flex"
+                    >
+                      <Eye className="text-info" /> view
+                    </Link>
                   </td>
                 </tr>
               ))
@@ -143,13 +151,16 @@ export default function UserListView() {
           <button className="join-item btn">Page {page}</button>
           <button
             onClick={() => {
-              if (!isLoading && !isFetching && data?.length == limit) {
+              if (!isLoading && !isFetching && data?.length === limit) {
                 setPage(page + 1);
               }
             }}
             className={`join-item btn ${
-              data?.length != limit ? "disabled" : ""
+              !isLoading && !isFetching && data?.length < limit
+                ? "disabled"
+                : ""
             }`}
+            disabled={!isLoading && !isFetching && data?.length < limit}
           >
             »
           </button>

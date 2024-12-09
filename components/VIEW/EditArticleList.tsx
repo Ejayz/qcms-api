@@ -7,6 +7,7 @@ import {
   CircleHelp,
   Pencil,
   Plus,
+  Trash2,
   TriangleAlert,
 } from "lucide-react";
 import Link from "next/link";
@@ -17,14 +18,14 @@ import { FormSelect } from "../UI/FormInput";
 import { useState, useEffect, use } from "react";
 import Order from "@/app/dashboard/laboratory_management/page";
 export default function AddOrderList(params: any) {
-  const navigator = useRouter();
-  const [userid, setuserid] = useState<string | null>(null);
-  useEffect(() => {
-    const userid = localStorage.getItem("userid");
-    setuserid(userid);
-  }, []);
+  // const navigator = useRouter();
+  // const [userid, setuserid] = useState<string | null>(null);
+  // useEffect(() => {
+  //   const userid = localStorage.getItem("userid");
+  //   setuserid(userid);
+  // }, []);
 
-  console.log("the current user:", userid);
+  // console.log("the current user:", userid);
 
   const router = useRouter();
   const id = params.params;
@@ -85,10 +86,10 @@ export default function AddOrderList(params: any) {
       return response.json();
     },
     onError: (error) => {
-      toast.error("Failed to add site");
+      toast.error("Failed to update article");
     },
     onSuccess: (data) => {
-      toast.success("Site Added Successfully");
+      toast.success("Article updated Successfully");
       router.push("/dashboard/article_management");
     },
     onMutate: (data) => {
@@ -124,7 +125,7 @@ export default function AddOrderList(params: any) {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch Order.");
+        setError("Failed to fetch article nominal.");
       } finally {
         setIsLoading(false);
       }
@@ -148,7 +149,7 @@ export default function AddOrderList(params: any) {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch Order.");
+        setError("Failed to fetch article min.");
       } finally {
         setIsLoading(false);
       }
@@ -172,7 +173,7 @@ export default function AddOrderList(params: any) {
           setError(data.error);
         }
       } catch (err) {
-        setError("Failed to fetch Order.");
+        setError("Failed to fetch article max.");
       } finally {
         setIsLoading(false);
       }
@@ -181,18 +182,56 @@ export default function AddOrderList(params: any) {
     fetcharticlemax();
   }, []);
 
+
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const removeUserMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/v1/remove_article?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_exist: data.is_exist,
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error((await response.json())?.error || "Failed to remove article");
+      }
+  
+      return response.json();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to remove article");
+    },
+    onSuccess: (data) => {
+      toast.success("Article removed successfully");
+      router.push("/dashboard/article_management");
+    },
+  });
+  
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/article_management">article Management</Link>
+            <Link href="/dashboard/article_management">Article Management</Link>
           </li>
           <li>
             <span>Edit Article</span>
           </li>
         </ul>
       </div>
+      <div className="flex flex-row justify-end items-center m-4">
+      {/* Remove User Button */}
+      <button
+        className="btn btn-error btn-md"
+        onClick={() => setIsRemoveModalOpen(true)}
+      >
+        <Trash2 /> Remove Article
+      </button>
+</div>
       <Formik
         initialValues={initialValues}
         validationSchema={Add_Order_Validator}
@@ -315,6 +354,35 @@ export default function AddOrderList(params: any) {
           </Form>
         )}
       </Formik>
+
+      {isRemoveModalOpen && (
+  <div className="modal modal-open">
+    <div className="modal-box">
+      <h3 className="text-lg font-bold">Confirm Removal</h3>
+      <p>Are you sure you want to remove this user? This action cannot be undone.</p>
+      <div className="modal-action">
+        <button
+          onClick={() => {
+            removeUserMutation.mutate(
+              {is_exist: false},
+            );
+          }}
+          className={`btn btn-error ${
+            removeUserMutation.isPending ? "loading" : ""
+          }`}
+        >
+          Confirm
+        </button>
+        <button
+          onClick={() => setIsRemoveModalOpen(false)}
+          className="btn btn-outline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

@@ -14,6 +14,7 @@ export async function POST(req: NextRequest) {
       h20,
       radial,
       number_control,
+      pallete_count,
       remarks,
       user_id,
     } = data;
@@ -28,12 +29,18 @@ export async function POST(req: NextRequest) {
       h20,
       radial,
       number_control,
+      pallete_count,
       remarks,
     );
 
     // Create Supabase client
     const supabase = await createClient();
-
+    if(pallete_count === 0 || pallete_count === null || pallete_count === undefined){
+      return NextResponse.json(
+        { error: "Pallete count cannot be 0" },
+        { status: 400 }
+      );
+    }
     // Insert data into tbl_orders_form
     const { data: insertResult, error } = await supabase
       .from("tbl_measurement")
@@ -47,6 +54,7 @@ export async function POST(req: NextRequest) {
           h20: h20 || null,
           radial: radial || null,
           number_control: number_control || null,
+          pallete_count: pallete_count,
           remarks: remarks || null,
           user_id: user_id || null,
           is_exist: true, // Always true

@@ -1,17 +1,11 @@
-import { createClient } from "@/utils/supabase/server";
+import { createClient, roleExtractor } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     // Parse incoming request data
     const data = await req.json();
-    const {
-      first_name,
-      last_name,
-      email,
-      middle_name,
-      user_id,
-    } = data;
+    const { first_name, last_name, email, middle_name, user_id } = data;
 
     console.log(
       "Received Data:",
@@ -25,29 +19,47 @@ export async function POST(req: NextRequest) {
     // Create Supabase client
     const supabase = await createClient();
 
-    // Insert data into tbl_orders_form
-    const { data: insertResult, error } = await supabase
+    // Verify user role
+    const current_role = await roleExtractor(supabase);
+    if (current_role !== "Super Admin") {
+      return NextResponse.json(
+        { error: "No permission to perform this action" },
+        { status: 401 }
+      );
+    }
+    // Check if the email already exists
+    const { data: existingEmail, error: fetchError } = await supabase
+      .from("tbl_customer")
+      .select("email")
+      .eq("email", email)
+      .single();
+
+    if (existingEmail) {
+      console.log("Email already exists:", email);
+      return NextResponse.json(
+        { message: "Email already exists" },
+        { status: 409 } // Conflict status code
+      );
+    }
+  
+    // Insert data into tbl_customer
+    const { data: insertResult, error: insertError } = await supabase
       .from("tbl_customer")
       .insert([
         {
-          // customer_id: customer_id || null,
-          // article_id: article_id || null,
-          // assignee: assignee || null,
-          // pallete_count: pallete_count || 0, // Default to 0 if not provided
           first_name: first_name || null,
           last_name: last_name || null,
           email: email || null,
           middle_name: middle_name || null,
-          user_id: user_id || null,
+          user_id: user_id,
           is_exist: true, // Always true
         },
       ]);
 
-    // Handle errors
-    if (error) {
-      console.error("Error inserting data:", error.message);
+    if (insertError) {
+      console.error("Error inserting data:", insertError.message);
       return NextResponse.json(
-        { error: error.message },
+        { error: insertError.message },
         { status: 500 }
       );
     }

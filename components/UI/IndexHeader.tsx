@@ -1,124 +1,126 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Footer from "@/components/UI/Footer";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { LayoutDashboard, User } from "lucide-react";
-import { usePathname } from "next/navigation";
-export default function IndexHeader({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+import {
+  BookText,
+  BookUser,
+  Boxes,
+  FileChartColumnIncreasing,
+  LayoutDashboard,
+  Microscope,
+  ShoppingCart,
+  User,
+  Users,
+} from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/client";
+
+export default function IndexHeader(){
+
   const queryClient = new QueryClient();
   const query = usePathname();
-  console.log(query)
+  console.log(query);
+
+  const router = useRouter();
+  const supabase = createClient(); // Create the Supabase client instance
+
+  const [useremail, setUseremail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUseremail(data.user?.user_metadata.email || null);
+      setUserRole(data.user?.user_metadata.role || null);
+    };
+
+    fetchUserEmail();
+  }, []);
+  console.log("User Email:", useremail);
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error during logout:", error.message);
+    } else {
+      // Clear additional client-side data if needed
+      localStorage.removeItem("customUserData"); // Example for custom storage
+      // Redirect to the login page or another route
+      router.push("/login");
+    }
+  };
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="drawer lg:drawer-open">
-        <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
-        <div className="drawer-content flex flex-col bg-white">
-          {/* Navbar */}
-          <div className="navbar bg-white w-full shadow-md lg:hidden text-black glass">
-            <div className="flex-none lg:hidden">
-              <label
-                htmlFor="my-drawer-3"
-                aria-label="open sidebar"
-                className="btn btn-square btn-ghost"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  className="inline-block h-6 w-6 stroke-current"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  ></path>
-                </svg>
-              </label>
-            </div>
-            <div className="mx-2 flex-1 px-2">
-              <Image
-                src="/Img/logo.png"
-                className=""
-                alt="logo"
-                width={214}
-                height={85}
-              />
-            </div>
-            <div className="hidden flex-none lg:block">
-              <ul className="menu menu-horizontal text-black">
-                {/* Navbar menu content here */}
-                <li>
-                  <Link href="/dashboard"> Dashboard </Link>
-                </li>
-                <li>
-                  <Link href="#contactus"> Contact </Link>
-                </li>
-                <li>
-                  <Link href="#services"> Services </Link>
-                </li>
-                <li>
-                  <Link href="#team"> Team </Link>
-                </li>
-                <li>
-                  <Link href="#productgallery"> Product Gallery </Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <Toaster position="top-right" reverseOrder={false} />
+        <div
+        className="navbar border-b-2  border-black text-black"
+        style={{
+          backgroundImage: "url('/Img/4.png')",
 
-          {/* Page content here */}
-          {children}
-          {/* <Footer /> */}
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="flex-1">
+          <div className="flex-none lg:hidden ">
+            <label
+              htmlFor="my-drawer-3"
+              aria-label="open sidebar"
+              className="btn btn-square btn-ghost"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 20 20"
+                className="inline-block h-20 w-20 stroke-current"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                ></path>
+              </svg>
+            </label>
+          </div>
+          <Image
+            src="/Img/logo1.png"
+            className=""
+            alt="logo"
+            width={214}
+            height={85}
+          />
         </div>
-        <div className="drawer-side overflow-auto">
-          <label
-            htmlFor="my-drawer-3"
-            aria-label="close sidebar"
-            className="drawer-overlay"
-          ></label>
-         
-          <ul className="menu bg-base-200 text-black min-h-full w-80 p-4">
-            {/* Sidebar content here */}
-            <li>
-              <Link
-                href="dashboard"
-                className={`${
-                  query=="/dashboard" ? "bg-primary" : ""
-                }`}
-              >
-                <LayoutDashboard></LayoutDashboard> Dashboard{" "}
-              </Link>
-            </li>
-            <li>
-              <Link
-                href="/dashboard/user_management"
-                className={`${
-                  query=="/dashboard/user_management"? "bg-primary" : ""
-                }`}
-              >
-                <User></User> User Management
-              </Link>
-            </li>
-            <li>
-              <Link href="#services"> Services </Link>
-            </li>
-            <li>
-              <Link href="#team"> Team </Link>
-            </li>
-            <li>
-              <Link href="#productgallery"> Product Gallery </Link>
-            </li>
-          </ul>
+        <div className="flex-none gap-2">
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-circle avatar"
+            >
+              <div className="w-10 rounded-full">
+                <img
+                  alt="Tailwind CSS Navbar component"
+                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                />
+              </div>
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <span className="text-black">{useremail}</span>
+              </li>
+              <li>
+                <a className="text-black" onClick={handleLogout}>
+                  Logout
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </QueryClientProvider>

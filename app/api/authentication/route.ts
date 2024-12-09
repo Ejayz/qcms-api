@@ -1,5 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { userInfo } from "os";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
@@ -11,9 +12,26 @@ export async function POST(req: NextRequest) {
     email: email,
     password: password,
   });
-  console.log(data,error)
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 401, statusText: "Login Failed" });
+  const userinformation = await supabase
+    .from("tbl_users")
+    .select("*")
+    .eq("uuid", data.user?.id);
+
+
+    console.log(userinformation,error);
+  if (error || userinformation.error) {
+    return NextResponse.json(
+      { error: error?.message || userinformation.error?.message },
+      { status: 401, statusText: "Login Failed" }
+    );
   }
-  return NextResponse.json(data,{ status: 200, statusText: "Login Successful" });   
+
+  const JoinData = { ...data, db_record:{...userinformation.data[0]} };
+
+  console.log(JoinData);
+
+  return NextResponse.json(JoinData, {
+    status: 200,
+    statusText: "Login Successful",
+  });
 }

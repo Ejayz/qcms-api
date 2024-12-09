@@ -40,7 +40,7 @@ export function FormInput({
           className={`input bg-white input-bordered w-auto max-w-md ${
             errors && touched ? "input-error" : ""
           }`}
-          disabled={readonly}
+          readOnly={readonly}
         />
       </label>
 

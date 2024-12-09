@@ -2,24 +2,22 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Pencil, Plus, Trash2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { FormSelect } from "../UI/FormInput";
+import { FormInput, FormSelect } from "../UI/FormInput";
 import { useEffect, useState } from "react";
 import { create } from "domain";
-export default function AddUserList(params:any) {
-  const router = useRouter();
-
+export default function EditCustomerList(params:any) {
+  const navigator = useRouter();
 const id=params.params;
   const [initialValues, setInitialValues] = useState({
     firstname: "",
     middlename: "",
     lastname: "",
     email: "",
-    user: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -34,7 +32,7 @@ const id=params.params;
     queryFn: async () => {
       const response = await fetch(`/api/v1/getonecustomer/?id=${id}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch user data: ${response.status}`);
+        throw new Error(`Failed to fetch customer data: ${response.status}`);
       }
       return response.json(); // Expecting an array
     },
@@ -50,12 +48,11 @@ const id=params.params;
         middlename: user.middle_name || "",
         lastname: user.last_name || "",
         email: user.email || "",
-        user: user.user_id || "",
       }));
     }
   }, [isSuccess, userData]);
 
-  const updateUserMutation = useMutation({
+  const updateCustomerMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch(`/api/v1/edit_customer?id=${id}`, {
         method: "PUT",
@@ -67,17 +64,35 @@ const id=params.params;
           first_name: data.firstname,
           middle_name: data.middlename,
           last_name: data.lastname,
-          user_id: data.user,
       }),
     });
-      return response.json();
+    const responseData = await response.json();
+  
+    // Return status and response data
+    return {
+      status: response.status,
+      data: responseData,
+    };
     },
     onError: (error) => { 
-      toast.error("Failed to add site");
+      toast.error("Failed to edit customer");
     },
-    onSuccess: (data) => {
-      toast.success("Site Added Successfully");
-      router.push("/dashboard/customer_management");
+    onSuccess: ({ status, data }) => {
+      if (status === 200) {
+        // Handle success for user creation
+        toast.success("Customer editted successfully");
+  
+        // Delay navigation by 2 seconds (2000 milliseconds)
+        setTimeout(() => {
+          navigator.push("/dashboard/customer_management");
+        }, 2000);
+      } else if (status === 409) {
+        // Handle conflict (e.g., user already exists)
+        toast.error("The email is currently used. Please use a different email and try again.");
+      } else {
+        // Handle other non-success statuses
+        toast.error("An unexpected error occurred. Please try again or reload the page.");
+      }
     },
     onMutate: (data) => {
       return data;
@@ -85,50 +100,44 @@ const id=params.params;
   });
 
   const Add_Customer_Validator = Yup.object().shape({
-    firstname: Yup.string().required("First Name is required"),
-    middlename: Yup.string().required("Middle Name is required"),
-    lastname: Yup.string().required("Last Name is required"),
+    firstname: Yup.string().required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
+    middlename: Yup.string().required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
+    lastname: Yup.string().required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
     email: Yup.string().email("Invalid email").required("Email is required"),
-    user: Yup.string().required("Created By is required"),
-    
 });
 
-  const [createdby, setcreatedby] = useState([]);
+const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchuser = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_user_select?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((createdby:any) => ({
-            value: createdby.uuid,
-            label: `${createdby.first_name} ${createdby.last_name}`,
-          }));
-          setcreatedby(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch customers.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+const removeCustomerMutation = useMutation({
+  mutationFn: async (data: any) => {
+    const response = await fetch(`/api/v1/remove_customer?id=${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        is_exist: data.is_exist,
+      }),
+    });
 
-    fetchuser();
-  }, []);
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-  
-  if (isError) {
-    return <div>Error: {error}</div>;
-  }
-  
+    if (!response.ok) {
+      throw new Error((await response.json())?.error || "Failed to remove customer");
+    }
+
+    return response.json();
+  },
+  onError: (error: any) => {
+    toast.error(error.message || "Failed to remove customer");
+  },
+  onSuccess: (data) => {
+    toast.success("Customer removed successfully");
+    navigator.push("/dashboard/customer_management");
+  },
+});
+
   
   return (
-    <div className="flex flex-col w-11/12 mx-auto bg-white text-black">
+    <div className="flex flex-col w-11/12 mx-auto bg-base-200 text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
@@ -139,176 +148,84 @@ const id=params.params;
           </li>
         </ul>
       </div>
+      <div className="flex flex-row justify-end items-center m-4">
+      {/* Remove User Button */}
+      <button
+        className="btn btn-error btn-md"
+        onClick={() => setIsRemoveModalOpen(true)}
+      >
+        <Trash2 /> Remove Customer
+      </button>
+</div>
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
         validationSchema={Add_Customer_Validator}
         onSubmit={(values) => {
-          updateUserMutation.mutate(values);
+          updateCustomerMutation.mutate(values);
         }}
       >
         {({ errors, touched, values }) => (
           <Form>
             <div className="flex flex-col gap-y-6">
               <div className="border p-12 rounded-md bg-white">
-                <h1 className="text-xl font-bold py-4">User Details</h1>
-                <div className="grid grid-cols-3 gap-6 w-full">
+                <h1 className="text-xl font-bold py-4">Customer Details</h1>
+                <div className="grid lg:grid-cols-2 gap-6 w-full place-content-center grid-cols-1">
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          First Name
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Input of the First Name. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder=""
+                    <FormInput
+                        tooltip="Input of the First Name. This is required."
                         name="firstname"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.firstname && touched.firstname
-                            ? "input-error"
-                            : ""
-                        }`}
+                        placeholder="First Name"
+                        label="First Name"
+                        errors={errors.firstname ? errors.firstname : ""}
+                        touched={touched.firstname ? "true" : ""}
                       />
                     </label>
 
-                    {errors.firstname && touched.firstname ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.firstname}
-                      </span>
-                    ) : null}
                   </div>
-                
+
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Middle Name
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Input of the Middle Name. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder=""
+                      <FormInput
+                        tooltip="Input of the Middle Name. This is required."
                         name="middlename"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.middlename && touched.middlename
-                            ? "input-error"
-                            : ""
-                        }`}
+                        placeholder="Middle Name"
+                        label="Middle Name"
+                        errors={errors.middlename ? errors.middlename : ""}
+                        touched={touched.middlename ? "true" : ""}
                       />
                     </label>
-
-                    {errors.middlename && touched.middlename ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.middlename}
-                      </span>
-                    ) : null}
                   </div>
 
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Last Name
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Input of the Last Name. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
-                        placeholder=""
+                      <FormInput
+                        tooltip="Input of the Last Name. This is required."
                         name="lastname"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.lastname && touched.lastname
-                            ? "input-error"
-                            : ""
-                        }`}
+                        placeholder="Last Name"
+                        label="Last Name"
+                        errors={errors.lastname ? errors.lastname : ""}
+                        touched={touched.lastname ? "true" : ""}
                       />
                     </label>
 
-                    {errors.lastname && touched.lastname ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.lastname}
-                      </span>
-                    ) : null}
                   </div>
-
-                </div>
-                <div className="grid grid-cols-3 gap-6 w-full">
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Email
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Input of the email. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
-                      <Field
-                        type="text"
+                      <FormInput
+                        tooltip="Input of the Email. This is required."
                         name="email"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.email && touched.email
-                            ? "input-error"
-                            : ""
-                        }`}
+                        placeholder="Email"
+                        label="Email"
+                        errors={errors.email ? errors.email : ""}
+                        touched={touched.email ? "true" : ""}
                       />
                     </label>
 
-                    {errors.email && touched.email ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.email}
-                      </span>
-                    ) : null}
                   </div>
-                  <FormSelect
-      tooltip="Select the created by name from the dropdown"
-      name="user"
-      placeholder="Choose a Created By"
-      label="Created By"
-      options={createdby}
-      errors={error ? error : ""}
-      touched="true" // Adjust as needed
-    />
-    {isLoading && <p>Loading users...</p>}
-    {error && <p className="text-red-500">{error}</p>}
-  </div>
+                </div>
+                
   <div>
                   
             </div>
@@ -318,30 +235,63 @@ const id=params.params;
         
             </div>
             <div className="modal-action p-6">
-              <button
-                type="submit"
-                className={`btn btn-outline ${
-                  updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
-                } btn-md`}
-              >
-                {updateUserMutation.isPending ? (
-                  <>
-                    <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
-                  </>
-                ) : (
-                  <>
-                    <Plus /> Edit Customer
-                  </>
-                )}
-              </button>
-              <Link className="btn btn-ghost btn-md " href="/dashboard/customer_management">
-                BACK
-              </Link>
+            <button
+            type="submit"
+            className={`btn ${
+              updateCustomerMutation.isPending ? "btn-disabled" : "btn-primary"
+            } btn-md`}
+          >
+            {updateCustomerMutation.isPending ? (
+              <>
+                <span className="loading loading-dots loading-sm"></span>{" "}
+                Editing Site...
+              </>
+            ) : (
+              <>
+                <Pencil /> EDIT CUSTOMER
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => navigator.push("/dashboard/customer_management")}
+            className="btn btn-accent btn-md"
+          >
+            BACK
+          </button>
             </div>
           </Form>
         )}
       </Formik>
+      {/* Remove User Modal */}
+      {isRemoveModalOpen && (
+  <div className="modal modal-open">
+    <div className="modal-box">
+      <h3 className="text-lg font-bold">Confirm Removal</h3>
+      <p>Are you sure you want to remove this customer? This action cannot be undone.</p>
+      <div className="modal-action">
+        <button
+          onClick={() => {
+            removeCustomerMutation.mutate(
+              {is_exist: false},
+            );
+          }}
+          className={`btn btn-error ${
+            removeCustomerMutation.isPending ? "loading" : ""
+          }`}
+        >
+          Confirm
+        </button>
+        <button
+          onClick={() => setIsRemoveModalOpen(false)}
+          className="btn btn-outline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
 
     );

@@ -6,14 +6,17 @@ export const metadata: Metadata = {
   description: "Quality Control Management System",
 };
 
+import IndexHeader from "@/components/UI/IndexHeader";
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en"className="bg-white" data-theme="light">
-      <body>{children}</body>
+    <html lang="en" className="bg-base-200 overflow-x-hidden" data-theme="light">
+      <body>
+        <IndexHeader />
+        {children}</body>
     </html>
   );
 }

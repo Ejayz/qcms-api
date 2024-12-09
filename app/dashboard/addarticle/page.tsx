@@ -6,11 +6,13 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import AddArticleList from "@/components/VIEW/AddArticleList";
-export default function AddArticle() {
+import AddArticleListCopy from "@/components/VIEW/AddArticleList";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
+export default function AddArticle() {  
   return (
-    
-    <AddArticleList></AddArticleList>
+   
+    <AddArticleListCopy/>
   );
 }
 
