@@ -201,7 +201,7 @@ export default function EditArticleListCopy(params:any) {
   
   const UpdateMinMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/v1/edit_article_min/?id=${nominalID}`, {
+      const response = await fetch(`/api/v1/edit_article_min/?id=${minID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -224,7 +224,7 @@ export default function EditArticleListCopy(params:any) {
 
   const UpdateMaxMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/v1/edit_article_max/?id=${nominalID}`, {
+      const response = await fetch(`/api/v1/edit_article_max/?id=${maxID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -260,33 +260,40 @@ export default function EditArticleListCopy(params:any) {
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
-        onSubmit={async (values) => {
-          for(const row of values.rows){
-            await UpdateNominalMutation.mutateAsync({
-              length: row.LengthNominal,
-              inside_diameter: row.InsideDiameterNominal,
-              outside_diameter: row.OutsideDiameterNominal,
-              flat_crush: row.FlatCrushNominal,
-              h20: row.H20Nominal,
-            });
-            await UpdateMinMutation.mutateAsync({
-              length: row.LengthMin,
-              inside_diameter: row.InsideDiameterMin,
-              outside_diameter: row.OutsideDiameterMin,
-              flat_crush: row.FlatCrushMin,
-              h20: row.H20Min,
-            });
-            await UpdateMaxMutation.mutateAsync({
-              length: row.LengthMax,
-              inside_diameter: row.InsideDiameterMax,
-              outside_diameter: row.OutsideDiameterMax,
-              flat_crush: row.FlatCrushMax,
-              h20: row.H20Max,
-            });
+       onSubmit={async (values) => {
+  const mutationPromises = values.rows.map((row) =>
+    Promise.all([
+      UpdateNominalMutation.mutateAsync({
+        length: row.LengthNominal,
+        inside_diameter: row.InsideDiameterNominal,
+        outside_diameter: row.OutsideDiameterNominal,
+        flat_crush: row.FlatCrushNominal,
+        h20: row.H20Nominal,
+      }),
+      UpdateMinMutation.mutateAsync({
+        length: row.LengthMin,
+        inside_diameter: row.InsideDiameterMin,
+        outside_diameter: row.OutsideDiameterMin,
+        flat_crush: row.FlatCrushMin,
+        h20: row.H20Min,
+      }),
+      UpdateMaxMutation.mutateAsync({
+        length: row.LengthMax,
+        inside_diameter: row.InsideDiameterMax,
+        outside_diameter: row.OutsideDiameterMax,
+        flat_crush: row.FlatCrushMax,
+        h20: row.H20Max,
+      }),
+    ])
+  );
 
-          }
-        }
-      }
+  await Promise.all(mutationPromises);
+
+  // Redirect after all mutations succeed
+  router.push("/dashboard/article_management");
+}}
+
+        
          
       >
         {({ values, setFieldValue }) => (
