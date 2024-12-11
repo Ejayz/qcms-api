@@ -669,9 +669,16 @@ const updateMeasurementMutation = useMutation({
                         >
                         Add Production
                       </button>
-                      <button
+                         <button
                       className="btn btn-accent"
-                         onClick={() => setIsModalOpen(false)}
+                         onClick={() => {
+                           setIsModalOpen(false);
+                           setOrderid(null);
+                           refetchMeasurentData();
+                           refetchProductionData();
+                           refetchProofingData();
+                           window.location.reload();
+                         }}
                          >Cancel</button>
                     </div>
                     <div className="text-black overflow-auto">
@@ -917,9 +924,16 @@ const updateMeasurementMutation = useMutation({
                         >
                         Add Proofing
                       </button>
-                      <button
+                         <button
                       className="btn btn-accent"
-                         onClick={() => setIsModalOpen(false)}
+                         onClick={() => {
+                           setIsModalOpen(false);
+                           setOrderid(null);
+                           refetchMeasurentData();
+                           refetchProductionData();
+                           refetchProofingData();
+                           window.location.reload();
+                         }}
                          >Cancel</button>
                     </div>
                     <div className="text-black overflow-auto">
@@ -1197,12 +1211,17 @@ const updateMeasurementMutation = useMutation({
                                     Add Measurement
                                   </button>
                                  
-                      <button
-                        className="btn btn-accent"
-                        onClick={() => setIsModalOpen(false)}
-                      >
-                        Cancel
-                      </button>
+                        <button
+                      className="btn btn-accent"
+                         onClick={() => {
+                           setIsModalOpen(false);
+                           setOrderid(null);
+                           refetchMeasurentData();
+                           refetchProductionData();
+                           refetchProofingData();
+                           window.location.reload();
+                         }}
+                         >Cancel</button>
                                     
                     </div>
                     <div className="text-black overflow-auto">
