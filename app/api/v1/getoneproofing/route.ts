@@ -9,7 +9,8 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabase
     .from("tbl_proofing")
     .select()
-    .eq("order_form_id", id);
+    .eq("order_form_id", id)
+    .eq("is_exist", true);
 
   if (error) {
     console.error("Error fetching user:", error.message);

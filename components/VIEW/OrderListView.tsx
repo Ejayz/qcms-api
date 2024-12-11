@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Formik, Form, FieldArray, Field, ErrorMessage } from "formik";
-import { Eye, Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
@@ -278,7 +278,36 @@ const updateProductionMutation = useMutation({
     toast.success("Production data updated successfully");
     refetchProductionData();
     
-    // You can do additional logic here, e.g., close the modal or refresh data
+  },
+});
+
+const removeProductionMutation = useMutation({
+  mutationFn: async (updatedData: any) => {
+    console.log("data of remove:mutation",updatedData);
+    const response = await fetch(`/api/v1/remove_production?id=${updatedData.production_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        is_exist: updatedData.is_exist,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update production data");
+    }
+
+    return response.json();
+  },
+  onError: (error) => {
+    toast.error("Failed to remove production data");
+    console.error(error);
+  },
+  onSuccess: (data) => {
+    toast.success("Production data remove successfully");
+    refetchProductionData();
+    
   },
 });
 
@@ -365,10 +394,36 @@ onSuccess: (data) => {
   toast.success("Proofing data updated successfully");
   refetchProofingData();
   
-  // You can do additional logic here, e.g., close the modal or refresh data
 },
 });
-
+const removeProofingMutation = useMutation({
+  mutationFn: async (updatedData: any) => {
+    const response = await fetch(`/api/v1/remove_proofing?id=${updatedData.proofing_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        is_exist: updatedData.is_exist
+      }),
+    });
+  
+    if (!response.ok) {
+      throw new Error("Failed to update proofing data");
+    }
+  
+    return response.json();
+  },
+  onError: (error) => {
+    toast.error("Failed to remove proofing data");
+    console.error(error);
+  },
+  onSuccess: (data) => {
+    toast.success("Proofing data remove successfully");
+    refetchProofingData();
+    
+  },
+  });
 
 //measurement
 const AddMeasurementMutation = useMutation({
@@ -471,6 +526,35 @@ const updateMeasurementMutation = useMutation({
   },
   });
 
+  const removeMeasurementMutation = useMutation({
+    mutationFn: async (updatedData: any) => {
+      const response = await fetch(`/api/v1/remove_measurement?id=${updatedData.measurement_id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_exist: updatedData.is_exist
+        }),
+      });
+    
+      if (!response.ok) {
+        throw new Error("Failed to remove measurement data");
+      }
+    
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Failed to remove measurement data");
+      console.error(error);
+    },
+    onSuccess: (data) => {
+      toast.success("Measurement data remove successfully");
+      refetchMeasurentData();
+      
+      // You can do additional logic here, e.g., close the modal or refresh data
+    },
+    });
 //assigning
 const [error, setError] = useState<string | null>(null);
 
@@ -907,6 +991,7 @@ const customerOptions =
             />
           </td>
           <td>
+            <div className="flex gap-2">
             {editableRow === index ? (
               <>
                 <button
@@ -928,16 +1013,38 @@ const customerOptions =
                 >
                   Save
                 </button>
+               
               </>
             ) : (
-              <button
+              
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setEditableRow(index)}
+                >
+                  Edit
+                </button>
+               
+                  
+            )} 
+            <button
                 type="button"
-                className="btn btn-primary"
-                onClick={() => setEditableRow(index)}
-              >
-                Edit
-              </button>
-            )}
+                  onClick={() => {
+                    const isConfirmed = window.confirm("Are you sure you want to remove this production?");
+                    if (isConfirmed) {
+                      removeProductionMutation.mutate({
+                        production_id: values.rows2[index].production_id,
+                        is_exist: false
+                      });
+                    }
+                  } }
+                  className={`btn btn-error ${removeProductionMutation.isPending ? "loading" : ""}`}
+                >
+                    <Trash className="w-sm h-sm" /> Remove
+                  </button>
+            </div>
+            
+
           </td>
         </tr>
       ))}
@@ -1163,7 +1270,7 @@ const customerOptions =
               type="date"
               className="input input-bordered"
               value={
-                new Date(values.rows3[index].proofing_entry_date_time)
+                new Date(values.rows3[index].proofing_exit_date_time)
                   .toLocaleDateString('en-CA')
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1193,6 +1300,7 @@ const customerOptions =
             />
           </td>
           <td>
+            <div className="flex gap-2">
             {editableRow === index ? (
               <>
                 <button
@@ -1226,6 +1334,22 @@ const customerOptions =
                 Edit
               </button>
             )}
+             <button
+  onClick={() => {
+    const isConfirmed = window.confirm("Are you sure you want to remove this proofing?");
+    if (isConfirmed) {
+      removeProofingMutation.mutate({
+        proofing_id: values.rows3[index].proofing_id,
+        is_exist: false });
+    }
+  }}
+  className={`btn btn-error ${
+    removeProofingMutation.isPending ? "loading" : ""
+  }`}
+> 
+<Trash/> Remove
+</button>
+            </div>
           </td>
         </tr>
       ))}
@@ -1560,6 +1684,7 @@ const customerOptions =
             />
           </td>
           <td>
+            <div className="flex gap-2">
             {editableRow === index ? (
               <>
                 <button
@@ -1597,6 +1722,23 @@ const customerOptions =
                 Edit
               </button>
             )}
+             <button
+             type="button"
+  onClick={() => {
+    const isConfirmed = window.confirm("Are you sure you want to remove this production?");
+    if (isConfirmed) {
+      removeMeasurementMutation.mutate({
+        measurement_id: values.rows4[index].measurement_id, 
+        is_exist: false });
+    }
+  }}
+  className={`btn btn-error ${
+    removeMeasurementMutation.isPending ? "loading" : ""
+  }`}
+> 
+<Trash/> Remove
+</button>
+</div>
           </td>
         </tr>
       ))}
