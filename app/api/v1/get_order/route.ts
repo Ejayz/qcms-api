@@ -14,6 +14,10 @@ export async function GET(req: NextRequest) {
     .select("* ,tbl_customer(*),tbl_article(*)")
     .eq("is_exist", true)
     .order("created_at", { ascending: false })
+    .or(
+      `product_name.ilike.%${search}%`
+    )
+    
     .range(
       (parseInt(page) - 1) * parseInt(limit),
       parseInt(page) * parseInt(limit) - 1
