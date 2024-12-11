@@ -301,7 +301,7 @@ const AddProofingMutation = useMutation({
   onSuccess: (data) => {
     toast.success("Proofing Added Successfully");
     navigator.push("/dashboard/order_management");
-    refetchProductionData();
+    refetchProofingData();
   },
 });
 
@@ -363,7 +363,7 @@ onError: (error) => {
 },
 onSuccess: (data) => {
   toast.success("Proofing data updated successfully");
-  refetchProductionData();
+  refetchProofingData();
   
   // You can do additional logic here, e.g., close the modal or refresh data
 },
@@ -389,6 +389,7 @@ const AddMeasurementMutation = useMutation({
   onSuccess: (data) => {
     toast.success("Measurement Added Successfully");
     navigator.push("/dashboard/order_management");
+    refetchMeasurentData();
   },
   onMutate: (data) => {
     return data;
@@ -464,7 +465,7 @@ const updateMeasurementMutation = useMutation({
   },
   onSuccess: (data) => {
     toast.success("Measurement data updated successfully");
-    refetchProductionData();
+    refetchMeasurentData();
     
     // You can do additional logic here, e.g., close the modal or refresh data
   },
@@ -477,6 +478,7 @@ const {
   data: customerData,
   isFetching: isFetchingCustomers,
   isError: isErrorCustomers,
+  refetch: refetchAssignData,
 } = useQuery({
   queryKey: ["get_users", page, search, limit],
   queryFn: async () => {
@@ -532,7 +534,7 @@ const customerOptions =
       if (status === 200) {
         // Handle success for user creation
         toast.success("Assign added successfully");
-
+        refetchAssignData();
         // Delay navigation by 2 seconds (2000 milliseconds)
         setTimeout(() => {
           navigator.push("/dashboard/order_management");
@@ -1266,8 +1268,8 @@ const customerOptions =
             });
           }
           
-          await new Promise((r) => setTimeout(r, 500));
-          alert(JSON.stringify(values, null, 2));
+          // await new Promise((r) => setTimeout(r, 500));
+          // alert(JSON.stringify(values, null, 2));
         }}
       >
         {({ values, setFieldValue }) => (
@@ -1462,8 +1464,8 @@ const customerOptions =
             type="button"
             className="btn btn-error"
             onClick={() => arrayHelpers.remove(index)}
-          >
-            Remove
+
+                      >Remove
           </button>
         </td>
       </tr>
