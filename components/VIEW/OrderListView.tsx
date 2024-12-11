@@ -96,11 +96,50 @@ export default function OrderListView() {
         production_order_form_id: "",
         production_entry_date_time: "",
         production_exit_date_time: "",
+       
+      
+      },
+    ],
+    rows2: [
+      {
+        production_id: "",
+        production_order_form_id: "",
+        production_entry_date_time: "",
+        production_exit_date_time: "",
+      
+      },
+    ],
+  });
+
+  const [initialValuesProofing, setInitialValuesProofing] = useState({
+    rowsproofing: [
+      {
+      
         proofing_order_form_id: "",
         proofing_entry_date_time: "",
         proofing_exit_date_time: "",
         proofing_num_pallete: "",
         proofing_program_name: "",
+        
+      },
+    ],
+    
+    rows3:[
+      {
+        proofing_id: "",
+        proofing_order_form_id: "",
+        proofing_entry_date_time: "",
+        proofing_exit_date_time: "",
+        proofing_num_pallete: "",
+        proofing_program_name: "",
+      }
+    ]
+  });
+
+  const [initialValuesMeasurement, setInitialValuesMeasurement] = useState({
+    rowsmeasurement: [
+      {
+        measurement_id: "",
         pallete_count: "",
         number_of_control: "",
         length: "",
@@ -112,18 +151,9 @@ export default function OrderListView() {
         remarks: "",
       },
     ],
-    rows2: [
+    rows4: [
       {
-        production_id: "",
-        production_order_form_id: "",
-        production_entry_date_time: "",
-        production_exit_date_time: "",
-        proofing_id: "",
-        proofing_order_form_id: "",
-        proofing_entry_date_time: "",
-        proofing_exit_date_time: "",
-        proofing_num_pallete: "",
-        proofing_program_name: "",
+        measurement_id: "",
         pallete_count: "",
         number_of_control: "",
         length: "",
@@ -133,6 +163,7 @@ export default function OrderListView() {
         h20: "",
         radial: "",
         remarks: "",
+        isControlRow: false,
       },
     ],
   });
@@ -143,15 +174,20 @@ export default function OrderListView() {
         production_entry_date_time: Yup.date()
           .required("Entry Date & Time is required")
           .typeError("Invalid date format"),
+      })
+    ),
+    
+  });
+  const validationSchemaProofing = Yup.object({
+    rowsproofing: Yup.array().of(
+      Yup.object().shape({
         proofing_entry_date_time: Yup.date()
           .required("Entry Date & Time is required")
           .typeError("Invalid date format"),
-        number_pallete: Yup.number()
-          .required("Number of Pallete is required")
-          .typeError("Invalid number format"),
-        program_name: Yup.string()
+        proofing_num_pallete: Yup.number()
+          .required("Number of Pallets is required"),
+        proofing_program_name: Yup.string()
           .required("Program Name is required")
-          .typeError("Invalid program name format"),
       })
     ),
   });
@@ -261,11 +297,11 @@ const AddProofingMutation = useMutation({
 });
 
 const { data: fetchedProofingData, refetch: refetchProofingData } = useQuery({
-  queryKey: ["production", orderid],
+  queryKey: ["proofing", orderid],
   queryFn: async () => {
     const response = await fetch(`/api/v1/getoneproofing/?id=${orderid}`);
     if (!response.ok) {
-      throw new Error(`Failed to fetch production data: ${response.status}`);
+      throw new Error(`Failed to fetch proofing data: ${response.status}`);
     }
     return response.json();
   },
@@ -274,16 +310,16 @@ const { data: fetchedProofingData, refetch: refetchProofingData } = useQuery({
 
 useEffect(() => {
   if (fetchedProofingData?.length > 0) {
-    const productionData = fetchedProofingData[0];
-    //setEditproductionID(productionData.id);
-    setInitialValues((prev) => ({
+    const proofingData = fetchedProofingData[0];
+    //setEditproductionID(proofingData.id);
+    setInitialValuesProofing((prev) => ({
       ...prev,
-      rows2: fetchedProofingData.map((data: any) => ({
+      rows3: fetchedProofingData.map((data: any) => ({
         proofing_id: data.id,
         proofing_order_form_id: data.order_form_id,
         proofing_entry_date_time: data.entry_date_time,
         proofing_exit_date_time: data.exit_date_time,
-        proofing_num_pallete: data.num_pallete,
+        proofing_num_pallete: data.num_pallets,
         proofing_program_name: data.program_name,
 
       })),
@@ -299,31 +335,131 @@ mutationFn: async (updatedData: any) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      entry_date_time: updatedData.production_entry_date_time,
-      exit_date_time: updatedData.production_exit_date_time,
+      entry_date_time: updatedData.proofing_entry_date_time,
+      exit_date_time: updatedData.proofing_exit_date_time,
       num_pallets: updatedData.proofing_num_pallete,
       program_name: updatedData.proofing_program_name,
     }),
   });
 
   if (!response.ok) {
-    throw new Error("Failed to update production data");
+    throw new Error("Failed to update proofing data");
   }
 
   return response.json();
 },
 onError: (error) => {
-  toast.error("Failed to update production data");
+  toast.error("Failed to update proofing data");
   console.error(error);
 },
 onSuccess: (data) => {
-  toast.success("Production data updated successfully");
+  toast.success("Proofing data updated successfully");
   refetchProductionData();
   
   // You can do additional logic here, e.g., close the modal or refresh data
 },
 });
 
+
+//measurement
+const AddMeasurementMutation = useMutation({
+  mutationFn: async (data: any) => {
+    const response = await fetch("/api/v1/create_measurement", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    return response.json();
+  },
+  onError: (error) => {
+    toast.error("Fialed to add Measurement"); 
+    console.error(error);
+  },
+  onSuccess: (data) => {
+    toast.success("Measurement Added Successfully");
+    navigator.push("/dashboard/order_management");
+  },
+  onMutate: (data) => {
+    return data;
+  },
+});
+
+
+const { data: fetchedMeasurementData, refetch: refetchMeasurentData } = useQuery({
+  queryKey: ["measurement", orderid],
+  queryFn: async () => {
+    const response = await fetch(`/api/v1/getonemeasurement/?id=${orderid}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch proofing data: ${response.status}`);
+    }
+    return response.json();
+  },
+  enabled: !!orderid,
+});
+
+useEffect(() => {
+  if (fetchedMeasurementData?.length > 0) {
+    const proofingData = fetchedMeasurementData[0];
+    //setEditproductionID(proofingData.id);
+    setInitialValuesMeasurement((prev) => ({
+      ...prev,
+      rows4: fetchedMeasurementData.map((data: any) => ({
+        measurement_id: data.id,
+        pallete_count: data.pallete_count,
+        number_of_control: data.number_control,
+        length: data.length,
+        inside_diameter: data.inside_diameter,
+        outside_diameter: data.outside_diameter,
+        flat_crush: data.flat_crush,
+        h20: data.h20,
+        radial: data.radial,
+        remarks: data.remarks,
+
+      })),
+    }));
+  }
+}, [fetchedMeasurementData]);
+
+
+const updateMeasurementMutation = useMutation({
+  mutationFn: async (updatedData: any) => {
+    const response = await fetch(`/api/v1/edit_measurement?id=${updatedData.measurement_id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // pallete_count: updatedData.pallete_count,
+        number_control: updatedData.number_of_control,
+        length: updatedData.length,
+        inside_diameter: updatedData.inside_diameter,
+        outside_diameter: updatedData.outside_diameter,
+        flat_crush: updatedData.flat_crush,
+        h20: updatedData.h20,
+        radial: updatedData.radial,
+        remarks: updatedData.remarks,
+      }),
+    });
+  
+    if (!response.ok) {
+      throw new Error("Failed to update measurement data");
+    }
+  
+    return response.json();
+  },
+  onError: (error) => {
+    toast.error("Failed to update measurement data");
+    console.error(error);
+  },
+  onSuccess: (data) => {
+    toast.success("Measurement data updated successfully");
+    refetchProductionData();
+    
+    // You can do additional logic here, e.g., close the modal or refresh data
+  },
+  });
   return (
     
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
@@ -487,16 +623,16 @@ onSuccess: (data) => {
   <Formik
   initialValues={initialValues}
   enableReinitialize={true}
-  // validationSchema={validationSchema}
+  validationSchema={validationSchema}
   onSubmit={async (values) => {
     try {
      
         for (const row of values.rows) {
           await AddOrderMutation.mutateAsync({
-            //order_form_id: orderid,
+            order_form_id: orderid,
             entry_date_time: row.production_entry_date_time,
             exit_date_time: row.production_exit_date_time,
-            //user_id: userID,
+            user_id: userID,
           });
         }
     } catch (error) {
@@ -680,6 +816,7 @@ onSuccess: (data) => {
                         production_entry_date_time: values.rows2[index].production_entry_date_time,
                         production_exit_date_time: values.rows2[index].production_exit_date_time,
                       });
+                      // alert("updated",updateProductionMutation.data);
                     } catch (error) {
                       console.error("Error in mutation:", error);
                     }
@@ -726,21 +863,20 @@ onSuccess: (data) => {
     defaultChecked />
   <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
   <Formik
-  initialValues={initialValues}
+  initialValues={initialValuesProofing}
   enableReinitialize={true}
-  validationSchema={validationSchema}
+  validationSchema={validationSchemaProofing}
   onSubmit={async (values) => {
     try {
      
-        for (const row of values.rows) {
+        for (const row of values.rowsproofing) {
           await AddProofingMutation.mutateAsync({
-            //order_form_id: orderid,
+            order_form_id: orderid,
             entry_date_time: row.proofing_entry_date_time,
             exit_date_time: row.proofing_exit_date_time,
-            number_pallets: row.proofing_num_pallete,
+            num_pallets: row.proofing_num_pallete,
             program_name: row.proofing_program_name,  
-
-            //user_id: userID,
+            user_id: userID,
           });
         }
     } catch (error) {
@@ -755,7 +891,7 @@ onSuccess: (data) => {
           <Form>
             <div className="">
               <FieldArray
-                name="rows"
+                name="rowsproofing"
                 render={(arrayHelpers) => (
                   <div>
                     <div className="flex place-content-end gap-3">
@@ -777,8 +913,9 @@ onSuccess: (data) => {
                       </button>
                        <button className="btn btn-primary" type="submit"
                         // onClick={() => setSubmitContext('rows')}
+                        
                         >
-                        Add Production
+                        Add Proofing
                       </button>
                       <button
                       className="btn btn-accent"
@@ -800,7 +937,7 @@ onSuccess: (data) => {
                           </tr>
                         </thead>
                         {/* tbody for length */}  
-                         {values.rows.map((row, index) => (
+                         {values.rowsproofing.map((row, index) => (
                             <React.Fragment key={index}>
                         <tbody>
                        
@@ -809,45 +946,45 @@ onSuccess: (data) => {
                                   <Field
                                     readOnly
                                     value={orderid}
-                                    name={`rows.${index}.proofing_order_form_id`}
+                                    name={`rowsproofing.${index}.proofing_order_form_id`}
                                     type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
-                                    name={`rows.${index}.proofing_entry_date_time`}
+                                    name={`rowsproofing.${index}.proofing_entry_date_time`}
                                     type="date"
                                     className={`input input-bordered ${
-                                      typeof errors.rows?.[index] === 'object' && errors.rows?.[index]?.production_entry_date_time &&
-                                      touched.rows?.[index]?.production_entry_date_time
+                                      typeof errors.rowsproofing?.[index] === 'object' && errors.rowsproofing?.[index]?.proofing_entry_date_time &&
+                                      touched.rowsproofing?.[index]?.proofing_entry_date_time
                                         ? "border-red-500"
                                         : ""
                                     }`}
                                   />
                                   <ErrorMessage
-                                    name={`rows.${index}.proofing_entry_date_time`}
+                                    name={`rowsproofing.${index}.proofing_entry_date_time`}
                                     component="div"
                                     className="text-red-500 text-sm"
                                   />
                                 </td>
                                 <td>
                                   <Field
-                                    name={`rows.${index}.proofing_exit_date_time`}
+                                    name={`rowsproofing.${index}.proofing_exit_date_time`}
                                     type="date"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
-                                    name={`rows.${index}.proofing_num_pallete`}
+                                    name={`rowsproofing.${index}.proofing_num_pallete`}
                                     type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
-                                    name={`rows.${index}.proofing_program_name`}
+                                    name={`rowsproofing.${index}.proofing_program_name`}
                                     type="text"
                                     className="input input-bordered"
                                   />
@@ -869,10 +1006,10 @@ onSuccess: (data) => {
 
                           {/* second FieldArray */}
                           <FieldArray
-  name="rows2"
+  name="rows3"
   render={(arrayHelpers) => (
     <tbody>
-      {values.rows2.map((row, index) => (
+      {values.rows3.map((row, index) => (
         <tr key={index}>
           {/* <td>
             <Field
@@ -884,7 +1021,7 @@ onSuccess: (data) => {
           </td> */}
           <td>
             <Field
-              name={`rows2.${index}.production_order_form_id`}
+              name={`rows3.${index}.proofing_order_form_id`}
               type="text"
               className="input input-bordered"
               readOnly
@@ -892,17 +1029,17 @@ onSuccess: (data) => {
           </td>
           <td>
             <Field
-              name={`rows2.${index}.production_entry_date_time`}
+              name={`rows3.${index}.proofing_entry_date_time`}
               type="date"
               className="input input-bordered"
               value={
-                new Date(values.rows2[index].production_entry_date_time)
+                new Date(values.rows3[index].proofing_entry_date_time)
                   .toLocaleDateString('en-CA') // Format the initial value
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const newValue = e.target.value;
                 setFieldValue(
-                  `rows2.${index}.production_entry_date_time`,
+                  `rows3.${index}.proofing_entry_date_time`,
                   new Date(newValue).toISOString()
                 );
               }}
@@ -911,21 +1048,37 @@ onSuccess: (data) => {
           </td>
           <td>
             <Field
-              name={`rows2.${index}.production_exit_date_time`}
+              name={`rows3.${index}.proofing_exit_date_time`}
               type="date"
               className="input input-bordered"
               value={
-                new Date(values.rows2[index].production_exit_date_time)
+                new Date(values.rows3[index].proofing_entry_date_time)
                   .toLocaleDateString('en-CA')
               }
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const newValue = e.target.value;
                 setFieldValue(
-                  `rows2.${index}.production_exit_date_time`,
+                  `rows3.${index}.proofing_exit_date_time`,
                   new Date(newValue).toISOString()
                 );
               }}
               readOnly={editableRow !== index} // Read-only unless the row is being edited
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows3.${index}.proofing_num_pallete`}
+              type="number"
+              className="input input-bordered"
+              readOnly={editableRow !== index}
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows3.${index}.proofing_program_name`}
+              type="text"
+              className="input input-bordered"
+              readOnly={editableRow !== index}
             />
           </td>
           <td>
@@ -937,10 +1090,13 @@ onSuccess: (data) => {
                   onClick={async () => {
                     try {
                       // Trigger the mutation with updated values
-                      await updateProductionMutation.mutateAsync({
-                        production_id: values.rows2[index].production_id,
-                        production_entry_date_time: values.rows2[index].production_entry_date_time,
-                        production_exit_date_time: values.rows2[index].production_exit_date_time,
+                      await updateProofingMutation.mutateAsync({
+                        proofing_id: values.rows3[index].proofing_id,
+                        proofing_entry_date_time: values.rows3[index].proofing_entry_date_time,
+                        proofing_exit_date_time: values.rows3[index].proofing_exit_date_time,
+                        proofing_num_pallete: values.rows3[index].proofing_num_pallete, 
+                        proofing_program_name: values.rows3[index].proofing_program_name,
+
                       });
                     } catch (error) {
                       console.error("Error in mutation:", error);
@@ -979,9 +1135,368 @@ onSuccess: (data) => {
       </Formik>
   </div>
 
-  <input type="radio" name="my_tabs_2" role="tab" className="tab" aria-label="Tab 3" />
+  <input type="radio" name="my_tabs_2" role="tab" className="tab" aria-label="Measurement" />
   <div role="tabpanel" className="tab-content bg-base-100 border-base-300 rounded-box p-6">
-    Tab content 3
+  <Formik
+        initialValues={initialValuesMeasurement}
+        enableReinitialize={true}
+        onSubmit={async (values) => {
+          for (const row of values.rowsmeasurement) {
+            AddMeasurementMutation.mutate({
+              order_id: orderid,
+              length: row.length,
+              inside_diameter: row.inside_diameter,
+              outside_diameter: row.outside_diameter,
+              flat_crush: row.flat_crush,
+              h20: row.h20,
+              radial: row.radial,
+              number_control: row.number_of_control,
+              remarks: row.remarks,
+              pallete_count: row.pallete_count,
+              user_id: userID,
+            });
+          }
+          
+          await new Promise((r) => setTimeout(r, 500));
+          alert(JSON.stringify(values, null, 2));
+        }}
+      >
+        {({ values, setFieldValue }) => (
+          
+          <Form>
+            <div className="">
+              <FieldArray
+                name="rowsmeasurement"
+                render={(arrayHelpers) => (
+                  <div>
+                    <div className="flex place-content-end gap-3">
+                      <button
+                        className="btn btn-info"
+                        type="button"
+                        onClick={() =>
+                          arrayHelpers.push({
+                            pallete_count: "",
+                            number_of_control: "",
+                            length: "",
+                            inside_diameter: "",
+                            outside_diameter: "",
+                            flat_crush: "",
+                            h20: "",
+                            radial: "",
+                            remarks: "",
+
+                          })
+                        }
+                      >
+                        Add Row
+                      </button>
+                      <button
+                                    className="btn btn-primary"
+                                    type="submit"
+                                  >
+                                    Add Measurement
+                                  </button>
+                                 
+                      <button
+                        className="btn btn-accent"
+                        onClick={() => setIsModalOpen(false)}
+                      >
+                        Cancel
+                      </button>
+                                    
+                    </div>
+                    <div className="text-black overflow-auto">
+                      <table className="table relative text-center overflow-auto">
+                        <thead className="text-black text-sm">
+                          <tr>
+                            <th>Pallete</th>
+                            <th>Number Of Controll</th>
+                            <th>Length</th>
+                            <th>Inside Diameter</th>
+                            <th>Outside Diameter</th>
+                            <th>Flat Crush</th>
+                            <th>H20</th>
+                            <th>Radial </th>
+                            <th>Remarks</th>
+                          
+                          </tr>
+                        </thead>
+                        <tbody>
+  {values.rowsmeasurement.map((row, index) => (
+    <React.Fragment key={index}>
+      <tr>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.pallete_count`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.number_of_control`}
+            type="number"
+            placeholder="0"
+            className="input bg-white input-bordered w-20 max-w-md"
+            onChange={(e:any) => {
+              const newCount = parseInt(e.target.value, 10);
+              const currentPallete =
+                values.rowsmeasurement[index].pallete_count;
+              const currentRowsCount = values.rowsmeasurement.filter(
+                (r) => r.pallete_count === currentPallete
+              ).length;
+
+              // Update `number_of_control`
+              setFieldValue(
+                `rowsmeasurement.${index}.number_of_control`,
+                newCount
+              );
+
+              // Calculate rows to adjust
+              const rowsToAdjust = newCount - currentRowsCount;
+
+              if (rowsToAdjust > 0) {
+                // Add rows if the number increased
+                for (let i = 0; i < rowsToAdjust; i++) {
+                  arrayHelpers.insert(index + 1, {
+                    pallete_count: currentPallete,
+                    number_of_control: "",
+                    length: "",
+                    inside_diameter: "",
+                    outside_diameter: "",
+                    flat_crush: "",
+                    h20: "",
+                    radial: "",
+                    remarks: "",
+                  });
+                }
+              } else if (rowsToAdjust < 0) {
+                // Remove rows if the number decreased
+                for (let i = 0; i < Math.abs(rowsToAdjust); i++) {
+                  const rowIndex = values.rowsmeasurement.findIndex(
+                    (r, idx) =>
+                      idx > index &&
+                      r.pallete_count === currentPallete
+                  );
+                  if (rowIndex !== -1) {
+                    arrayHelpers.remove(rowIndex);
+                  }
+                }
+              }
+            }}
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.length`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.inside_diameter`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.outside_diameter`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.flat_crush`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.h20`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.radial`}
+            placeholder="0"
+            type="number"
+            className="input bg-white input-bordered w-20 max-w-md"
+          />
+        </td>
+        <td>
+          <Field
+            name={`rowsmeasurement.${index}.remarks`}
+            placeholder="0"
+            type="text"
+            className="input bg-white input-bordered w-auto max-w-md"
+          />
+        </td>
+        <td>
+          <button
+            type="button"
+            className="btn btn-error"
+            onClick={() => arrayHelpers.remove(index)}
+          >
+            Remove
+          </button>
+        </td>
+      </tr>
+    </React.Fragment>
+  ))}
+</tbody>
+{/* second Feild Array */}
+<FieldArray
+  name="rows4"
+  render={(arrayHelpers) => (
+    <tbody>
+      {values.rows4.map((row, index) => (
+        <tr key={index}>
+          <td>
+            <Field
+              name={`rows4.${index}.pallete_count`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.number_of_control`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly
+
+            /> 
+            </td>
+          <td>
+            <Field
+              name={`rows4.${index}.length`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly={editableRow !== index}
+
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.inside_diameter`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly={editableRow !== index}
+
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.outside_diameter`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly={editableRow !== index}
+
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.flat_crush`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly={editableRow !== index}
+
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.h20`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly={editableRow !== index}
+
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.radial`}
+              type="number"
+              className="input input-bordered w-20 max-w-md"
+              readOnly={editableRow !== index}
+ 
+            />
+          </td>
+          <td>
+            <Field
+              name={`rows4.${index}.remarks`}
+              type="text"
+              className="input input-bordered"
+              readOnly={editableRow !== index}
+
+            />
+          </td>
+          <td>
+            {editableRow === index ? (
+              <>
+                <button
+                  type="button"
+                  className="btn btn-success"
+                  onClick={async () => {
+                    try {
+                      // Trigger the mutation with updated values
+                      await updateMeasurementMutation.mutateAsync({
+                        measurement_id: values.rows4[index].measurement_id,
+                        pallete_count: values.rows4[index].pallete_count,
+                        number_of_control: values.rows4[index].number_of_control,
+                        length: values.rows4[index].length,
+                        inside_diameter: values.rows4[index].inside_diameter,
+                        outside_diameter: values.rows4[index].outside_diameter,
+                        flat_crush: values.rows4[index].flat_crush,
+                        h20: values.rows4[index].h20,
+                        radial: values.rows4[index].radial,
+                        remarks: values.rows4[index].remarks,
+                      });
+                    } catch (error) {
+                      console.error("Error in mutation:", error);
+                    }
+                  }}
+                >
+                  Save
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => setEditableRow(index)}
+              >
+                Edit
+              </button>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  )}
+/>
+
+                      </table>
+                    </div>
+                  </div>
+                )}
+              />
+            </div>
+          </Form>
+        )}
+      </Formik>
   </div>
 </div>
     </div>
