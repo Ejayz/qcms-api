@@ -46,7 +46,7 @@ export default function OrderListView() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userID, setUserID] = useState<string | null>(null);
   const [orderid, setOrderid] = useState<string | null>(null);
-
+  const [asssing_id, setAssign_id] = useState<string | null>(null);
   const [editableRow, setEditableRow] = useState<number | null>(null);
   const [editproductionID, setEditproductionID] = useState<string | null>(null);
 
@@ -509,10 +509,10 @@ const customerOptions =
 
 
   const AssignOrderMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: any) => {                                                 
       const response = await fetch("/api/v1/create_assign", {
         method: "POST",
-        headers: {
+        headers: {                                                                                      
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
@@ -1618,78 +1618,50 @@ const customerOptions =
 )}
 {isAssignModalOpen && (
   <div className="modal modal-open">
-    <div className="modal-box w-11/12 max-w-xl">
-      <div className="flex place-content-end">
-      <Formik
-  initialValues={{
-    userId: "",
-  }}
-  validationSchema={validationSchemaAssign}
-  onSubmit={(e) => {
-    AssignOrderMutation.mutate(
-      {
-        order_form_id: orderid,
-        user_id: e.userId,
-      },
-      {
-        onSuccess: () => {
-          console.log('Order assigned successfully');
-          setAssignModal(false);
-          setOrderid(null);
-        },
-        onError: (error) => {
-          console.error('Error assigning order:', error);
-        },
-      }
-    );
-  }}
->
-  {({ errors, touched }) => (
-    <Form>
-      <div>
-        <label className="form-control w-96 max-w-lg">
-          <FormSelect
-            tooltip="Select the customer's name from the dropdown"
-            name="userId"
-            placeholder="Choose a customer"
-            label="Customer Name"
-            options={customerOptions}
-            errors={errors.userId}
-            touched={touched.userId ? "true" : undefined}
-          />
-          {isFetchingCustomers && <p>Loading customers...</p>}
-          {error && <p className="text-red-500">{error}</p>}
-        </label>
-      </div>
-      <div className="flex place-content-end gap-3">
+    <div className="modal-box w-11/12 max-w-1xl">
+      
+      <div className="flex flex-col gap-y-4">
+        <div className="flex flex-col gap-y-4">
+          <label className="label">
+            Assign Order
+          </label>
+          <select
+            className="select select-bordered"
+            onChange={(e) => {
+              setAssign_id(e.target.value);
+            }}
+          >
+            <option value="" disabled selected>Select Customer</option>
+            {customerOptions.map((option: any) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex gap-4 place-content-end">
         <button
           className="btn btn-primary"
-          type="submit"
-          onClick={()=>{
+          onClick={() => {
             AssignOrderMutation.mutate({
               order_form_id: orderid,
-              user_id: userID,
+              user_id: asssing_id,
             });
-
           }}
         >
           Assign
         </button>
         <button
           className="btn btn-accent"
-          type="button"
           onClick={() => {
             setAssignModal(false);
             setOrderid(null);
+            window.location.reload();
           }}
         >
           Cancel
         </button>
-      </div>
-    </Form>
-  )}
-</Formik>
-
+        </div>
       </div>
     </div>
   </div>
