@@ -16,6 +16,7 @@ export default function AddOrderList() {
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
+    AssigneeName: Yup.string().required("Assignee is required"),
   });
 
   const AddOrderMutation = useMutation({
@@ -113,6 +114,39 @@ export default function AddOrderList() {
     label: `${article.article_name}`,
   })) || [];
 
+  const {
+    data: assigneeData,
+    isFetching: isFetchingAssignees,
+    isError: isErrorAssignees,
+  } = useQuery({
+    queryKey: ["get_users", page, search, limit],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch customers");
+      }
+
+      return response.json();
+    },
+    staleTime: 5000, // Avoid flickering on refetch
+    retry: 2,
+  });
+
+  const assignOptions = assigneeData?.map((assignee: any) => ({
+    value: assignee.uuid,
+    label: `${assignee.first_name} ${assignee.last_name}`,
+  })) || [];
+
+
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
@@ -129,7 +163,7 @@ export default function AddOrderList() {
         initialValues={{
           CustomerName: "",
           ArticleName: "",
-          // AssigneeName: "",
+          AssigneeName: "",
           PalleteCount: "",
         }}
         validationSchema={Add_Order_Validator}
@@ -137,7 +171,7 @@ export default function AddOrderList() {
           AddOrderMutation.mutate({
             customer_id: e.CustomerName,
             article_id: e.ArticleName,
-            // assignee: e.AssigneeName,
+            assignee: e.AssigneeName,
             pallete_count: e.PalleteCount,
           });
         }}
@@ -174,7 +208,19 @@ export default function AddOrderList() {
                     {isLoading && <p>Loading article...</p>}
                     {error && <p className="text-red-500">{error}</p>}
                   </div>
-
+                  <div>
+                    <FormSelect
+                      tooltip="Select the article's name from the dropdown"
+                      name="AssigneeName"
+                      placeholder="Choose a Assignee"
+                      label="Assignee Name"
+                      options={assignOptions}
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                    />
+                    {isLoading && <p>Loading article...</p>}
+                    {error && <p className="text-red-500">{error}</p>}
+                  </div>
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">
@@ -193,7 +239,7 @@ export default function AddOrderList() {
                         </span>
                       </div>
                       <Field
-                        type="text"
+                        type="number"
                         placeholder="Site Name: Example: EzMiner"
                         name="PalleteCount"
                         className={`input input-bordered w-full max-w-md ${

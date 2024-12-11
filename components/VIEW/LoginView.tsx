@@ -48,15 +48,15 @@ export default function LoginView() {
       const userid=data.user.id;
       localStorage.setItem("userid", userid);
     
-      const useremail=data.user.email;
-      console.log("emails:",useremail);
-      if(checkemail===false){
-        toast.error("Email is not verified");
-        route.push("/verify_email");
-      }else{
+      // const useremail=data.user.email;
+      // console.log("emails:",useremail);
+      // if(checkemail===false){
+      //   toast.error("Email is not verified");
+      //   route.push("/verify_email");
+      // }else{
       toast.success("Login Successful");
       route.push("/dashboard");
-      }
+      // }
     },
   });
   

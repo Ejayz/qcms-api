@@ -1,51 +1,56 @@
 "use client";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Field, Form, Formik } from "formik";
-import {
-  CircleCheckBig,
-  CircleHelp,
-  Pencil,
-  Plus,
-  Trash2,
-  TriangleAlert,
-} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { Field, FieldArray, Form, Formik } from "formik";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import * as Yup from "yup";
-import { FormSelect } from "../UI/FormInput";
-import { useState, useEffect, use } from "react";
-import Order from "@/app/dashboard/laboratory_management/page";
-export default function AddOrderList(params: any) {
-  // const navigator = useRouter();
-  // const [userid, setuserid] = useState<string | null>(null);
-  // useEffect(() => {
-  //   const userid = localStorage.getItem("userid");
-  //   setuserid(userid);
-  // }, []);
+import { Pencil } from "lucide-react";
 
-  // console.log("the current user:", userid);
-
+export default function EditArticleListCopy(params:any) {
   const router = useRouter();
   const id = params.params;
 
-  const [initialValues, setInitialValues] = useState({
-    ArticleNominal: "",
-    ArticleMin: "",
-    ArticleMax: "",
-    NumberControl: "",
+  const [initialValues,setInitialValues] = useState({ 
+    rows: [
+      {
+        // article_name: "",
+        LengthNominal: "",
+        LengthMin: "",
+        LengthMax: "",
+        InsideDiameterNominal: "",
+        InsideDiameterMin: "",
+        InsideDiameterMax: "",
+        OutsideDiameterNominal: "",
+        OutsideDiameterMin: "",
+        OutsideDiameterMax: "",
+        FlatCrushNominal: "",
+        FlatCrushMin: "",
+        FlatCrushMax: "",
+        H20Nominal: "",
+        H20Min: "",
+        H20Max: "",
+        NumberControl: "",
+      },
+    ],
   });
+
+  
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [nominalID, setNominalID] = useState<string | null>(null);
+  const [minID, setMinID] = useState<string | null>(null);
+  const [maxID, setMaxID] = useState<string | null>(null);
+
   const {
-    data: userData,
-    isLoading: isUserLoading,
-    isSuccess,
-    isError,
-    error: userError,
+    data: articleData,
+    isLoading: isArticleLoading,
+    isSuccess: isArticleSuccess,
+    isError: isArticleError,
   } = useQuery({
-    queryKey: ["customer", id],
+    queryKey: ["article", id],
     queryFn: async () => {
       const response = await fetch(`/api/v1/getonearticle/?id=${id}`);
       if (!response.ok) {
@@ -55,33 +60,153 @@ export default function AddOrderList(params: any) {
     },
     enabled: !!id, // Only fetch data if id exists
   });
-  console.log("Gatherd data:", userData);
+  console.log("Gatherd data:", articleData);
   useEffect(() => {
-    if (isSuccess && userData && userData.length > 0) {
-      const user = userData[0]; // Get the first user object
+    if (isArticleSuccess && articleData && articleData.length > 0) {
+      const user = articleData[0];
+      setNominalID(user.article_nominal);
+      setMinID(user.article_min);
+      setMaxID(user.article_max);
       setInitialValues((prev) => ({
         ...prev,
-        ArticleNominal: user.article_nominal,
-        ArticleMin: user.article_min,
-        ArticleMax: user.article_max,
-        NumberControl: user.number_control,
+        number_control: user.number_control,
+      }));
+      }
+  }, [isArticleSuccess, articleData]);
+  
+  const {
+    data: nominalData,
+    isLoading: isNominalLoading,
+    isSuccess: isNominalSuccess,
+    isError: isNominalError,
+  } = useQuery({
+    queryKey: ["article_nominal", nominalID],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/getonearticlenominal/?id=${nominalID}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user data: ${response.status}`);
+      }
+      return response.json(); // Expecting an array
+    },
+    enabled: !!id, // Only fetch data if id exists
+  });
+  console.log("Gatherd data:", nominalData);
+  useEffect(() => {
+    if (isNominalSuccess && nominalData?.length > 0) {
+      setInitialValues((prev) => ({
+        ...prev,
+        rows: prev.rows.map((row) => ({
+          ...row,
+          LengthNominal: nominalData[0].length,
+          InsideDiameterNominal: nominalData[0].inside_diameter,
+          OutsideDiameterNominal: nominalData[0].outside_diameter,
+          FlatCrushNominal: nominalData[0].flat_crush,
+          H20Nominal: nominalData[0].h20,
+        })),
       }));
     }
-  }, [isSuccess, userData]);
+  }, [isNominalSuccess, nominalData]);
+  
 
-  const updateUserMutation = useMutation({
+  const {
+    data: minData,
+    isLoading: isMinLoading,
+    isSuccess: isMinSuccess,
+    isError: isMinError,
+    error: userError,
+  } = useQuery({
+    queryKey: ["article_min",minID],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/getonearticlemin/?id=${minID}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user data: ${response.status}`);
+      }
+      return response.json(); // Expecting an array
+    },
+    enabled: !!id, // Only fetch data if id exists
+  });
+  console.log("Gatherd data:", minData);
+  useEffect(() => {
+    if (isMinSuccess && minData?.length > 0) {
+      setInitialValues((prev) => ({
+        ...prev,
+        rows: prev.rows.map((row) => ({
+          ...row,
+          LengthMin: minData[0].length,
+          InsideDiameterMin: minData[0].inside_diameter,
+          OutsideDiameterMin: minData[0].outside_diameter,
+          FlatCrushMin: minData[0].flat_crush,
+          H20Min: minData[0].h20,
+        })),
+      }));
+    }
+  }, [isMinSuccess, minData]);
+
+  const {
+    data: maxData,
+    isLoading: isMaxLoading,
+    isSuccess: isMaxSuccess,
+    isError: isMaxError,
+    error: maxError,
+  } = useQuery({
+    queryKey: ["article_max", maxID],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/getonearticlemax/?id=${maxID}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user data: ${response.status}`);
+      }
+      return response.json(); // Expecting an array
+    },
+    enabled: !!id, // Only fetch data if id exists
+  });
+  console.log("Gatherd data:", maxData);
+  useEffect(() => {
+    if (isMaxSuccess && maxData?.length > 0) {
+      setInitialValues((prev) => ({
+        ...prev,
+        rows: prev.rows.map((row) => ({
+          ...row,
+          LengthMax: maxData[0].length,
+          InsideDiameterMax: maxData[0].inside_diameter,
+          OutsideDiameterMax: maxData[0].outside_diameter,
+          FlatCrushMax: maxData[0].flat_crush,
+          H20Max: maxData[0].h20,
+        })),
+      }));
+    }
+  }, [isMaxSuccess, maxData]);
+
+  const UpdateNominalMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch(`/api/v1/edit_article?id=${id}`, {
+      const response = await fetch(`/api/v1/edit_article_nominal/?id=${nominalID}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          article_nominal: data.ArticleNominal,
-          article_min: data.ArticleMin,
-          article_max: data.ArticleMax,
-          number_control: data.NumberControl,
-        }),
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Failed to update article");
+    },
+    onSuccess: (data) => {
+      toast.success("Article updated Successfully");
+      router.push("/dashboard/article_management");
+    },
+    onMutate: (data) => {
+      return data;
+    },
+  });
+  
+  const UpdateMinMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/v1/edit_article_min/?id=${nominalID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
       return response.json();
     },
@@ -97,235 +222,293 @@ export default function AddOrderList(params: any) {
     },
   });
 
-  const Add_Order_Validator = Yup.object().shape({
-    ArticleNominal: Yup.string().required("Article Nominal is required"),
-    ArticleMin: Yup.string().required("Article Min is required"),
-    ArticleMax: Yup.string().required("Article Max is required"),
-    NumberControl: Yup.string().required("Number Control is required"),
+  const UpdateMaxMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/v1/edit_article_max/?id=${nominalID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Failed to update article");
+    },
+    onSuccess: (data) => {
+      toast.success("Article updated Successfully");
+      router.push("/dashboard/article_management");
+    },
+    onMutate: (data) => {
+      return data;
+    },
   });
-
-  const [articlenominal, setarticlenominal] = useState([]);
-  const [articlemin, setarticlemin] = useState([]);
-  const [articlemax, setarticlemax] = useState([]);
-
-  useEffect(() => {
-    const fetcharticlenominal = async () => {
-      try {
-        const response = await fetch(
-          `/api/v1/get_article_nominal?page=1&limit=10`
-        ); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((order: any) => ({
-            value: order.id,
-            label: `${order.id}`,
-          }));
-          setarticlenominal(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch article nominal.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetcharticlenominal();
-  }, []);
-
-  useEffect(() => {
-    const fetcharticlemin = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_article_min?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((order: any) => ({
-            value: order.id,
-            label: `${order.id}`,
-          }));
-          setarticlemin(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch article min.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetcharticlemin();
-  }, []);
-
-  useEffect(() => {
-    const fetcharticlemax = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_article_max?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((order: any) => ({
-            value: order.id,
-            label: `${order.id}`,
-          }));
-          setarticlemax(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch article max.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetcharticlemax();
-  }, []);
-
-
-
+  
   
   return (
-    <div className="flex flex-col w-11/12 mx-auto text-black">
+    <div className="flex flex-col w-full p-12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/article_management">Article Management</Link>
-          </li>
-          <li>
-            <span>View Article</span>
+            <Link href="/dashboard/measurement_management">
+              Measurement Management
+            </Link>
           </li>
         </ul>
       </div>
-      
       <Formik
         initialValues={initialValues}
-        validationSchema={Add_Order_Validator}
         enableReinitialize={true}
-        onSubmit={async (e, actions) => {
-          updateUserMutation.mutate(e);
-        }}
+        onSubmit={async (values) => {
+          for(const row of values.rows){
+            await UpdateNominalMutation.mutateAsync({
+              length: row.LengthNominal,
+              inside_diameter: row.InsideDiameterNominal,
+              outside_diameter: row.OutsideDiameterNominal,
+              flat_crush: row.FlatCrushNominal,
+              h20: row.H20Nominal,
+            });
+            await UpdateMinMutation.mutateAsync({
+              length: row.LengthMin,
+              inside_diameter: row.InsideDiameterMin,
+              outside_diameter: row.OutsideDiameterMin,
+              flat_crush: row.FlatCrushMin,
+              h20: row.H20Min,
+            });
+            await UpdateMaxMutation.mutateAsync({
+              length: row.LengthMax,
+              inside_diameter: row.InsideDiameterMax,
+              outside_diameter: row.OutsideDiameterMax,
+              flat_crush: row.FlatCrushMax,
+              h20: row.H20Max,
+            });
+
+          }
+        }
+      }
+         
       >
-        {({ errors, touched, values }) => (
+        {({ values, setFieldValue }) => (
           <Form>
-            <div className="flex flex-col gap-y-6">
-              <div className="border p-12 rounded-md bg-white">
-                <h1 className="text-xl font-bold py-4">Order Details</h1>
-                <div className="grid grid-cols-3 gap-6 w-full">
+            <div className="">
+              <FieldArray
+                name="rows"
+                render={(arrayHelpers) => (
                   <div>
-                    <FormSelect
-                      tooltip="Select the article nominal's ID from the dropdown"
-                      name="ArticleNominal"
-                      placeholder="Choose a Article Nominal"
-                      label="Article Nominal"
-                      options={articlenominal}
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
-                      readonly={true}
-                    />
-                    {isLoading && <p>Loading article...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                  </div>
-
-                  <div>
-                    <FormSelect
-                      tooltip="Select the article min's ID from the dropdown"
-                      name="ArticleMin"
-                      placeholder="Choose a Article Min"
-                      label="Article Min"
-                      options={articlemin}
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
-                      readonly={true}
-                    />
-                    {isLoading && <p>Loading article...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                  </div>
-
-                  <div>
-                    <FormSelect
-                      tooltip="Select the article max's ID from the dropdown"
-                      name="ArticleMax"
-                      placeholder="Choose a Article Max"
-                      label="Article Max"
-                      options={articlemax}
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
-                      readonly={true}
-                    />
-                    {isLoading && <p>Loading article...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                  </div>
-
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <div className="label">
-                        <span className="label-text font-bold gap-x-2 flex flex-row">
-                          Number Of Control
-                          <span
-                            className="tooltip tooltip-right"
-                            data-tip="Exit Date Field. This is required."
-                          >
-                            <CircleHelp
-                              className=" my-auto"
-                              size={20}
-                              strokeWidth={0.75}
-                            />
-                          </span>
-                        </span>
-                      </div>
+                    <div className="flex place-content-end gap-3">
                       <Field
                       readOnly
-                        type="text"
-                        placeholder="Site Name: Example: EzMiner"
-                        name="NumberControl"
-                        className={`input input-bordered w-full max-w-md ${
-                          errors.NumberControl && touched.NumberControl
-                            ? "input-error"
-                            : ""
-                        }`}
+                        name="number_control"
+                        type="number"
+                        placeholder=""
+                        className="input input-bordered"
                       />
-                    </label>
+                     
+                      {/* <button>Remove</button> */}
+                      {/* <button className="btn btn-primary" type="submit">
+                        Edit Article
+                      </button> */}
+                      <Link
+                        href="/dashboard/article_management"
+                        className="btn btn-accent"
+                      >
+                        Back
+                      </Link>
+                    </div>
+                    <div className="text-black overflow-auto">
+                      <table className="table relative text-center overflow-auto">
+                        <thead className="text-black text-sm">
+                          <tr>
+                            {/* <th>Article Name</th> */}
+                            <td></td>
+                            <th>Scoll Nominal</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                          </tr>
+                        </thead>
+                        {/* tbody for length */}   {values.rows.map((row, index) => (
+                            <React.Fragment key={index}>
+                        <tbody>
+                       
+                              <tr>
+                                <td>Length</td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.LengthNominal`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.LengthMin`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.LengthMax`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
 
-                    {errors.NumberControl && touched.NumberControl ? (
-                      <span className="text-error  flex flex-row">
-                        {errors.NumberControl}
-                      </span>
-                    ) : null}
+                              
+                              </tr>
+                         
+                        </tbody>
+                        {/* tbody for inside diameter */}
+                        <tbody>
+                        
+                              <tr>
+                                <td>Inside Diameter</td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.InsideDiameterNominal`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.InsideDiameterMin`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.InsideDiameterMax`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                             
+                              </tr>
+                          
+                        </tbody>
+                        {/* tbody for outside diameter */}
+                        <tbody>
+                        
+                              <tr>
+                                <td>Outside Diameter</td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.OutsideDiameterNominal`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.OutsideDiameterMin`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.OutsideDiameterMax`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                               
+                              </tr>
+                          
+                        </tbody>
+                        {/* tbody for flat crush */}
+                        <tbody>
+                          {values.rows.map((row, index) => (
+                            <React.Fragment key={index}>
+                              <tr>
+                                <td>Flat Crush</td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.FlatCrushNominal`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.FlatCrushMin`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.FlatCrushMax`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                              </tr>
+                            </React.Fragment>
+                          ))}
+                        </tbody>
+                        {/* tbody for h20 */}
+                        <tbody>
+                         
+                              <tr>
+                                <td>H20</td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.H20Nominal`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.H20Min`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                  readOnly
+                                    name={`rows.${index}.H20Max`}
+                                    type="text"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                          
+                              </tr>
+                          
+                        </tbody>  </React.Fragment>
+                          ))}
+                      </table>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </div>
-            <div className="modal-action p-6">
-              {/* <button
-                type="submit"
-                className={`btn btn-outline ${
-                  updateUserMutation.isPending ? "btn-disabled" : "btn-primary"
-                } btn-md`}
-              >
-                {updateUserMutation.isPending ? (
-                  <>
-                    <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding Site...
-                  </>
-                ) : (
-                  <>
-                    <Pencil /> Edit Article
-                  </>
                 )}
-              </button> */}
-              <Link
-                className="btn btn-accent btn-md "
-                href="/dashboard/article_management"
-              >
-                BACK
-              </Link>
+              />
             </div>
           </Form>
         )}
       </Formik>
-
-      
     </div>
   );
 }
