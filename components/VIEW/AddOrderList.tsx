@@ -7,16 +7,18 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { FormSelect } from "../UI/FormInput";
+import { FormInput, FormSelect } from "../UI/FormInput";
 import { useState, useEffect } from "react";
 export default function AddOrderList() {
   const navigator = useRouter();
 
   const Add_Order_Validator = Yup.object().shape({
+    Id: Yup.string().required("Id is required"),
+    product_name: Yup.string().required("Product Name is required"),
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
-    AssigneeName: Yup.string().required("Assignee is required"),
+    // AssigneeName: Yup.string().required("Assignee is required"),
   });
 
   const AddOrderMutation = useMutation({
@@ -161,6 +163,8 @@ export default function AddOrderList() {
       </div>
       <Formik
         initialValues={{
+          Id: "",
+          product_name: "",
           CustomerName: "",
           ArticleName: "",
           AssigneeName: "",
@@ -169,6 +173,8 @@ export default function AddOrderList() {
         validationSchema={Add_Order_Validator}
         onSubmit={async (e, actions) => {
           AddOrderMutation.mutate({
+            id: e.Id,
+            product_name: e.product_name,
             customer_id: e.CustomerName,
             article_id: e.ArticleName,
             assignee: e.AssigneeName,
@@ -183,6 +189,27 @@ export default function AddOrderList() {
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-2 gap-6 w-full">
                   <div>
+                    <FormInput
+                      tooltip="Enter the order ID"
+                      name="Id"
+                      placeholder="Order ID"
+                      label="Order ID"
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                    />
+                  </div>
+                  <div>
+                    <FormInput
+                      tooltip="Enter the product name"
+                      name="product_name"
+                      placeholder="Product Name"
+                      label="Product Name"
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                    />
+                  </div>
+                  <div>
+                  <label className="form-control w-96 max-w-lg">
                     <FormSelect
                       tooltip="Select the customer's name from the dropdown"
                       name="CustomerName"
@@ -194,8 +221,10 @@ export default function AddOrderList() {
                     />
                     {isLoading && <p>Loading customers...</p>}
                     {error && <p className="text-red-500">{error}</p>}
+                  </label>
                   </div>
                   <div>
+                  <label className="form-control w-96 max-w-lg">
                     <FormSelect
                       tooltip="Select the article's name from the dropdown"
                       name="ArticleName"
@@ -207,8 +236,9 @@ export default function AddOrderList() {
                     />
                     {isLoading && <p>Loading article...</p>}
                     {error && <p className="text-red-500">{error}</p>}
+                    </label>
                   </div>
-                  <div>
+                  {/* <div>
                     <FormSelect
                       tooltip="Select the article's name from the dropdown"
                       name="AssigneeName"
@@ -220,7 +250,7 @@ export default function AddOrderList() {
                     />
                     {isLoading && <p>Loading article...</p>}
                     {error && <p className="text-red-500">{error}</p>}
-                  </div>
+                  </div> */}
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <div className="label">

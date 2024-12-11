@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
+import { FormSelect } from "../UI/FormInput";
 
 export default function OrderListView() {
   const [page, setPage] = useState(1);
@@ -90,6 +91,7 @@ export default function OrderListView() {
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAssignModalOpen, setAssignModal] = useState(false);
   const [initialValues, setInitialValues] = useState({
     rows: [
       {
@@ -166,6 +168,13 @@ export default function OrderListView() {
         isControlRow: false,
       },
     ],
+  });
+  const initialValuesAssign = {
+    user_id: "",
+  };
+  const validationSchemaAssign= Yup.object({
+    user_id: Yup.string().required("User is required"),
+    
   });
 
   const validationSchema = Yup.object({
@@ -460,6 +469,90 @@ const updateMeasurementMutation = useMutation({
     // You can do additional logic here, e.g., close the modal or refresh data
   },
   });
+
+//assigning
+const [error, setError] = useState<string | null>(null);
+
+const {
+  data: customerData,
+  isFetching: isFetchingCustomers,
+  isError: isErrorCustomers,
+} = useQuery({
+  queryKey: ["get_users", page, search, limit],
+  queryFn: async () => {
+    const response = await fetch(
+      `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch customers");
+    }
+
+    return response.json();
+  },
+  staleTime: 5000,
+  retry: 2,
+  // Handle error inside the query function
+});
+
+const customerOptions =
+  customerData?.map((customer: any) => ({
+    value: customer.uuid,
+    label: `${customer.first_name} ${customer.last_name}`,
+  })) || [];
+
+
+  const AssignOrderMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/v1/create_assign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      const responseData = await response.json();
+
+      // Return status and response data
+      return {
+        status: response.status,
+        data: responseData,
+      };
+    },
+    onError: (error) => {
+      toast.error("Failed to add assignee");
+    },
+    onSuccess: ({status,data}) => {
+      if (status === 200) {
+        // Handle success for user creation
+        toast.success("Assign added successfully");
+
+        // Delay navigation by 2 seconds (2000 milliseconds)
+        setTimeout(() => {
+          navigator.push("/dashboard/order_management");
+        }, 2000);
+      } else if (status === 409) {
+        // Handle conflict (e.g., user already exists)
+        toast.error(
+          "The email is already registered. Please use a different email and try again."
+        );
+      } else {
+        // Handle other non-success statuses
+        toast.error("An unexpected error occur  red. Please try again.");
+      }
+    },
+    onMutate: (data) => {
+      return data;
+    },
+  });
+
+
   return (
     
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
@@ -538,7 +631,7 @@ const updateMeasurementMutation = useMutation({
 >
   {order.id}
 </td>
-                  <td></td>
+                  <td>{order.product_name}</td>
                   <td className="text-xs">
                     {order.tbl_customer.last_name}{" "}
                     {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "}
@@ -551,18 +644,20 @@ const updateMeasurementMutation = useMutation({
                  
                   <td className="justify-center items-center flex gap-4">
                    {userRole==="Super Admin" && (
-                    <Link
-                      href={`/dashboard/assignorder/${order.id}`}
-                      className="flex flex-row gap-x-2 link"
+                    <button className="btn btn-info"
+                    onClick={() => {
+                      setAssignModal(true);
+                      setOrderid(order.id);
+                    }}
+
                     >
-                      {/* <Pencil className="text-warning" /> */}
-                       Assign
-                    </Link>
+                      Assign
+                    </button>
                     )}  
-                  <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
+                  {/* <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
                     className="link">
                     Measurement
-                    </Link>
+                    </Link> */}
                     <Link
                       href={`/dashboard/editorder/${order.id}`}
                       className="link flex" 
@@ -1521,7 +1616,85 @@ const updateMeasurementMutation = useMutation({
     </div>
   </div>
 )}
+{isAssignModalOpen && (
+  <div className="modal modal-open">
+    <div className="modal-box w-11/12 max-w-xl">
+      <div className="flex place-content-end">
+      <Formik
+  initialValues={{
+    userId: "",
+  }}
+  validationSchema={validationSchemaAssign}
+  onSubmit={(e) => {
+    AssignOrderMutation.mutate(
+      {
+        order_form_id: orderid,
+        user_id: e.userId,
+      },
+      {
+        onSuccess: () => {
+          console.log('Order assigned successfully');
+          setAssignModal(false);
+          setOrderid(null);
+        },
+        onError: (error) => {
+          console.error('Error assigning order:', error);
+        },
+      }
+    );
+  }}
+>
+  {({ errors, touched }) => (
+    <Form>
+      <div>
+        <label className="form-control w-96 max-w-lg">
+          <FormSelect
+            tooltip="Select the customer's name from the dropdown"
+            name="userId"
+            placeholder="Choose a customer"
+            label="Customer Name"
+            options={customerOptions}
+            errors={errors.userId}
+            touched={touched.userId ? "true" : undefined}
+          />
+          {isFetchingCustomers && <p>Loading customers...</p>}
+          {error && <p className="text-red-500">{error}</p>}
+        </label>
       </div>
+      <div className="flex place-content-end gap-3">
+        <button
+          className="btn btn-primary"
+          type="submit"
+          onClick={()=>{
+            AssignOrderMutation.mutate({
+              order_form_id: orderid,
+              user_id: userID,
+            });
+
+          }}
+        >
+          Assign
+        </button>
+        <button
+          className="btn btn-accent"
+          type="button"
+          onClick={() => {
+            setAssignModal(false);
+            setOrderid(null);
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </Form>
+  )}
+</Formik>
+
+      </div>
+    </div>
+  </div>
+)}
+            </div>
     </div>
   );
 }

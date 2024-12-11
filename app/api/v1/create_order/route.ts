@@ -6,6 +6,8 @@ export async function POST(req: NextRequest) {
     // Parse incoming request data
     const data = await req.json();
     const {
+      id,
+      product_name,
       customer_id,
       article_id,
       assignee,
@@ -16,6 +18,8 @@ export async function POST(req: NextRequest) {
 
     console.log(
       "Received Data:",
+      id,
+      product_name,
       customer_id,
       article_id,
       assignee,
@@ -30,11 +34,13 @@ export async function POST(req: NextRequest) {
       .from("tbl_orders_form")
       .insert([
         {
+          id:id||null,
+          product_name: product_name || null,
           customer_id: customer_id || null,
           article_id: article_id || null,
-          assignee: assignee || null,
+          //assignee: assignee || null,
           pallete_count: pallete_count || 0, // Default to 0 if not provided
-          is_assigned: true,
+          //is_assigned: true,
           is_exist: true, // Always true
         },
       ])
@@ -59,23 +65,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Insert data into tbl_assignee_history
-    const { error: historyError } = await supabase
-      .from("tbl_assignee_history")
-      .insert([
-        {
-          order_form_id: order_form_id, // Use the retrieved ID
-          user_id: assignee || null,
-          is_assigned: true,
-          is_exist: true, // Always true
-        },
-      ]);
+    // // Insert data into tbl_assignee_history
+    // const { error: historyError } = await supabase
+    //   .from("tbl_assignee_history")
+    //   .insert([
+    //     {
+    //       order_form_id: order_form_id, // Use the retrieved ID
+    //       user_id: assignee || null,
+    //       is_assigned: true,
+    //       is_exist: true, // Always true
+    //     },
+    //   ]);
 
-    // Handle errors
-    if (historyError) {
-      console.error("Error inserting assignee history:", historyError.message);
-      return NextResponse.json({ error: historyError.message }, { status: 500 });
-    }
+    // // Handle errors
+    // if (historyError) {
+    //   console.error("Error inserting assignee history:", historyError.message);
+    //   return NextResponse.json({ error: historyError.message }, { status: 500 });
+    // }
 
     // Return success response
     return NextResponse.json(

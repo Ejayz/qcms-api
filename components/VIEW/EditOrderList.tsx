@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { FormSelect } from "../UI/FormInput";
+import { FormInput, FormSelect } from "../UI/FormInput";
 import { useState, useEffect } from "react";
 export default function AddOrderList(params:any) {
   
@@ -15,6 +15,8 @@ export default function AddOrderList(params:any) {
   const id=params.params;
 
   const [initialValues, setInitialValues] = useState({
+    Id: "",
+    product_name: "",
     CustomerName: "",
     ArticleName: "",
     PalleteCount: "",
@@ -44,6 +46,8 @@ export default function AddOrderList(params:any) {
       const user = userData[0]; // Get the first user object
       setInitialValues((prev) => ({
         ...prev,
+        Id: user.id || "",
+        product_name: user.product_name || "",
         CustomerName: user.customer_id || "",
         ArticleName: user.article_id || "",
         PalleteCount: user.pallete_count ||"",
@@ -60,6 +64,8 @@ export default function AddOrderList(params:any) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          Id: data.Id,
+          product_name: data.product_name,
           customer_id: data.CustomerName,
           article_id: data.ArticleName,
           pallete_count: data.PalleteCount,
@@ -81,6 +87,8 @@ export default function AddOrderList(params:any) {
   });
 
   const Add_Order_Validator = Yup.object().shape({
+    Id: Yup.string().required("Id is required"),
+    product_name: Yup.string().required("Product Id is required"),
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
@@ -221,6 +229,28 @@ const removeCustomerMutation = useMutation({
                 <h1 className="text-xl font-bold py-4">Order Details</h1>
                 <div className="grid grid-cols-2 gap-6 w-full">
                   <div>
+                    <FormInput
+                      tooltip="Enter the order ID"
+                      name="Id"
+                      placeholder="Order ID"
+                      label="Order ID"
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                      readonly={true}
+                    />
+                  </div>
+                  <div>
+                    <FormInput
+                      tooltip="Enter the product name"
+                      name="product_name"
+                      placeholder="Product Name"
+                      label="Product Name"
+                      errors={error ? error : ""}
+                      touched="true" // Adjust as needed
+                    />
+                  </div>
+                  <div>
+                    <label className="form-control w-96 max-w-lg">
                     <FormSelect
                       tooltip="Select the customer's name from the dropdown"
                       name="CustomerName"
@@ -230,8 +260,10 @@ const removeCustomerMutation = useMutation({
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
+                    </label>
                   </div>
                   <div>
+                    <label className="form-control w-96 max-w-lg">
                     <FormSelect
                       tooltip="Select the article's name from the dropdown"
                       name="ArticleName"
@@ -241,6 +273,7 @@ const removeCustomerMutation = useMutation({
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
+                    </label>
                   </div>
 
                   <div>
