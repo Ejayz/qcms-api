@@ -1,27 +1,24 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { use } from "react";
 
 export async function POST(req: NextRequest) {
   try {
     // Parse incoming request data
     const data = await req.json();
     const {
-      length,
-      inside_diameter,
-      outside_diameter,
-      flat_crush,
-      h20,
+      order_form_id,
+      entry_date_time,
+      exit_date_time,
       user_id,
     } = data;
 
     console.log(
       "Received Data:",
-      length,
-      inside_diameter,
-      outside_diameter,
-      flat_crush,
-      h20,
-      user_id
+      order_form_id,
+      entry_date_time,
+      exit_date_time,
+      user_id,
     );
 
     // Create Supabase client
@@ -29,19 +26,16 @@ export async function POST(req: NextRequest) {
 
     // Insert data into tbl_orders_form
     const { data: insertResult, error } = await supabase
-      .from("tbl_article_max")
+      .from("tbl_production")
       .insert([
         {
-          length: length || null,
-          inside_diameter: inside_diameter || null,
-          outside_diameter: outside_diameter || null,
-          flat_crush: flat_crush || null,
-          h20: h20 || null,
-          user_id: user_id,
+          order_form_id: order_form_id || null,
+          entry_date_time: entry_date_time || null,
+          exit_date_time: exit_date_time || null,
+          user_id: user_id || null,
           is_exist: true, // Always true
         },
-      ])
-      .select(); // Ensure we return the inserted row, including its ID
+      ]);
 
     // Handle errors
     if (error) {
@@ -53,10 +47,10 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("Insert Result:", insertResult);
-    const insertedId = insertResult[0]?.id;
+
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted successfully", id:insertedId, data: insertResult },
+      { message: "Data inserted successfully", data: insertResult },
       { status: 200 }
     );
   } catch (err) {

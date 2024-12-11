@@ -13,7 +13,6 @@ export async function GET(req: NextRequest) {
     .from("tbl_orders_form")
     .select("* ,tbl_customer(*),tbl_article(*)")
     .eq("is_exist", true)
-    
     .order("created_at", { ascending: false })
     .range(
       (parseInt(page) - 1) * parseInt(limit),

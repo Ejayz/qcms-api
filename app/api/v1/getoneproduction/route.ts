@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient();
 
   const { data, error } = await supabase
-    .from("tbl_proofing")
+    .from("tbl_production")
     .select()
     .eq("order_form_id", id);
 

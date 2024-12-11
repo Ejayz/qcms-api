@@ -40,7 +40,7 @@ export default function IndexHeader(){
 
     fetchUserEmail();
   }, []);
-  console.log("User Email:", useremail);
+  console.log("User Email is:", useremail);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {

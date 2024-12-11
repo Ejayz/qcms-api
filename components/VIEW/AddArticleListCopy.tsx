@@ -1,41 +1,64 @@
 "use client";
-
-import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useEffect, useRef, useState } from "react";
 import { Field, FieldArray, Form, Formik } from "formik";
-import { CircleHelp, Plus } from "lucide-react";
 import Link from "next/link";
+import { createClient } from "@/utils/supabase/client";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import * as Yup from "yup";
-import { FormSelect } from "../UI/FormInput";
-import { useState, useEffect, use } from "react";
-export default function AddArticleList() {
+import { Pencil } from "lucide-react";
+
+export default function AddArticleListCopy() {
+  const queryClient = new QueryClient();
+  const query = usePathname();
+  console.log(query);
+  // const id = params.params;
   const navigator = useRouter();
-  const [userid, setuserid] = useState<string | null>(null);
+  const supabase = createClient(); // Create the Supabase client instance
+
+  const [useremail, setUseremail] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userID, setUserID] = useState<string | null>(null);
+  const [nominalId, setNominalId] = useState<string | null>(null);
+  const [minId, setMinId] = useState<string | null>(null);
+  const [maxId, setMaxId] = useState<string | null>(null);
   useEffect(() => {
-    const userid = localStorage.getItem("userid");
-    setuserid(userid);
+    const fetchUserEmail = async () => {
+      const { data } = await supabase.auth.getUser();
+      setUseremail(data.user?.user_metadata.email || null);
+      setUserRole(data.user?.user_metadata.role || null);
+      setUserID(data.user?.id || null);
+    };
+
+    fetchUserEmail();
   }, []);
 
-  console.log("the current user:", userid);
+  console.log("the user id is:", userID);
 
-  const router = useRouter();
-
-  const Add_Article_Validator = Yup.object().shape({
-    ArticleNominal: Yup.string().required("Article Nominal is required"),
-    ArticleMin: Yup.string().required("Article Min is required"),
-    ArticleMax: Yup.string().required("Article Max is required"),
-    NumberControl: Yup.string().required("Number Control is required"),
-  });
-
-  const [initialValues, setInitialValues] = useState({
-    ArticleNominal: "",
-    ArticleMin: "",
-    ArticleMax: "",
-    NumberControl: "",
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const initialValues = {
+    rows: [
+      {
+        // article_name: "",
+        LengthNominal: "",
+        LengthMin: "",
+        LengthMax: "",
+        InsideDiameterNominal: "",
+        InsideDiameterMin: "",
+        InsideDiameterMax: "",
+        OutsideDiameterNominal: "",
+        OutsideDiameterMin: "",
+        OutsideDiameterMax: "",
+        FlatCrushNominal: "",
+        FlatCrushMin: "",
+        FlatCrushMax: "",
+        H20Nominal: "",
+        H20Min: "",
+        H20Max: "",
+        NumberControl: "",
+      },
+    ],
+  };
 
   const AddArticleMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -49,986 +72,467 @@ export default function AddArticleList() {
       return response.json();
     },
     onError: (error) => {
-      toast.error("Failed to add article");
+      toast.error("Fialed to add Article");
       console.error(error);
     },
     onSuccess: (data) => {
       toast.success("Article Added Successfully");
       navigator.push("/dashboard/article_management");
+      console.log("article on success data", data.id);
     },
     onMutate: (data) => {
       return data;
     },
   });
 
-  const [articlenominal, setarticlenominal] = useState([]);
-  const [articlemin, setarticlemin] = useState([]);
-  const [articlemax, setarticlemax] = useState([]);
-
-  useEffect(() => {
-    const fetcharticlenominal = async () => {
-      try {
-        const response = await fetch(
-          `/api/v1/get_article_nominal?page=1&limit=10`
-        ); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((nominal: any) => ({
-            value: nominal.id,
-            label: `${nominal.id}`,
-          }));
-          setarticlenominal(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch Nominal.");
-      } finally {
-        setIsLoading(false);
+  const AddNominalMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/v1/create_article_nominal", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Fialed to add Article Nominal");
+      console.error(error);
+    },
+    onSuccess: (data) => {
+      if (data?.id) {
+        setNominalId(data.id);
+        toast.success("Article Nominal Added Successfully");
+        navigator.push("/dashboard/article_management");
+        console.log("Nominal ID on success:", data.id);
+      } else {
+        console.warn("No ID returned in the response:", data);
       }
-    };
+    },
+    onMutate: (data) => {
+      return data;
+    },
+  });
+  const AddMinMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/v1/create_article_min", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Fialed to add Article Min");
+      console.error(error);
+    },
+    onSuccess: (data) => {
+      toast.success("Article Min Added Successfully");
+      navigator.push("/dashboard/article_management");
+      setMinId(data.id);
+      console.log("min on success data", data.id);
+    },
+    onMutate: (data) => {
+      return data;
+    },
+  });
+  const AddMaxMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch("/api/v1/create_article_max", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Fialed to add Article Max");
+      console.error(error);
+    },
+    onSuccess: (data) => {
+      toast.success("Article Max Added Successfully");
+      navigator.push("/dashboard/article_management");
+      setMaxId(data.id);
+      console.log("max on success data", data.id);
+    },
+    onMutate: (data) => {
+      return data;
+    },
+  });
 
-    fetcharticlenominal();
-  }, []);
-
-  useEffect(() => {
-    const fetcharticlemin = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_article_min?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((min: any) => ({
-            value: min.id,
-            label: `${min.id}`,
-          }));
-          setarticlemin(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch Min.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetcharticlemin();
-  }, []);
-
-  useEffect(() => {
-    const fetcharticlemax = async () => {
-      try {
-        const response = await fetch(`/api/v1/get_article_max?page=1&limit=10`); // Adjust endpoint URL
-        const data = await response.json();
-        if (response.ok) {
-          const options = data.map((max: any) => ({
-            value: max.id,
-            label: `${max.id}`,
-          }));
-          setarticlemax(options);
-        } else {
-          setError(data.error);
-        }
-      } catch (err) {
-        setError("Failed to fetch Max.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetcharticlemax();
-  }, []);
-
+  // console.log("orders data  ",measurementsData);
+  console.log("max id", maxId+"min id", minId+"nominal id", nominalId);
   return (
-    <div className="flex flex-col w-11/12 mx-auto text-black">
+    <div className="flex flex-col w-full p-12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/article_management">Article Management</Link>
-          </li>
-          <li>
-            <span>Add Article</span>
+            <Link href="/dashboard/measurement_management">
+              Measurement Management
+            </Link>
           </li>
         </ul>
       </div>
       <Formik
-        initialValues={{
-          LengthNominal: [],
-          LengthMin: [],
-          LengthMax: [],
-          InsideDiameterNominal: [],
-          InsideDiameterMin: [],
-          InsideDiameterMax: [],
-          OutsideDiameterNominal: [],
-          OutsideDiameterMin: [],
-          OutsideDiameterMax: [],
-          FlatCrushNominal: [],
-          FlatCrushMin: [],
-          FlatCrushMax: [],
-          H20Nominal: [],
-          H20Min: [],
-          H20Max: [],
-          NumberControl: "",
+        initialValues={initialValues}
+        onSubmit={async (values) => {
+          for (const row of values.rows) {
+            try {
+              // Run Nominal, Min, and Max Mutations in parallel
+              const [nominalResponse, minResponse, maxResponse] = await Promise.all([
+                new Promise((resolve, reject) => {
+                  AddNominalMutation.mutate(
+                    {
+                      length: row.LengthNominal,
+                      inside_diameter: row.InsideDiameterNominal,
+                      outside_diameter: row.OutsideDiameterNominal,
+                      flat_crush: row.FlatCrushNominal,
+                      h20: row.H20Nominal,
+                      user_id: userID,
+                    },
+                    { onSuccess: resolve, onError: reject }
+                  );
+                }),
+                new Promise((resolve, reject) => {
+                  AddMinMutation.mutate(
+                    {
+                      length: row.LengthMin,
+                      inside_diameter: row.InsideDiameterMin,
+                      outside_diameter: row.OutsideDiameterMin,
+                      flat_crush: row.FlatCrushMin,
+                      h20: row.H20Min,
+                      user_id: userID,
+                    },
+                    { onSuccess: resolve, onError: reject }
+                  );
+                }),
+                new Promise((resolve, reject) => {
+                  AddMaxMutation.mutate(
+                    {
+                      length: row.LengthMax,
+                      inside_diameter: row.InsideDiameterMax,
+                      outside_diameter: row.OutsideDiameterMax,
+                      flat_crush: row.FlatCrushMax,
+                      h20: row.H20Max,
+                      user_id: userID,
+                    },
+                    { onSuccess: resolve, onError: reject }
+                  );
+                }),
+              ]);
+        
+              // Extract IDs
+              const nominalId = (nominalResponse as { id: string })?.id;
+              const minId = (minResponse as { id: string })?.id;
+              const maxId = (maxResponse as { id: string })?.id;
+        
+              // Ensure all IDs are valid before proceeding
+              if (!nominalId || !minId || !maxId) {
+                throw new Error("One or more required IDs are missing");
+              }
+        
+              // Add Article Mutation
+              await new Promise((resolve, reject) => {
+                AddArticleMutation.mutate(
+                  {
+                    article_nominal: nominalId,
+                    article_min: minId,
+                    article_max: maxId,
+                    number_control: row.NumberControl,
+                    user_id: userID,
+                  },
+                  { onSuccess: resolve, onError: reject }
+                );
+              });
+        
+              
+            } catch (error) {
+              toast.error("Failed to add article");
+              console.error("Error in mutation chain:", error);
+            }
+          }
         }}
-        onSubmit={(values, { setSubmitting }) => {
-          setTimeout(() => {
-            alert(JSON.stringify(values, null, 2));
-            setSubmitting(false);
-          }, 500);
-        }}
-        render={({ values }) => (
+        
+      >
+        {({ values, setFieldValue }) => (
           <Form>
-            <div className="flex flex-col gap-y-2">
-              <div className="lg:opacity-100 opacity-0">
-                <div className="grid grid-cols-7 gap-2 w-full">
-                  <label></label>
-                  <label className="text-md font-bold gap-x-2 flex flex-row">
-                    Length
-                  </label>
-                  <label className="text-md font-bold gap-x-2 flex flex-row">
-                    Inside Diameter
-                  </label>
-                  <label className="text-md font-bold gap-x-2 flex flex-row">
-                    Outside Diameter
-                  </label>
-                  <label className="text-md font-bold gap-x-2 flex flex-row">
-                    Flat Crush
-                  </label>
-                  <label className="text-md font-bold gap-x-2 flex flex-row">
-                    H20
-                  </label>
-                </div>
-              </div>
-              {/* Nominal */}
-              <div className="border py-5 rounded-md bg-white">
-                <div className="grid lg:grid-cols-7 grid-cols-1 gap-6 w-full">
-                  <label className="text-lg font-bold">Scoll Nominal</label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Length
-                    </label>
-                    <FieldArray
-                      name="LengthNominal"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.LengthNominal &&
-                          values.LengthNominal.length > 0 ? (
-                            values.LengthNominal.map((LengthNominal, index) => (
-                              <div key={index}>
-                                <Field
-                                  name={`LengthNominal.${index}`}
-                                  placeholder="Length"
-                                  type="text"
-                                  className="input text-md input-bordered"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                  className="btn bg-transparent" // remove a friend from the list
-                                >
-                                  -
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.insert(index, "")}
-                                  className="btn bg-transparent" // insert an empty string at a position
-                                >
-                                  +
-                                </button>
-                              </div>
-                            ))
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Nominal
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Inside Diameter
-                    </label>
-                    <FieldArray
-                      name="InsideDiameterNominal"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.InsideDiameterNominal &&
-                          values.InsideDiameterNominal.length > 0 ? (
-                            values.InsideDiameterNominal.map(
-                              (InsideDiameterNominal, index) => (
-                                <div key={index}>
+            <div className="">
+              <FieldArray
+                name="rows"
+                render={(arrayHelpers) => (
+                  <div>
+                    <div className="flex place-content-end gap-3">
+                      {values.rows.map((row, index) => (
+                        <Field
+                          key={index}
+                          name={`rows.${index}.NumberControl`}
+                          type="number"
+                          placeholder="Enter Number Of Control"
+                          className="input input-bordered"
+                        />
+                      ))}
+                      {/* <button
+                        className="btn btn-info"
+                        type="button"
+                        onClick={() =>
+                          arrayHelpers.push({
+                            // article_name: "",
+                            LengthNominal: "",
+                            LengthMin: "",
+                            LengthMax: "",
+                            InsideDiameterNominal: "",
+                            InsideDiameterMin: "",
+                            InsideDiameterMax: "",
+                            OutsideDiameterNominal: "",
+                            OutsideDiameterMin: "",
+                            OutsideDiameterMax: "",
+                            FlatCrushNominal: "",
+                            FlatCrushMin: "",
+                            FlatCrushMax: "",
+                            H20Nominal: "",
+                            H20Min: "",
+                            H20Max: "",
+                            NumberControl: "",
+                          })
+                        }
+                      >
+                        Add Row
+                      </button> */}
+                      <button className="btn btn-primary" type="submit">
+                        Add Article
+                      </button>
+                      <Link
+                        href="/dashboard/article_management"
+                        className="btn btn-accent"
+                      >
+                        Back
+                      </Link>
+                    </div>
+                    <div className="text-black overflow-auto">
+                      <table className="table relative text-center overflow-auto">
+                        <thead className="text-black text-sm">
+                          <tr>
+                            {/* <th>Article Name</th> */}
+                            <td></td>
+                            <th>Scoll Nominal</th>
+                            <th>Min</th>
+                            <th>Max</th>
+                            {/* <th>Action</th> */}
+                          </tr>
+                        </thead>
+                        {/* tbody for length */}   {values.rows.map((row, index) => (
+                            <React.Fragment key={index}>
+                        <tbody>
+                       
+                              <tr>
+                                <td>Length</td>
+                                <td>
                                   <Field
-                                    name={`InsideDiameterNominal.${index}`}
-                                    placeholder="Inside Diameter"
-                                    type="text"
-                                    className="input text-md input-bordered"
+                                    name={`rows.${index}.LengthNominal`}
+                                    type="number"
+                                    className="input input-bordered"
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                    className="btn bg-transparent" // remove a friend from the list
-                                  >
-                                    -
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.insert(index, "")
-                                    }
-                                    className="btn bg-transparent" // insert an empty string at a position
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Nominal
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Outside Diameter
-                    </label>
-                    <FieldArray
-                      name="OutsideDiameterNominal"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.OutsideDiameterNominal &&
-                          values.OutsideDiameterNominal.length > 0 ? (
-                            values.OutsideDiameterNominal.map(
-                              (OutsideDiameterNominal, index) => (
-                                <div key={index}>
+                                </td>
+                                <td>
                                   <Field
-                                    name={`OutsideDiameterNominal.${index}`}
-                                    placeholder="Outside Diameter"
-                                    type="text"
-                                    className="input text-md input-bordered"
+                                    name={`rows.${index}.LengthMin`}
+                                    type="number"
+                                    className="input input-bordered"
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                    className="btn bg-transparent" // remove a friend from the list
-                                  >
-                                    -
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.insert(index, "")
-                                    }
-                                    className="btn bg-transparent" // insert an empty string at a position
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Nominal
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Flat Crush
-                    </label>
-                    <FieldArray
-                      name="FlatCrushNominal"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.FlatCrushNominal &&
-                          values.FlatCrushNominal.length > 0 ? (
-                            values.FlatCrushNominal.map(
-                              (FlatCrushNominal, index) => (
-                                <div key={index}>
+                                </td>
+                                <td>
                                   <Field
-                                    name={`FlatCrushNominal.${index}`}
-                                    placeholder="Flat Crush"
-                                    type="text"
-                                    className="input text-md input-bordered"
+                                    name={`rows.${index}.LengthMax`}
+                                    type="number"
+                                    className="input input-bordered"
                                   />
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                    className="btn bg-transparent" // remove a friend from the list
-                                  >
-                                    -
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.insert(index, "")
-                                    }
-                                    className="btn bg-transparent" // insert an empty string at a position
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Nominal
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      H20
-                    </label>
-                    <FieldArray
-                      name="H20Nominal"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.H20Nominal && values.H20Nominal.length > 0 ? (
-                            values.H20Nominal.map((H20Nominal, index) => (
-                              <div key={index}>
-                                <Field
-                                  name={`H20Nominal.${index}`}
-                                  placeholder="H20"
-                                  type="text"
-                                  className="input text-md input-bordered"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                  className="btn bg-transparent" // remove a friend from the list
-                                >
-                                  -
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.insert(index, "")}
-                                  className="btn bg-transparent" // insert an empty string at a position
-                                >
-                                  +
-                                </button>
-                              </div>
-                            ))
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Nominal
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label><button className="btn btn-primary">submit</button></label>
-                </div>
-              </div>
-              {/* min */}
-              <div className="border p-6 rounded-md bg-white">
-                <div className="grid lg:grid-cols-7 grid-cols-1 gap-6 w-full">
-                  <label className="text-lg font-bold">Min</label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Length
-                    </label>
-                    <FieldArray
-                      name="LengthMin"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.LengthMin && values.LengthMin.length > 0 ? (
-                            values.LengthMin.map((LengthMin, index) => (
-                              <div key={index}>
-                                <Field
-                                  name={`LengthMin.${index}`}
-                                  placeholder="Length"
-                                  type="text"
-                                  className="input text-md input-bordered"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                  className="btn bg-transparent" // remove a friend from the list
-                                >
-                                  -
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.insert(index, "")}
-                                  className="btn bg-transparent" // insert an empty string at a position
-                                >
-                                  +
-                                </button>
-                              </div>
-                            ))
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Min
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Inside Diameter
-                    </label>
-                    <FieldArray
-                      name="InsideDiameterMin"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.InsideDiameterMin &&
-                          values.InsideDiameterMin.length > 0 ? (
-                            values.InsideDiameterMin.map(
-                              (InsideDiameterMin, index) => (
-                                <div key={index}>
-                                  <Field
-                                    name={`InsideDiameterMin.${index}`}
-                                    placeholder="Inside Diameter"
-                                    type="text"
-                                    className="input text-md input-bordered"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                    className="btn bg-transparent" // remove a friend from the list
-                                  >
-                                    -
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.insert(index, "")
-                                    }
-                                    className="btn bg-transparent" // insert an empty string at a position
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Min
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-</label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Outside Diameter
-                    </label>
-                    <FieldArray
-                      name="OutsideDiameterMin"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.OutsideDiameterMin &&
-                          values.OutsideDiameterMin.length > 0 ? (
-                            values.OutsideDiameterMin.map(
-                              (OutsideDiameterMin, index) => (
-                                <div key={index}>
-                                  <Field
-                                    name={`OutsideDiameterMin.${index}`}
-                                    placeholder="Outside Diameter"
-                                    type="text"
-                                    className="input text-md input-bordered"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                    className="btn bg-transparent" // remove a friend from the list
-                                  >
-                                    -
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.insert(index, "")
-                                    }
-                                    className="btn bg-transparent" // insert an empty string at a position
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              )
-                            )
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Min
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      Flat Crush
-                    </label>
-                    <FieldArray
-                      name="FlatCrushMin"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.FlatCrushMin && values.FlatCrushMin.length > 0 ? (
-                            values.FlatCrushMin.map((FlatCrushMin, index) => (
-                              <div key={index}>
-                                <Field
-                                  name={`FlatCrushMin.${index}`}
-                                  placeholder="Flat Crush"
-                                  type="text"
-                                  className="input text-md input-bordered"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                  className="btn bg-transparent" // remove a friend from the list
-                                >
-                                  -
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.insert(index, "")}
-                                  className="btn bg-transparent" // insert an empty string at a position
-                                >
-                                  +
-                                </button>
-                              </div>
-                            ))
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Min
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label>
-                    <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                      H20
-                    </label>
-                    <FieldArray
-                      name="H20Min"
-                      render={(arrayHelpers) => (
-                        <div>
-                          {values.H20Min && values.H20Min.length > 0 ? (
-                            values.H20Min.map((H20Min, index) => (
-                              <div key={index}>
-                                <Field
-                                  name={`H20Min.${index}`}
-                                  placeholder="H20"
-                                  type="text"
-                                  className="input text-md input-bordered"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.remove(index)}
-                                  className="btn bg-transparent" // remove a friend from the list
-                                >
-                                  -
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.insert(index, "")}
-                                  className="btn bg-transparent" // insert an empty string at a position
-                                >
-                                  +
-                                </button>
-                              </div>
-                            ))
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => arrayHelpers.push("")}
-                              className="btn btn-info"
-                            >
-                              {/* show this when user has removed all friends from the list */}
-                              Add a Min
-                            </button>
-                          )}
-                          <div>
-                            <button type="submit">Submit</button>
-                          </div>
-                        </div>
-                      )}
-                    />
-                  </label>
-                  <label><button className="btn btn-primary">submit</button></label>
-                  </div>
-                  </div>
-                {/* max */}
-                <div className="border p-6 rounded-md bg-white">
-                  <div className="grid lg:grid-cols-7 grid-cols-1 gap-6 w-full">
-                    <label className="text-lg font-bold">Max</label>
-                    <label>
-                      <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                        Length
-                      </label>
-                      <FieldArray
-                        name="LengthMax"
-                        render={(arrayHelpers) => (
-                          <div>
-                            {values.LengthMax && values.LengthMax.length > 0 ? (
-                              values.LengthMax.map((LengthMax, index) => (
-                                <div key={index}>
-                                  <Field
-                                    name={`LengthMax.${index}`}
-                                    placeholder="Length"
-                                    type="text"
-                                    className="input text-md input-bordered"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.remove(index)}
-                                    className="btn bg-transparent" // remove a friend from the list
-                                  >
-                                    -
-                                  </button>
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.insert(index, "")}
-                                    className="btn bg-transparent" // insert an empty string at a position
-                                  >
-                                    +
-                                  </button>
-                                </div>
-                              ))
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => arrayHelpers.push("")}
-                                className="btn btn-info"
-                              >
-                                {/* show this when user has removed all friends from the list */}
-                                Add a Max
-                              </button>
-                            )}
-                            <div>
-                              <button type="submit">Submit</button>
-                            </div>
-                          </div>
-                        )}
-                      />
-                    </label>
-                    <label>
-                      <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                        Inside Diameter
-                      </label>
-                      <FieldArray
-                        name="InsideDiameterMax"
-                        render={(arrayHelpers) => (
-                          <div>
-                            {values.InsideDiameterMax &&
-                            values.InsideDiameterMax.length > 0 ? (
-                              values.InsideDiameterMax.map(
-                                (InsideDiameterMax, index) => (
-                                  <div key={index}>
-                                    <Field
-                                      name={`InsideDiameterMax.${index}`}
-                                      placeholder="Inside Diameter"
-                                      type="text"
-                                      className="input text-md input-bordered"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => arrayHelpers.remove(index)}
-                                      className="btn bg-transparent" // remove a friend from the list
-                                    >
-                                      -
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        arrayHelpers.insert(index, "")
-                                      }
-                                      className="btn bg-transparent" // insert an empty string at a position
-                                    >
-                                      +
-                                    </button>
-                                    </div>
-                                  )
-                                )
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => arrayHelpers.push("")}
-                                  className="btn btn-info"
-                                >
-                                  {/* show this when user has removed all friends from the list */}
-                                  Add a Max
-                                </button>
-                              )}
-                              <div>
-                                <button type="submit">Submit</button>
-                                </div>
-                                </div>
-                              )}
-                            />
-                          </label>
-                          <label>
-                            <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                              Outside Diameter
-                            </label>
-                            <FieldArray
-                              name="OutsideDiameterMax"
-                              render={(arrayHelpers) => (
-                                <div>
-                                  {values.OutsideDiameterMax &&
-                                  values.OutsideDiameterMax.length > 0 ? (
-                                    values.OutsideDiameterMax.map(
-                                      (OutsideDiameterMax, index) => (
-                                        <div key={index}>
-                                          <Field
-                                            name={`OutsideDiameterMax.${index}`}
-                                            placeholder="Outside Diameter"
-                                            type="text"
-                                            className="input text-md input-bordered"
-                                          />
-                                          <button
-                                            type="button"
-                                            onClick={() => arrayHelpers.remove(index)}
-                                            className="btn bg-transparent" // remove a friend from the list
-                                          >
-                                            -
-                                          </button>
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              arrayHelpers.insert(index, "")
-                                            }
-                                            className="btn bg-transparent" // insert an empty string at a position
-                                          >
-                                            +
-                                          </button>
-                                        </div>
-                                      )
-                                    )
-                                  ) : (
-                                    <button
-                                      type="button"
-                                      onClick={() => arrayHelpers.push("")}
-                                      className="btn btn-info"
-                                    >
-                                      {/* show this when user has removed all friends from the list */}
-                                      Add a Max
-                                    </button>
-                                  )}
-                                  <div>
-                                    <button type="submit">Submit</button>
-                                  </div>
-                                </div>
-                              )}
-                            />
-                          </label>
-                          <label>
-                            <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                              Flat Crush
-                            </label>
-                            <FieldArray
-                            name="FlatCrushMax"
-                            render={(arrayHelpers) => (
-                              <div>
-                                {values.FlatCrushMax && values.FlatCrushMax.length > 0 ? (
-                                  values.FlatCrushMax.map((FlatCrushMax, index) => (
-                                    <div key={index}>
-                                      <Field
-                                        name={`FlatCrushMax.${index}`}
-                                        placeholder="Flat Crush"
-                                        type="text"
-                                        className="input text-md input-bordered"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => arrayHelpers.remove(index)}
-                                        className="btn bg-transparent" // remove a friend from the list
-                                      >
-                                        -
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => arrayHelpers.insert(index, "")}
-                                        className="btn bg-transparent" // insert an empty string at a position
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.push("")}
-                                    className="btn btn-info"
-                                  >
-                                    {/* show this when user has removed all friends from the list */}
-                                    Add a Max
-                                  </button>
-                                )}
-                                <div>
-                                  <button type="submit">Submit</button>
-                                </div>
-                              </div>
-                            )}
-                          />
-                        </label>
-                        <label>
-                          <label className="text-md font-bold gap-x-2 flex flex-row lg:hidden ">
-                            H20
-                          </label>
-                          <FieldArray
-                            name="H20Max"
-                            render={(arrayHelpers) => (
-                              <div>
-                                {values.H20Max && values.H20Max.length > 0 ? (
-                                  values.H20Max.map((H20Max, index) => (
-                                    <div key={index}>
-                                      <Field
-                                        name={`H20Max.${index}`}
-                                        placeholder="H20"
-                                        type="text"
-                                        className="input text-md input-bordered"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => arrayHelpers.remove(index)}
-                                        className="btn bg-transparent" // remove a friend from the list
-                                      >
-                                        -
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={() => arrayHelpers.insert(index, "")}
-                                        className="btn bg-transparent" // insert an empty string at a position
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <button
-                                    type="button"
-                                    onClick={() => arrayHelpers.push("")}
-                                    className="btn btn-info"
-                                  >
-                                    {/* show this when user has removed all friends from the list */}
-                                    Add a Max
-                                  </button>
-                                )}
-                                <div>
-                                  <button type="submit">Submit</button>
-                                </div>
-                              </div>
-                            )}
-                          />
-                        </label>
-                        <label><button className="btn btn-primary">submit</button></label>
-                        </div>
-                        </div>
-                        <div className="border p-6 rounded-md bg-white">
-                <div className="grid grid-cols-4 gap-6 w-full">
-                  <label className="text-lg font-bold">Number Control</label>
-                  <Field
-                    name="NumberControl"
-                    type="text"
-                    className="input text-md input-bordered"
-                  />
-                </div>
-              </div>
-              <div className="flex flex-row p-6 justify-end">
-                <button type="submit" className="btn btn-primary">
-                  Add Article
-                </button>
-                <button type="submit" className="btn btn-accent">
-                  <Link href="/dashboard/article_management">Back</Link>
-                </button>
-              </div> 
+                                </td>
 
+                                {/* <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                         
+                        </tbody>
+                        {/* tbody for inside diameter */}
+                        <tbody>
+                        
+                              <tr>
+                                <td>Inside Diameter</td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.InsideDiameterNominal`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.InsideDiameterMin`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.InsideDiameterMax`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                                {/* <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                          
+                        </tbody>
+                        {/* tbody for outside diameter */}
+                        <tbody>
+                        
+                              <tr>
+                                <td>Outside Diameter</td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.OutsideDiameterNominal`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.OutsideDiameterMin`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.OutsideDiameterMax`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                                {/* <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                          
+                        </tbody>
+                        {/* tbody for flat crush */}
+                        <tbody>
+                          {values.rows.map((row, index) => (
+                            <React.Fragment key={index}>
+                              <tr>
+                                <td>Flat Crush</td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.FlatCrushNominal`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.FlatCrushMin`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.FlatCrushMax`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+{/* 
+                                <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                            </React.Fragment>
+                          ))}
+                        </tbody>
+                        {/* tbody for h20 */}
+                        <tbody>
+                         
+                              <tr>
+                                <td>H20</td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.H20Nominal`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.H20Min`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.H20Max`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                                {/* <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                          
+                        </tbody>  </React.Fragment>
+                          ))}
+                      </table>
+                    </div>
+                  </div>
+                )}
+              />
             </div>
           </Form>
         )}
-      />
+      </Formik>
     </div>
   );
 }
