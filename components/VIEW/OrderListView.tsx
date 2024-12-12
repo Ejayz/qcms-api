@@ -16,30 +16,33 @@ export default function OrderListView() {
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
   
-  const { data: ordersData, isFetching, isLoading, isError } = useQuery({
-    queryKey: ["get_customer", page, search, limit],
-    queryFn: async () => {
-      const response = await fetch(
-        `/api/v1/get_order?page=${page}&search=${search}&limit=${limit}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "*/*",
-            "User-Agent": "Thunder Client (https://www.thunderclient.com)",
-          },
-        }
-      );
-      const result = await response.json();
+  const [startDate, setStartDate] = useState("");
+const [endDate, setEndDate] = useState("");
 
-      if (response.ok) {
-        return result;
-      } else {
-        throw new Error("Something went wrong while fetching site list.");
+const { data: ordersData, isFetching, isLoading, isError } = useQuery({
+  queryKey: ["get_customer", page, search, limit, startDate, endDate],
+  queryFn: async () => {
+    const response = await fetch(
+      `/api/v1/get_order?page=${page}&search=${search}&limit=${limit}&startDate=${startDate}&endDate=${endDate}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+          "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+        },
       }
-    },
-    retry: 1,
-  });
+    );
+    const result = await response.json();
 
+    if (response.ok) {
+      return result;
+    } else {
+      throw new Error("Something went wrong while fetching site list.");
+    }
+  },
+  retry: 1,
+});
+  
   const navigator = useRouter();
   const supabase = createClient();
   const [useremail, setUseremail] = useState<string | null>(null);
@@ -81,12 +84,20 @@ export default function OrderListView() {
     enabled: !!ordersData,
   });
 
-  const ordersWithCustomerNames = ordersData?.map((order: any) => {
+  const ordersWithCustomerNames =
+  ordersData?.map((order: any) => {
     const customerName = customersData?.find(
       (customer: any) => customer.id === order.customer_id
     )?.name;
-    return { ...order, customer_name: customerName || "Unknown" };
+
+    return {
+      ...order,
+      customer_name: customerName || "Unknown",
+      customer: order.tbl_customer || {},
+      article: order.tbl_article || {},
+    };
   }) || [];
+
 
 
 
@@ -671,6 +682,29 @@ const customerOptions =
               <Search color="#000000" /> Search
             </button>
           </label>
+          <div className="flex gap-4">
+  <input
+    type="date"
+    onChange={(e) => setStartDate(e.target.value)}
+    className="input input-bordered"
+    placeholder="Start Date"
+  />
+  <input
+    type="date"
+    onChange={(e) => setEndDate(e.target.value)}
+    className="input input-bordered"
+    placeholder="End Date"
+  />
+  <button
+    onClick={() => {
+      setSearch(searchInput.current?.value || "");
+      setPage(1);
+    }}
+    className="btn btn-sm btn-primary"
+  >
+    Search
+  </button>
+</div>
 
           <Link
             href="/dashboard/addorder"
@@ -692,76 +726,60 @@ const customerOptions =
             </tr>
           </thead>
           <tbody>
-            {isLoading || isFetching ? (
-              <tr>
-                <td colSpan={7}>
-                  <span className="loading loading-dots loading-md"></span>
-                </td>
-              </tr>
-            ) : isError ? (
-              <tr>
-                <td className="text-error font-bold" colSpan={7}>
-                  Something went wrong while fetching orders list.
-                </td>
-              </tr>
-            ) : ordersWithCustomerNames.length > 0 ? (
-              ordersWithCustomerNames.map((order: any, index: number) => (
-                <tr key={index}>
-                  {/* <th>{index + 1}</th> */}
-                  <td
-  className="text-xs"
-  onClick={() => {
-    setIsModalOpen(true);
-    setOrderid(order.id); 
-  }}
->
-  {order.id}
-</td>
-                  <td>{order.product_name}</td>
-                  <td className="text-xs">
-                    {order.tbl_customer.last_name}{" "}
-                    {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "}
-                    , {order.tbl_customer.first_name}{" "}
-                    {order.tbl_customer.middle_name}
-                  </td>
-                  <td>{order.tbl_article.article_name}</td>
-                 
-                  <td>{order.pallete_count}</td> 
-                 
-                  <td className="justify-center items-center flex gap-4">
-                   {userRole==="Super Admin" && (
-                    <button className="btn btn-info"
-                    onClick={() => {
-                      setAssignModal(true);
-                      setOrderid(order.id);
-                    }}
+  {isLoading || isFetching ? (
+    <tr>
+      <td colSpan={7}>
+        <span className="loading loading-dots loading-md"></span>
+      </td>
+    </tr>
+  ) : isError ? (
+    <tr>
+      <td className="text-error font-bold" colSpan={7}>
+        Something went wrong while fetching orders list.
+      </td>
+    </tr>
+  ) : ordersWithCustomerNames.length > 0 ? (
+    ordersWithCustomerNames.map((order: any, index: number) => (
+      <tr key={index}>
+        <td className="text-xs" onClick={() => {
+          setIsModalOpen(true);
+          setOrderid(order.id); 
+        }}>
+          {order.id}
+        </td>
+        <td>{order.product_name}</td>
+        <td className="text-xs">
+          {order.tbl_customer.last_name}{" "}
+          {/* {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "} */}
+          , {order.tbl_customer.first_name}{" "}
+          {order.tbl_customer.middle_name}
+        </td>
+        <td>{order.tbl_article.article_name}</td>
+        <td>{order.pallete_count}</td>
+        <td className="justify-center items-center flex gap-4">
+          {userRole === "Super Admin" && (
+            <button className="btn btn-info" onClick={() => {
+              setAssignModal(true);
+              setOrderid(order.id);
+            }}>
+              Assign
+            </button>
+          )}
+          <Link href={`/dashboard/editorder/${order.id}`} className="link flex">
+            <Pencil className="text-warning" /> Edit
+          </Link>
+        </td>
+      </tr>
+    ))
+  ) : (
+    <tr>
+      <td className="font-bold" colSpan={7}>
+        NO DATA FOUND.
+      </td>
+    </tr>
+  )}
+</tbody>
 
-                    >
-                      Assign
-                    </button>
-                    )}  
-                  {/* <Link href={`/dashboard/edit_measurementCopy/${order.id}`}
-                    className="link">
-                    Measurement
-                    </Link> */}
-                    <Link
-                      href={`/dashboard/editorder/${order.id}`}
-                      className="link flex" 
-                    >
-                      <Pencil className="text-warning" /> Edit
-                    </Link>
-                    
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td className="font-bold" colSpan={7}>
-                  NO DATA FOUND.
-                </td>
-              </tr>
-            )}
-          </tbody>
         </table>
         <div className="join mx-auto">
           <button
