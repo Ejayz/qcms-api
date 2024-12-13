@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     .select("*")
     .eq("is_exist", true)
     .or(
-      `email.ilike.%${search}%,first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%`
+      `email.ilike.%${search}%,first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%,company_name.ilike.%${search}%`
     )
     .order("created_at", { ascending: false })
     .range(

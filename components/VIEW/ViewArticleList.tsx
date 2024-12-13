@@ -320,17 +320,15 @@ export default function EditArticleListCopy(params:any) {
                       <table className="table relative text-center overflow-auto">
                         <thead className="text-black text-sm">
                           <tr>
-                            {/* <th>Article Name</th> */}
                             <td></td>
                             <th>Scoll Nominal</th>
                             <th>Min</th>
                             <th>Max</th>
                           </tr>
                         </thead>
-                        {/* tbody for length */}   {values.rows.map((row, index) => (
+                       {values.rows.map((row, index) => (
                             <React.Fragment key={index}>
                         <tbody>
-                       
                               <tr>
                                 <td>Length</td>
                                 <td>

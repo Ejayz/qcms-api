@@ -137,13 +137,12 @@ export default function EditUserList(params: any) {
 
   const Add_User_Validator = Yup.object().shape({
     firstname: Yup.string()
-        .required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
+        .required("First Name is required"),
     
-      middlename: Yup.string()
-        .required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
+      middlename: Yup.string(),
     
       lastname: Yup.string()
-        .required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
+        .required("Last Name is required"),
     
       suffix: Yup.string()
         .required("Suffix is required"),
