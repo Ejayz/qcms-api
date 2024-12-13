@@ -48,15 +48,15 @@ export default function LoginView() {
       const userid=data.user.id;
       localStorage.setItem("userid", userid);
     
-      // const useremail=data.user.email;
-      // console.log("emails:",useremail);
-      // if(checkemail===false){
-      //   toast.error("Email is not verified");
-      //   route.push("/verify_email");
-      // }else{
+      const useremail=data.user.email;
+      console.log("emails:",useremail);
+      if(checkemail===false){
+        toast.error("Email is not verified");
+        route.push("/verify_email");
+      }else{
       toast.success("Login Successful");
       route.push("/dashboard");
-      // }
+      }
     },
   });
   
@@ -101,7 +101,7 @@ export default function LoginView() {
           >
             {({ errors, touched }) => (
               <Form className="w-full justify-evenly gap-y-2 flex flex-col p-4 mx-auto my-auto bg-transparent">
-              
+                
                 <FormInput
                   
                   errors={errors.email}
@@ -110,15 +110,6 @@ export default function LoginView() {
                   name="email"
                   placeholder="youremail@mail.domain"
                   label="Email Address"
-                />
-                <FormInput
-                  errors={errors.password}
-                  touched={touched.password?.toString()}
-                  tooltip="Enter your password."
-                  name="password"
-                  placeholder="Enter your password."
-                  label="Password"
-                  type="password"
                 />
 
                 <div className="mx-auto w-3/4 flex">
@@ -136,7 +127,7 @@ export default function LoginView() {
                         Authenticating...
                       </div>
                     ) : (
-                      "Log In"
+                      "Continue with Email"
                     )}
                   </button>
                 </div>

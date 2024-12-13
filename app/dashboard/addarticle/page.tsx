@@ -6,7 +6,7 @@
 // import Navigation from "@/components/UI/Navigation";
 // import SideBar from "@/components/UI/SideBar";
 "use client";
-import AddArticleListCopy from "@/components/VIEW/AddArticleList";
+import AddArticleListCopy from "@/components/VIEW/AddArticleListCopy";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 export default function AddArticle() {  

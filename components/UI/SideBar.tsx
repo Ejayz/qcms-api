@@ -11,6 +11,7 @@ import {
   BookUser,
   Boxes,
   FileChartColumnIncreasing,
+  FolderKanban,
   LayoutDashboard,
   Microscope,
   ShoppingCart,
@@ -46,7 +47,7 @@ export default function Sidebar({
 
     fetchUserEmail();
   }, []);
-  console.log("User Email:", useremail);
+  // console.log("User Email:", useremail);
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -175,70 +176,47 @@ export default function Sidebar({
                 <LayoutDashboard></LayoutDashboard> Dashboard{" "}
               </Link>
             </li>
-            {userRole === "Super Admin" ? (
-              <li className="rounded collapse collapse-arrow">
-                <details
-                  open={
-                    query === "/dashboard/user_management" ||
-                    query === "/dashboard/customer_management"
-                  }
-                >
-                  <summary
+            {userRole == "Super Admin" ? (
+              <>
+                <li>
+                  <Link
+                    href="/dashboard/user_management"
                     className={`${
                       query == "/dashboard/user_management" ? "bg-primary" : ""
-                    } ${
-                      query == "/dashboard/customer_management"
-                        ? "bg-primary"
-                        : ""
                     }`}
                   >
-                    <BookUser />
+                    <Users color="#000000" />
                     User Management
-                  </summary>
-                  <ul>
-                    <li>
-                      <Link
-                        href="/dashboard/user_management"
-                        className={`${
-                          query == "/dashboard/user_management"
-                            ? "bg-orange-700"
-                            : ""
-                        }`}
-                      >
-                        Manage Users
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        href="/dashboard/customer_management"
-                        className={`${
-                          query == "/dashboard/customer_management"
-                            ? "bg-orange-700"
-                            : ""
-                        }`}
-                      >
-                        Manage Customer
-                      </Link>
-                    </li>
-                  </ul>
-                </details>
-              </li>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/dashboard/customer_management"
+                    className={`${
+                      query == "/dashboard/customer_management" ? "bg-primary" : ""
+                    }`}
+                  >
+                    <User color="#000000" />
+                    Customer Management
+                  </Link>
+                </li>
+              </>
             ) : (
               <li>
                 <Link
-                  href="/dashboard/user_management"
+                  href="/dashboard/customer_management"
                   className={`${
-                    query == "/dashboard/user_management" ? "bg-primary" : ""
+                    query == "/dashboard/customer_management" ? "bg-primary" : ""
                   }`}
                 >
-                  <Microscope color="#000000" />
-                  User Management
+                  <User color="#000000" />
+                  Customer Management
                 </Link>
               </li>
             )}
 
             <li className="rounded collapse collapse-arrow">
-              <details>
+              <details  open={query === "/dashboard/article_management"}>
                 <summary>
                   <BookText />
                   Article Management
@@ -253,56 +231,13 @@ export default function Sidebar({
                           : ""
                       }`}
                     >
-                      Manage Article
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard/article_nominal_management"
-                      className={`${
-                        query == "/dashboard/article_nominal_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Article Nominal
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard/article_min_management"
-                      className={`${
-                        query == "/dashboard/article_min_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Article Min
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard/article_max_management"
-                      className={`${
-                        query == "/dashboard/article_max_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Article Max
+                      Article Creation
                     </Link>
                   </li>
                 </ul>
               </details>
-            </li>
-            <li className="rounded collapse collapse-arrow">
-              <details>
-                <summary>
-                  <BookText />
-                  Order Form Management
-                </summary>
-                <ul>
-                  <li>
+            </li> 
+            <li>
                     <Link
                       href="/dashboard/order_management"
                       className={`${
@@ -311,49 +246,10 @@ export default function Sidebar({
                           : ""
                       }`}
                     >
-                      Manage Order
+                      <FolderKanban />
+                      Order Fabrication     Management
                     </Link>
                   </li>
-                  <li>
-                    <Link
-                      href="/dashboard/production_management"
-                      className={`${
-                        query == "/dashboard/production_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Production
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard/proofing_management"
-                      className={`${
-                        query == "/dashboard/profing_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Proofing
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href="/dashboard/measurement_management"
-                      className={`${
-                        query == "/dashboard/measurement_management"
-                          ? "bg-primary"
-                          : ""
-                      }`}
-                    >
-                      Manage Measurement
-                    </Link>
-                  </li>
-                </ul>
-              </details>
-            </li>
-
             <li>
               <Link
                 href="/dashboard/laboratory_management"

@@ -100,9 +100,8 @@ const id=params.params;
   });
 
   const Add_Customer_Validator = Yup.object().shape({
-    firstname: Yup.string().required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    middlename: Yup.string().required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    lastname: Yup.string().required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
+    firstname: Yup.string().required("First Name is required"),
+    lastname: Yup.string().required("Last Name is required"),
     email: Yup.string().email("Invalid email").required("Email is required"),
 });
 

@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest) {
     const { data: userUpdateData, error: userUpdateError } = await supabase
       .from("tbl_measurement")
       .update({
-        order_form_id,
+        // order_form_id,
         length,
         inside_diameter,
         outside_diameter,

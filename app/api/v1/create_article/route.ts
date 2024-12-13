@@ -30,11 +30,11 @@ export async function POST(req: NextRequest) {
       .from("tbl_article")
       .insert([
         {
-          article_nominal: article_nominal || null,
-          article_min: article_min || null,
-          article_max: article_max || null,
+          article_nominal: article_nominal,
+          article_min: article_min,
+          article_max: article_max,
           number_control: number_control || null,
-          user_id: user_id || null,
+          user_id: user_id,
           is_exist: true, // Always true
         },
       ])
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
 
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted and updated successfully", data: updateResult },
+      { message: "Data inserted and updated successfully", id: insertedId, data: updateResult },
       { status: 200 }
     );
   } catch (err) {

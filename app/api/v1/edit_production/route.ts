@@ -8,7 +8,7 @@ export async function PUT(req: NextRequest) {
    
 
     // Parse request body
-    const { Id,product_name, customer_id,article_id,pallete_count } =
+    const {entry_date_time,exit_date_time} =
       await req.json();
 
     // Initialize Supabase client
@@ -25,13 +25,10 @@ export async function PUT(req: NextRequest) {
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
-      .from("tbl_orders_form")
+      .from("tbl_production")
       .update({
-        
-        product_name,
-        customer_id,
-        article_id,
-        pallete_count,
+        entry_date_time,
+        exit_date_time,
         updated_at: new Date(),
       })
       .eq("id", id);
@@ -43,6 +40,7 @@ export async function PUT(req: NextRequest) {
         { status: 500 }
       );
     }
+    console.log("recieved data are:",userUpdateData)
 
     // Optional: Update Auth if password is provided
     // if (password) {

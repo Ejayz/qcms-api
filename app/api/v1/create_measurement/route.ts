@@ -43,23 +43,25 @@ export async function POST(req: NextRequest) {
     }
     // Insert data into tbl_orders_form
     const { data: insertResult, error } = await supabase
-      .from("tbl_measurement")
-      .insert([
-        {
-          order_form_id: order_id || null,
-          length: length || null,
-          inside_diameter: inside_diameter || null,
-          outside_diameter: outside_diameter || null,
-          flat_crush: flat_crush || null,
-          h20: h20 || null,
-          radial: radial || null,
-          number_control: number_control || null,
-          pallete_count: pallete_count,
-          remarks: remarks || null,
-          user_id: user_id || null,
-          is_exist: true, // Always true
-        },
-      ]);
+  .from("tbl_measurement")
+  .insert([
+    {
+      // Do not include `id` in the payload
+      order_form_id: order_id || null,
+      length: length || null,
+      inside_diameter: inside_diameter || null,
+      outside_diameter: outside_diameter || null,
+      flat_crush: flat_crush || null,
+      h20: h20 || null,
+      radial: radial || null,
+      number_control: number_control || null,
+      pallete_count: pallete_count,
+      remarks: remarks || null,
+      user_id: user_id || null,
+      is_exist: true,
+    },
+  ]);
+
 
     // Handle errors
     if (error) {

@@ -37,10 +37,11 @@ export async function POST(req: NextRequest) {
           outside_diameter: outside_diameter || null,
           flat_crush: flat_crush || null,
           h20: h20 || null,
-          user_id: user_id || null,
+          user_id: user_id,
           is_exist: true, // Always true
         },
-      ]);
+      ])
+      .select(); // Ensure we return the inserted row, including its ID
 
     // Handle errors
     if (error) {
@@ -53,11 +54,13 @@ export async function POST(req: NextRequest) {
 
     console.log("Insert Result:", insertResult);
 
+    const insertedId = insertResult[0]?.id;
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted successfully", data: insertResult },
+      { message: "Data inserted successfully", id: insertedId, data: insertResult },
       { status: 200 }
     );
+    
   } catch (err) {
     console.error("Unexpected Error:", err);
     return NextResponse.json(
