@@ -32,7 +32,7 @@ export default function AddArticleListCopy() {
     };
 
     fetchUserEmail();
-  }, [supabase.auth]);
+  }, []);
 
   console.log("the user id is:", userID);
 
@@ -329,7 +329,6 @@ export default function AddArticleListCopy() {
                             <React.Fragment key={index}>
                         <tbody>
                        
-                          {/* length */}
                               <tr>
                                 <td>Length</td>
                                 <td>
@@ -364,8 +363,12 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                         {/* inside_diameter */}
-                         <tr>
+                         
+                        </tbody>
+                        {/* tbody for inside diameter */}
+                        <tbody>
+                        
+                              <tr>
                                 <td>Inside Diameter</td>
                                 <td>
                                   <Field
@@ -399,7 +402,11 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                              {/* outside diameter */}
+                          
+                        </tbody>
+                        {/* tbody for outside diameter */}
+                        <tbody>
+                        
                               <tr>
                                 <td>Outside Diameter</td>
                                 <td>
@@ -434,7 +441,12 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                              {/* flat crush */}
+                          
+                        </tbody>
+                        {/* tbody for flat crush */}
+                        <tbody>
+                          {values.rows.map((row, index) => (
+                            <React.Fragment key={index}>
                               <tr>
                                 <td>Flat Crush</td>
                                 <td>
@@ -469,7 +481,12 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                              {/* h20 */}
+                            </React.Fragment>
+                          ))}
+                        </tbody>
+                        {/* tbody for h20 */}
+                        <tbody>
+                         
                               <tr>
                                 <td>H20</td>
                                 <td>
@@ -504,34 +521,8 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                        </tbody>
-                        {/* tbody for inside diameter */}
-                        {/* <tbody>
-                        
-                             
                           
-                        </tbody> */}
-                        {/* tbody for outside diameter */}
-                        {/* <tbody>
-                        
-                              
-                          
-                        </tbody> */}
-                        {/* tbody for flat crush */}
-                        {/* <tbody>
-                          {values.rows.map((row, index) => (
-                            <React.Fragment key={index}>
-                             
-                            </React.Fragment>
-                          ))}
-                        </tbody> */}
-                        {/* tbody for h20 */}
-                        {/* <tbody>
-                         
-                              
-                          
-                        </tbody> */}
-                          </React.Fragment>
+                        </tbody>  </React.Fragment>
                           ))}
                       </table>
                     </div>
