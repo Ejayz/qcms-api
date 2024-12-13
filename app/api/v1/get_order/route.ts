@@ -10,21 +10,31 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient();
 
-  // Base query
+  let data = null;
+  let error = null;
+
+  // First query: Search in product_name
   let query = supabase
     .from("tbl_orders_form")
-    .select("* ,tbl_customer(*),tbl_article(*)")
+    .select(
+      `
+      *,
+      tbl_customer!inner (
+        first_name,
+        last_name,
+        middle_name
+      ),
+      tbl_article!inner (
+        article_name
+      )
+    `
+    )
     .eq("is_exist", true)
-    .order("created_at", { ascending: false })
+    .or(`product_name.ilike.%${search}%`)
     .range(
       (parseInt(page) - 1) * parseInt(limit),
       parseInt(page) * parseInt(limit) - 1
     );
-
-  // Add search filter
-  if (search) {
-    query = query.or(`product_name.ilike.%${search}%`);
-  }
 
   // Add date filters
   if (startDate) {
@@ -33,15 +43,103 @@ export async function GET(req: NextRequest) {
   if (endDate) {
     query = query.lte("created_at", endDate);
   }
+  
+  const { data: productData, error: productError } = await query;
 
-  const { data, error } = await query;
+  if (productError) {
+    error = productError;
+  }
 
-  console.log(data, error);
+  // If no product data found, search in tbl_customer
+  if (!productData || productData.length === 0) {
+    query = supabase
+      .from("tbl_orders_form")
+      .select(
+        `
+        *,
+        tbl_customer!inner (
+          first_name,
+          last_name,
+          middle_name
+        ),
+        tbl_article!inner (
+          article_name
+        )
+      `
+      )
+      .filter("tbl_customer.first_name", "ilike", `%${search}%`)
+      .eq("is_exist", true)
+      .not("product_name", "is", null)
+      .range(
+        (parseInt(page) - 1) * parseInt(limit),
+        parseInt(page) * parseInt(limit) - 1
+      );
+
+      
+    // Add date filters
+    if (startDate) {
+      query = query.gte("created_at", startDate);
+    }
+    if (endDate) {
+      query = query.lte("created_at", endDate);
+    }
+
+    const { data: customerData, error: customerError } = await query;
+
+    if (customerError) {
+      error = customerError;
+    } else {
+      data = customerData;
+    }
+  }else// If no product data found, search in tbl_customer
+  if (!productData || productData.length === 0) {
+    query = supabase
+      .from("tbl_orders_form")
+      .select(
+        `
+        *,
+        tbl_customer!inner (
+          first_name,
+          last_name,
+          middle_name
+        ),
+        tbl_article!inner (
+          article_name
+        )
+      `
+      )
+      .filter("tbl_article.article_name", "ilike", `%${search}%`).eq("is_exist", true)
+      .range(
+        (parseInt(page) - 1) * parseInt(limit),
+        parseInt(page) * parseInt(limit) - 1
+      );
+
+      
+    // Add date filters
+    if (startDate) {
+      query = query.gte("created_at", startDate);
+    }
+    if (endDate) {
+      query = query.lte("created_at", endDate);
+    }
+
+    const { data: customerData, error: customerError } = await query;
+
+    if (customerError) {
+      error = customerError;
+    } else {
+      data = customerData;
+    }
+  } 
+  
+  
+  else {
+    data = productData;
+  }
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
-  } else {
-    return NextResponse.json(data, {
-      status: 200,
-    });
   }
+
+  return NextResponse.json(data || [], { status: 200 });
 }
