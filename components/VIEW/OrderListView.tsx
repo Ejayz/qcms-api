@@ -741,7 +741,7 @@ const customerOptions =
   ) : ordersWithCustomerNames.length > 0 ? (
     ordersWithCustomerNames.map((order: any, index: number) => (
       <tr key={index}>
-        <td className="text-xs hover:text-blue" onClick={() => {
+        <td className="text-xs hover:text-orange-500 hover:cursor-pointer" onClick={() => {
           setIsModalOpen(true);
           setOrderid(order.id); 
         }}>
