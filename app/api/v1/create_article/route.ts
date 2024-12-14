@@ -13,14 +13,7 @@ export async function POST(req: NextRequest) {
       user_id,
     } = data;
 
-    console.log(
-      "Received Data:",
-      article_nominal,
-      article_min,
-      article_max,
-      number_control,
-      user_id
-    );
+   
 
     // Create Supabase client
     const supabase = await createClient();
@@ -49,7 +42,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Insert Result:", insertResult);
 
     // Retrieve the inserted ID (assuming only one row is inserted)
     const insertedId = insertResult[0]?.id;
@@ -73,7 +65,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Update Result:", updateResult);
+   
 
     // Return success response
     return NextResponse.json(

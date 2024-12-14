@@ -47,7 +47,7 @@ export default function AddOrderList() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
- 
+
   const [page, setPage] = useState(1); // Pagination support
   const [search, setSearch] = useState(""); // Search input
   const limit = 10; // Items per page
@@ -72,17 +72,17 @@ export default function AddOrderList() {
       if (!response.ok) {
         throw new Error("Failed to fetch customers");
       }
-
       return response.json();
     },
     staleTime: 5000, // Avoid flickering on refetch
     retry: 2,
   });
 
-  const customerOptions = customerData?.map((customer: any) => ({
-    value: customer.id,
-    label: `${customer.first_name} ${customer.last_name}`,
-  })) || [];
+  const customerOptions =
+    customerData?.data.map((customer: any) => ({
+      value: customer.id,
+      label: `${customer.company_name} `,
+    })) || [];
 
   const {
     data: articleData,
@@ -111,10 +111,11 @@ export default function AddOrderList() {
     retry: 2,
   });
 
-  const articleOptions = articleData?.map((article: any) => ({
-    value: article.id,
-    label: `${article.article_name}`,
-  })) || [];
+  const articleOptions =
+    articleData?.data.map((article: any) => ({
+      value: article.id,
+      label: `${article.article_name}`,
+    })) || [];
 
   const {
     data: assigneeData,
@@ -143,11 +144,11 @@ export default function AddOrderList() {
     retry: 2,
   });
 
-  const assignOptions = assigneeData?.map((assignee: any) => ({
-    value: assignee.uuid,
-    label: `${assignee.first_name} ${assignee.last_name}`,
-  })) || [];
-
+  const assignOptions =
+    assigneeData?.data.map((assignee: any) => ({
+      value: assignee.uuid,
+      label: `${assignee.first_name} ${assignee.last_name}`,
+    })) || [];
 
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
@@ -209,33 +210,34 @@ export default function AddOrderList() {
                     />
                   </div>
                   <div>
-                  <label className="form-control w-96 max-w-lg">
-                    <FormSelect
-                      tooltip="Select the customer's name from the dropdown"
-                      name="CustomerName"
-                      placeholder="Choose a customer"
-                      label="Customer Name"
-                      options={customerOptions}
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
-                    />
-                    {isLoading && <p>Loading customers...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
-                  </label>
+                    <label className="form-control w-96 max-w-lg">
+                      <FormSelect
+                        tooltip="Select the customer's name from the dropdown"
+                        name="CustomerName"
+                        placeholder="Choose a customer"
+                        label="Customer Name"
+                        options={customerOptions
+                        }
+                        errors={error ? error : ""}
+                        touched="true" // Adjust as needed
+                      />
+                      {isLoading && <p>Loading customers...</p>}
+                      {error && <p className="text-red-500">{error}</p>}
+                    </label>
                   </div>
                   <div>
-                  <label className="form-control w-96 max-w-lg">
-                    <FormSelect
-                      tooltip="Select the article's name from the dropdown"
-                      name="ArticleName"
-                      placeholder="Choose a Article"
-                      label="Article Name"
-                      options={articleOptions}
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
-                    />
-                    {isLoading && <p>Loading article...</p>}
-                    {error && <p className="text-red-500">{error}</p>}
+                    <label className="form-control w-96 max-w-lg">
+                      <FormSelect
+                        tooltip="Select the article's name from the dropdown"
+                        name="ArticleName"
+                        placeholder="Choose a Article"
+                        label="Article Name"
+                        options={articleOptions}
+                        errors={error ? error : ""}
+                        touched="true" // Adjust as needed
+                      />
+                      {isLoading && <p>Loading article...</p>}
+                      {error && <p className="text-red-500">{error}</p>}
                     </label>
                   </div>
                   {/* <div>
@@ -258,7 +260,7 @@ export default function AddOrderList() {
                           Pallete Count
                           <span
                             className="tooltip tooltip-right"
-                            data-tip="Name of the site. This is required."
+                            data-tip="Pallet count is the number of pallets that will be used for this order."
                           >
                             <CircleHelp
                               className=" my-auto"
@@ -270,7 +272,7 @@ export default function AddOrderList() {
                       </div>
                       <Field
                         type="number"
-                        placeholder="Site Name: Example: EzMiner"
+                        placeholder="Pallete Count"
                         name="PalleteCount"
                         className={`input input-bordered w-full max-w-md ${
                           errors.PalleteCount && touched.PalleteCount

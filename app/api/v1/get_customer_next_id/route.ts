@@ -8,19 +8,14 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient();
 
+  console.log("Search Value:", search); // Debug
 
   // Query the data with total count
-  const { data, error,count } = await supabase
-    .from("tbl_users")
-    .select("*",{ count: "exact" })
-    .eq("is_exist", true)
-    .or(
-      `email.ilike.%${search}%,first_name.ilike.%${search}%,middle_name.ilike.%${search}%,last_name.ilike.%${search}%`
-    )
+  const { data, error, count } = await supabase
+    .from("tbl_customer")
+    .select("*", { count: "exact" })
     .order("created_at", { ascending: false })
-    .range((page - 1) * limit, page * limit - 1);
-
-
+  console.log(data)
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

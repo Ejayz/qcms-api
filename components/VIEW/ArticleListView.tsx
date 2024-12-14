@@ -141,16 +141,23 @@ console.log("artcle data",data)
               </tr>
             )}
           </tbody>
-        </table>
-         {/* Pagination */}
-         <div className="flex justify-between gap-4 items-center mx-auto">
-          <span className="text-base font-semibold text-gray-700">
+          <tfoot>
+            <tr>
+              <td colSpan={7}>
+              <span className="text-sm">
             {data?.total_count
               ? `${(page - 1) * limit + 1}-${
                   Math.min(page * limit, data.total_count)
-                } of ${data.total_count}`
+                } of ${data.total_count} of Articles`
               : "No Results"}
           </span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+         {/* Pagination */}
+         <div className="flex justify-between gap-4 items-center mx-auto">
+        
 
           <div className="join">
             <button

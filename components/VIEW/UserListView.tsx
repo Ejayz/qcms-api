@@ -39,7 +39,6 @@ export default function UserListView() {
   });
 
   return (
-    
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
@@ -59,14 +58,12 @@ export default function UserListView() {
               ref={searchInput}
               className="grow w-full"
               placeholder="Search Email or Name"
-
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   setSearch(searchInput.current?.value || "");
                   setPage(1);
                 }
-              }
-              }
+              }}
             />
             <button
               onClick={() => {
@@ -126,7 +123,7 @@ export default function UserListView() {
                     >
                       <Pencil className="text-warning" /> Edit
                     </Link>
-                  
+
                     <Link
                       href={`/dashboard/viewuser/${get_users.uuid}`}
                       className="link flex"
@@ -144,17 +141,23 @@ export default function UserListView() {
               </tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={4}>
+                <span className="text-sm">
+                  {data?.total_count
+                    ? `${(page - 1) * limit + 1}-${Math.min(
+                        page * limit,
+                        data.total_count
+                      )} of ${data.total_count}`
+                    : "No Results"}
+                </span>
+              </td>
+            </tr>
+          </tfoot>
         </table>
         {/* Pagination */}
         <div className="flex justify-between gap-4 items-center mx-auto">
-          <span className="text-base font-semibold text-gray-700">
-            {data?.total_count
-              ? `${(page - 1) * limit + 1}-${
-                  Math.min(page * limit, data.total_count)
-                } of ${data.total_count}`
-              : "No Results"}
-          </span>
-
           <div className="join">
             <button
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}

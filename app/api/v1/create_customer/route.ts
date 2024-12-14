@@ -7,15 +7,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const { first_name, last_name, email, middle_name,company_name, user_id } = data;
 
-    console.log(
-      "Received Data:",
-      first_name,
-      last_name,
-      email,
-      middle_name,
-      company_name,
-      user_id
-    );
+
 
     // Create Supabase client
     const supabase = await createClient();
@@ -28,20 +20,7 @@ export async function POST(req: NextRequest) {
         { status: 401 }
       );
     }
-    // // Check if the email already exists
-    // const { data: existingEmail, error: fetchError } = await supabase
-    //   .from("tbl_customer")
-    //   .select("email")
-    //   .eq("email", email)
-    //   .single();
 
-    // if (existingEmail) {
-    //   console.log("Email already exists:", email);
-    //   return NextResponse.json(
-    //     { message: "Email already exists" },
-    //     { status: 409 } // Conflict status code
-    //   );
-    // }
   
     // Insert data into tbl_customer
     const { data: insertResult, error: insertError } = await supabase
@@ -65,8 +44,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-
-    console.log("Insert Result:", insertResult);
 
     // Return success response
     return NextResponse.json(
