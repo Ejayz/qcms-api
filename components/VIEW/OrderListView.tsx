@@ -897,7 +897,7 @@ export default function OrderListView() {
                     ? `${(page - 1) * limit + 1}-${Math.min(
                         page * limit,
                         ordersData.total_count
-                      )} of ${ordersData.total_count} Order Fabrication ID`
+                      )} of ${ordersData.total_count} Order Fabrication ID Found`
                     : "No Results"}
                 </span>
               </td>

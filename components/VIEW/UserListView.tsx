@@ -149,7 +149,7 @@ export default function UserListView() {
                     ? `${(page - 1) * limit + 1}-${Math.min(
                         page * limit,
                         data.total_count
-                      )} of ${data.total_count}`
+                      )} of ${data.total_count} Users Found`
                     : "No Results"}
                 </span>
               </td>

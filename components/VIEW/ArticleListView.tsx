@@ -148,7 +148,7 @@ console.log("artcle data",data)
             {data?.total_count
               ? `${(page - 1) * limit + 1}-${
                   Math.min(page * limit, data.total_count)
-                } of ${data.total_count} of Articles`
+                } of ${data.total_count}  Articles Found`
               : "No Results"}
           </span>
               </td>
