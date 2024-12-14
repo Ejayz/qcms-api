@@ -20,11 +20,13 @@ export default function OrderListView() {
 const [endDate, setEndDate] = useState("");
 
 const { data: ordersData, isFetching, isLoading, isError } = useQuery({
-  queryKey: ["get_customer", page, search, limit, startDate, endDate],
+  queryKey: ["get_order", page, search, limit, startDate, endDate],
   queryFn: async () => {
     const response = await fetch(
-      `/api/v1/get_order?page=${page}&search=${search}&limit=${limit}&startDate=${startDate}&endDate=${endDate}`,
-      {
+      `/api/v1/get_order?page=${page}&search=${encodeURIComponent(
+          search
+        )}&limit=${limit}`,
+        {
         method: "GET",
         headers: {
           Accept: "*/*",
@@ -64,40 +66,46 @@ const { data: ordersData, isFetching, isLoading, isError } = useQuery({
     fetchUserEmail();
   }, [supabase.auth]);
 
-  const { data: customersData } = useQuery({
-    queryKey: ["get_customer"],
+  const { data:customersData } = useQuery({
+    queryKey: ["get_customer", page, search, limit],
     queryFn: async () => {
-      const response = await fetch(`/api/v1/get_customer`, {
-        method: "GET",
-        headers: {
-          Accept: "*/*",
-        },
-      });
+      console.log("Fetching Data with:", { page, search, limit }); // Debug
+      const response = await fetch(
+        `/api/v1/get_customer`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "*/*",
+            "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+          },
+          redirect: "follow",
+        }
+      );
       const result = await response.json();
+
+      console.log("API Response:", result); // Debug Response
       if (response.ok) {
         return result;
       } else {
-        throw new Error("Something went wrong while fetching customers.");
+        throw new Error("Something went wrong while fetching customer list.");
       }
     },
     retry: 1,
-    enabled: !!ordersData,
   });
-
   const ordersWithCustomerNames =
-  ordersData?.map((order: any) => {
-    const customerName = customersData?.find(
-      (customer: any) => customer.id === order.customer_id
-    )?.name;
+  ordersData?.data?.map((order: any) => {
+    const customer = customersData?.data?.find(
+      (cust: any) => cust.id === order.customer_id
+    );
 
     return {
       ...order,
-      customer_name: customerName || "Unknown",
-      customer: order.tbl_customer || {},
-      article: order.tbl_article || {},
+      customer_name: customer
+        ? `${customer.first_name} ${customer.last_name}`
+        : "Unknown",
     };
   }) || [];
-
+console.log("Orders With Customer Names:", ordersWithCustomerNames);
 
 
 
@@ -598,11 +606,11 @@ const {
   // Handle error inside the query function
 });
 
-const customerOptions =
-  customerData?.map((customer: any) => ({
-    value: customer.uuid,
-    label: `${customer.first_name} ${customer.last_name}`,
-  })) || [];
+// const customerOptions =
+//   customerData?.map((customer: any) => ({
+//     value: customer.uuid,
+//     label: `${customer.first_name} ${customer.last_name}`,
+//   })) || [];
 
 
   const AssignOrderMutation = useMutation({
@@ -670,8 +678,18 @@ const customerOptions =
               type="text"
               ref={searchInput}
               className="grow w-full"
-              placeholder="Search"
+              placeholder="Search Product Name"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  const searchValue = searchInput.current?.value || "";
+                  console.log("Search Triggered:", searchValue); // Debug
+                  setSearch(searchValue);
+                  setPage(1); // Reset to page 1
+                }
+              }
+              }
             />
+
             <button
               onClick={() => {
                 setSearch(searchInput.current?.value || "");
@@ -682,20 +700,23 @@ const customerOptions =
               <Search color="#000000" /> Search
             </button>
           </label>
+
           <div className="flex gap-4">
+<label className="text-black">Start Date:  </label>
   <input
     type="date"
     onChange={(e) => setStartDate(e.target.value)}
     className="input input-bordered"
     placeholder="Start Date"
   />
+  <label className="text-black">End Date:  </label>
   <input
     type="date"
     onChange={(e) => setEndDate(e.target.value)}
     className="input input-bordered"
     placeholder="End Date"
   />
-  <button
+  {/* <button
     onClick={() => {
       setSearch(searchInput.current?.value || "");
       setPage(1);
@@ -703,7 +724,7 @@ const customerOptions =
     className="btn btn-sm btn-primary"
   >
     Search
-  </button>
+  </button> */}
 </div>
 
           <Link
@@ -722,6 +743,7 @@ const customerOptions =
               <th>Customer Name</th>
               <th>Article Name</th>
               <th>Pallete Count</th>
+              <th>Created Date</th>
               <th>OPTIONS</th>
             </tr>
           </thead>
@@ -739,7 +761,7 @@ const customerOptions =
       </td>
     </tr>
   ) : ordersWithCustomerNames.length > 0 ? (
-    ordersWithCustomerNames.map((order: any, index: number) => (
+    ordersWithCustomerNames?.map((order: any, index: number) => (
       <tr key={index}>
         <td className="text-xs hover:text-orange-500 hover:cursor-pointer" onClick={() => {
           setIsModalOpen(true);
@@ -752,10 +774,12 @@ const customerOptions =
           {order.tbl_customer.last_name}{" "}
           {/* {order.tbl_customer.suffix ? order.tbl_customer.suffix : ""}{" "} */}
           , {order.tbl_customer.first_name}{" "}
-          {order.tbl_customer.middle_name}
+          {/* {order.tbl_customer.middle_name} */}
         </td>
         <td>{order.tbl_article.article_name}</td>
         <td>{order.pallete_count}</td>
+        <td>{new Date(order.created_at).toLocaleDateString()}</td>
+
         <td className="justify-center items-center flex gap-4">
           {userRole === "Super Admin" && (
             <button className="btn btn-info" onClick={() => {
@@ -781,33 +805,39 @@ const customerOptions =
 </tbody>
 
         </table>
-        <div className="join mx-auto">
-          <button
-            onClick={() => {
-              if (page !== 1) {
-                setPage(page - 1);
+        {/* Pagination */}
+        <div className="flex justify-between gap-4 items-center mx-auto">
+          <span className="text-base font-semibold text-gray-700">
+            {ordersData?.total_count
+              ? `${(page - 1) * limit + 1}-${
+                  Math.min(page * limit, ordersData.total_count)
+                } of ${ordersData.total_count}`
+              : "No Results"}
+          </span>
+
+          <div className="join">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              className={`join-item btn ${page === 1 ? "disabled" : ""}`}
+              disabled={page === 1}
+            >
+              «
+            </button>
+            <button className="join-item btn">Page {page}</button>
+            <button
+              onClick={() =>
+                setPage((prev) =>
+                  prev * limit < (ordersData?.total_count || 0) ? prev + 1 : prev
+                )
               }
-            }}
-            className="join-item btn"
-          >
-            «
-          </button>
-          <button className="join-item btn">Page {page}</button>
-          <button
-            onClick={() => {
-              if (!isLoading && !isFetching && ordersData?.length === limit) {
-                setPage(page + 1);
-              }
-            }}
-            className={`join-item btn ${
-              !isLoading && !isFetching && ordersData?.length < limit
-                ? "disabled"
-                : ""
-            }`}
-            disabled={!isLoading && !isFetching && ordersData?.length < limit}
-          >
-            »
-          </button>
+              className={`join-item btn ${
+                page * limit >= (ordersData?.total_count || 0) ? "disabled" : ""
+              }`}
+              disabled={page * limit >= (ordersData?.total_count || 0)}
+            >
+              »
+            </button>
+          </div>
         </div>
 
         {isModalOpen && (
@@ -1787,7 +1817,7 @@ const customerOptions =
           <label className="label">
             Assign Order
           </label>
-          <select
+          {/* <select
             className="select select-bordered"
             onChange={(e) => {
               setAssign_id(e.target.value);
@@ -1799,7 +1829,7 @@ const customerOptions =
                 {option.label}
               </option>
             ))}
-          </select>
+          </select> */}
         </div>
         <div className="flex gap-4 place-content-end">
         <button

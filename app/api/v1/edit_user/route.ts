@@ -14,7 +14,7 @@ export async function PUT(req: NextRequest) {
     }
 
     // Parse request body
-    const { email, first_name, middle_name, last_name, role, suffix } =
+    const { email, first_name, last_name, role } =
       await req.json();
 
     // Check required fields
@@ -62,10 +62,10 @@ export async function PUT(req: NextRequest) {
       .update({
         email,
         first_name,
-        middle_name,
+        // middle_name,
         last_name,
         role,
-        suffix,
+        // suffix,
 
         updated_at: new Date(),
       })

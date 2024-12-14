@@ -64,10 +64,11 @@ export default function AddCustomerList() {
   
  
   const Add_Customer_Validator = Yup.object().shape({
-    firstname: Yup.string().required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    middlename: Yup.string().required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    lastname: Yup.string().required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
+    // firstname: Yup.string().required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
+    // middlename: Yup.string().required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
+    // lastname: Yup.string().required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
+    // email: Yup.string().email("Invalid email").required("Email is required"),
+    company_name: Yup.string().required("Company Name is required"),
   });
 
   return (
@@ -84,18 +85,20 @@ export default function AddCustomerList() {
       </div>
       <Formik
         initialValues={{
-          firstname: "",
-          middlename: "",
-          lastname: "",
-          email: "",
+          // firstname: "",
+          // middlename: "",
+          // lastname: "",
+          // email: "",
+          company_name: "",
         }}
         validationSchema={Add_Customer_Validator}
         onSubmit={async (e, actions) => {
           AddCustomerMutaion.mutate({
-            first_name: e.firstname,
-            middle_name: e.middlename,
-            last_name: e.lastname,
-            email: e.email,
+            // first_name: e.firstname,
+            // middle_name: e.middlename,
+            // last_name: e.lastname,
+            // email: e.email,
+            company_name: e.company_name,
             user_id: userid,
           });
         }}
@@ -109,58 +112,17 @@ export default function AddCustomerList() {
                   <div>
                     <label className="form-control w-96 max-w-lg">
                     <FormInput
-                        tooltip="Input of the First Name. This is required."
-                        name="firstname"
-                        placeholder="First Name"
-                        label="First Name"
-                        errors={errors.firstname ? errors.firstname : ""}
-                        touched={touched.firstname ? "true" : ""}
+                        tooltip="Input of the Company Name. This is required."
+                        name="company_name"
+                        placeholder="Entera a Company Name"
+                        label="Company Name"
+                        errors={errors.company_name ? errors.company_name : ""}
+                        touched={touched.company_name ? "true" : ""}
                       />
                     </label>
 
                   </div>
-
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormInput
-                        tooltip="Input of the Middle Name. This is required."
-                        name="middlename"
-                        placeholder="Middle Name"
-                        label="Middle Name"
-                        errors={errors.middlename ? errors.middlename : ""}
-                        touched={touched.middlename ? "true" : ""}
-                      />
-                    </label>
-                  </div>
-
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormInput
-                        tooltip="Input of the Last Name. This is required."
-                        name="lastname"
-                        placeholder="Last Name"
-                        label="Last Name"
-                        errors={errors.lastname ? errors.lastname : ""}
-                        touched={touched.lastname ? "true" : ""}
-                      />
-                    </label>
-
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormInput
-                        tooltip="Input of the Email. This is required."
-                        name="email"
-                        placeholder="Email"
-                        label="Email"
-                        errors={errors.email ? errors.email : ""}
-                        touched={touched.email ? "true" : ""}
-                      />
-                    </label>
-
-                  </div>
-                </div>
-                  
+</div>
                 
               </div>
             </div>

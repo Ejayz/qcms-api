@@ -215,14 +215,7 @@ export default function Sidebar({
               </li>
             )}
 
-            <li className="rounded collapse collapse-arrow">
-              <details  open={query === "/dashboard/article_management"}>
-                <summary>
-                  <BookText />
-                  Article Management
-                </summary>
-                <ul>
-                  <li>
+             <li>
                     <Link
                       href="/dashboard/article_management"
                       className={`${
@@ -231,12 +224,9 @@ export default function Sidebar({
                           : ""
                       }`}
                     >
-                      Article Creation
+                      <BookText/>Article Creation
                     </Link>
                   </li>
-                </ul>
-              </details>
-            </li> 
             <li>
                     <Link
                       href="/dashboard/order_management"

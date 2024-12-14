@@ -7,8 +7,8 @@ export async function PUT(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id");
 
     // Parse request body
-    const { email, first_name, middle_name, last_name, user_id } = await req.json();
-
+    const { email, first_name, middle_name, last_name, company_name, user_id } = await req.json();
+    console.log("Received Data:", email, first_name, middle_name, last_name, company_name, user_id);
     // Initialize Supabase client
     const supabase = await createClient();
 
@@ -21,46 +21,47 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Fetch the existing user by ID
-    const { data: existingUser, error: userFetchError } = await supabase
-      .from("tbl_customer")
-      .select("email")
-      .eq("id", id)
-      .single();
+    // // Fetch the existing user by ID
+    // const { data: existingUser, error: userFetchError } = await supabase
+    //   .from("tbl_customer")
+    //   .select("email")
+    //   .eq("id", id)
+    //   .single();
 
-    if (userFetchError || !existingUser) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
+    // if (userFetchError || !existingUser) {
+    //   return NextResponse.json(
+    //     { error: "User not found" },
+    //     { status: 404 }
+    //   );
+    // }
 
-    // Check if email is being updated and if it already exists in another record
-    if (email && email !== existingUser.email) {
-      const { data: existingEmail, error: emailCheckError } = await supabase
-        .from("tbl_customer")
-        .select("email, id")
-        .eq("email", email)
-        .single();
+    // // Check if email is being updated and if it already exists in another record
+    // if (email && email !== existingUser.email) {
+    //   const { data: existingEmail, error: emailCheckError } = await supabase
+    //     .from("tbl_customer")
+    //     .select("email, id")
+    //     .eq("email", email)
+    //     .single();
 
 
-      if (existingEmail && existingEmail.id !== id) {
-        console.log("Email already exists:", email);
-        return NextResponse.json(
-          { message: "Email already exists" },
-          { status: 409 } // Conflict status code
-        );
-      }
-    }
+    //   if (existingEmail && existingEmail.id !== id) {
+    //     console.log("Email already exists:", email);
+    //     return NextResponse.json(
+    //       { message: "Email already exists" },
+    //       { status: 409 } // Conflict status code
+    //     );
+    //   }
+    // }
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
       .from("tbl_customer")
       .update({
-        email: email || existingUser.email, // Keep the original email if not updated
-        first_name,
-        middle_name,
-        last_name,
+        // email: email || existingUser.email, // Keep the original email if not updated
+        // first_name,
+        // middle_name,
+        // last_name,
+        company_name,
         user_id,
         updated_at: new Date(),
       })

@@ -21,15 +21,15 @@ export default function AddUserList() {
 
   const Add_User_Validator = Yup.object().shape({
     firstname: Yup.string()
-      .required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
+      .required("First Name is required").matches(/^[A-Za-z ]+$/, "Only alphabets are allowed"), // Regex for no special characters
 
-    middlename: Yup.string()
-      .required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
+    // middlename: Yup.string()
+    //   .required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
 
     lastname: Yup.string()
-      .required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
+      .required("Last Name is required").matches(/^[A-Za-z ]+$/, "Only alphabets are allowed"), // Regex for no special characters
 
-    suffix: Yup.string().required("Suffix is required"),
+    // suffix: Yup.string().required("Suffix is required"),
 
     role: Yup.string().required("Role is required"),
 
@@ -83,7 +83,7 @@ export default function AddUserList() {
         );
       } else {
         // Handle other non-success statuses
-        toast.error("An unexpected error occur  red. Please try again.");
+        toast.error("An unexpected error occurred. Please try again.");
       }
     },
   });
@@ -103,9 +103,9 @@ export default function AddUserList() {
       <Formik
         initialValues={{
           firstname: "",
-          middlename: "",
+          // middlename: "",
           lastname: "",
-          suffix: "",
+          // suffix: "",
           role: "",
           email: "",
           password: "",
@@ -115,9 +115,9 @@ export default function AddUserList() {
         onSubmit={async (e, actions) => {
           mutateNewSite.mutate({
             first_name: e.firstname,
-            middle_name: e.middlename,
+            // middle_name: e.middlename,
             last_name: e.lastname,
-            suffix: e.suffix,
+            // suffix: e.suffix,
             role: e.role,
             email: e.email,
             password: e.password,
@@ -144,7 +144,7 @@ export default function AddUserList() {
                     </label>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormInput
                         tooltip="Input of the Middle Name. This is required."
@@ -155,7 +155,7 @@ export default function AddUserList() {
                         touched={touched.middlename ? "true" : ""}
                       />
                     </label>
-                  </div>
+                  </div> */}
 
                   <div>
                     <label className="form-control w-96 max-w-lg">
@@ -170,7 +170,7 @@ export default function AddUserList() {
                     </label>
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormSelect
                         tooltip="Select the Suffix name from the dropdown"
@@ -189,7 +189,7 @@ export default function AddUserList() {
                         touched={touched.role ? "true" : ""}
                       />
                     </label>
-                  </div>
+                  </div> */}
 
                   <div>
                     <label className="form-control w-96 max-w-lg">

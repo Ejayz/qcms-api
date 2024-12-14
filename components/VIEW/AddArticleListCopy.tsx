@@ -173,7 +173,7 @@ export default function AddArticleListCopy() {
         <ul>
           <li>
             <Link href="/dashboard/measurement_management">
-              Measurement Management
+              Article Management
             </Link>
           </li>
         </ul>
