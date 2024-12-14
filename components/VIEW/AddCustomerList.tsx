@@ -15,12 +15,12 @@ export default function AddCustomerList() {
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["get_customer"],
     queryFn: async () => {
-      let headersList = {
+      const headersList = {
         Accept: "*/*",
         "User-Agent": "Thunder Client (https://www.thunderclient.com)",
       };
 
-      let response = await fetch(
+      const response = await fetch(
         "http://localhost:3000/api/v1/get_customer_next_id",
         {
           method: "GET",
@@ -28,7 +28,7 @@ export default function AddCustomerList() {
         }
       );
 
-      let data = await response.json();
+      const data = await response.json();
       console.log(data);
       return data;
     },

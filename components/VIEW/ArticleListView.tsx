@@ -89,6 +89,7 @@ console.log("artcle data",data)
         <table className="table text-center">
           <thead>
             <tr className="">
+              <th>Product Name</th>
               <th>Customer Name</th>
               <th>Article Nominal</th>
               <th>Article Min</th>
@@ -117,6 +118,7 @@ console.log("artcle data",data)
                   {/* <th>{index + 1}</th> */}
                   {/* <td className="text-xs">{get_users.id}</td> */}
                   <td>{get_users.article_name}</td>
+                  <td>{get_users.customer_id}</td>
                   <td>{get_users.article_nominal}</td>
                   <td>{`${get_users.article_min}`}</td>
                   <td>{get_users.article_max}</td>

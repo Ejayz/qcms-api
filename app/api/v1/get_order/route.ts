@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
       : req.nextUrl.searchParams.get("sort_by") || "created_at";
 
   const supabase = await createClient();
-  let totalDataBasedOnQuery = 0;
+  // let totalDataBasedOnQuery = 0;
 
   // Base query
   let query = supabase
