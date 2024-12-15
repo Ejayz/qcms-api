@@ -16,7 +16,8 @@ export default function EditArticleListCopy(params:any) {
   const [initialValues,setInitialValues] = useState({ 
     rows: [
       {
-        // article_name: "",
+        article_name: "",
+        customer_id: "",
         LengthNominal: "",
         LengthMin: "",
         LengthMax: "",
@@ -70,6 +71,12 @@ export default function EditArticleListCopy(params:any) {
       setInitialValues((prev) => ({
         ...prev,
         number_control: user.number_control,
+        rows: prev.rows.map((row) => ({
+          ...row,
+          article_name: user.article_name,
+          customer_id: user.customer_id,
+          NumberControl: user.number_control,
+        })),
       }));
       }
   }, [isArticleSuccess, articleData]);
@@ -246,13 +253,51 @@ export default function EditArticleListCopy(params:any) {
   });
   
   
+    const [page, setPage] = useState(1);
+      const searchInput = useRef<HTMLInputElement>(null);
+      const [limit] = useState(10);
+      const [search, setSearch] = useState("");
+    
+      const [asssing_id, setAssign_id] = useState<string | null>(null);
+     const { data: customerData } = useQuery({
+        queryKey: ["get_customer", page, search, limit],
+        queryFn: async () => {
+          console.log("Fetching Data with:", { page, search, limit }); // Debug
+          const response = await fetch(`/api/v1/get_customer`, {
+            method: "GET",
+            headers: {
+              Accept: "*/*",
+              "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+            },
+            redirect: "follow",
+          });
+          const result = await response.json();
+    
+          console.log("API Response:", result); // Debug Response
+          if (response.ok) {
+            return result;
+          } else {
+            throw new Error("Something went wrong while fetching customer list.");
+          }
+        },
+        retry: 1,
+      });
+      
+      console.log("Customer Data:", customerData);
+    
+      const customerOptions =
+        customerData?.data?.map((customer: any) => ({
+          value: customer.id,
+          label: `${customer.company_name}`,
+        })) || [];
+    
   return (
     <div className="flex flex-col w-full p-12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
             <Link href="/dashboard/measurement_management">
-              Measurement Management
+              Article Management
             </Link>
           </li>
         </ul>
@@ -296,19 +341,59 @@ export default function EditArticleListCopy(params:any) {
                 name="rows"
                 render={(arrayHelpers) => (
                   <div>
+                     <div className="flex place-content-start gap-6">
+                                                              {values.rows.map((row, index) => (
+                                                                <div key={index} className="flex gap-4">
+                                                                  <div className="inline gap-2">
+                                                                  <label className="label">Product Name</label>
+                                                                  <Field
+                                                                  readOnly
+                                                                    name={`rows.${index}.article_name`}
+                                                                    type="text"
+                                                                    placeholder="Enter Product Name"
+                                                                    className="input input-bordered"
+                                                                  />
+                                                                  </div>
+                                                                  <div className="inline gap-2">
+                                          <label className="label">Customer Name</label>
+                                          <Field
+                                          disabled
+                                            as="select"
+                                            name={`rows.${index}.customer_id`}
+                                            className="select select-bordered"
+                                            defaultValue=""
+                                            onChange={(e:any) => {
+                                              // Update Formik state directly
+                                              setFieldValue(`rows.${index}.customer_id`, e.target.value);
+                                            }}
+                                          >
+                                            <option value="" disabled>
+                                              Select Customer
+                                            </option>
+                                            {customerOptions?.map((option: any) => (
+                                              <option key={option.value} value={option.value}>
+                                                {option.label}
+                                              </option>
+                                            ))}
+                                          </Field>
+                                        </div>
+                                        
+                                                                  <div className="inline gap-2">
+                                                                  <label className="label">Number of Control</label>
+                                                                  <Field
+                                                                  readOnly
+                                                                    name={`rows.${index}.NumberControl`}
+                                                                    type="number"
+                                                                    placeholder="Enter Number Of Control"
+                                                                    className="input input-bordered"
+                                                                  />
+                                                                  </div>
+                                                                  
+                                                                </div>
+                                                              ))}
+                                                            </div>
                     <div className="flex place-content-end gap-3">
-                      <Field
-                      readOnly
-                        name="number_control"
-                        type="number"
-                        placeholder=""
-                        className="input input-bordered"
-                      />
-                     
-                      {/* <button>Remove</button> */}
-                      {/* <button className="btn btn-primary" type="submit">
-                        Edit Article
-                      </button> */}
+                      
                       <Link
                         href="/dashboard/article_management"
                         className="btn btn-accent"

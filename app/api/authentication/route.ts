@@ -4,7 +4,6 @@ import { userInfo } from "os";
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
-  console.log(email, password);
 
   const supabase = await createClient();
 
@@ -18,7 +17,6 @@ export async function POST(req: NextRequest) {
     .eq("uuid", data.user?.id);
 
 
-    console.log(userinformation,error);
   if (error || userinformation.error) {
     return NextResponse.json(
       { error: error?.message || userinformation.error?.message },
@@ -28,7 +26,6 @@ export async function POST(req: NextRequest) {
 
   const JoinData = { ...data, db_record:{...userinformation.data[0]} };
 
-  console.log(JoinData);
 
   return NextResponse.json(JoinData, {
     status: 200,

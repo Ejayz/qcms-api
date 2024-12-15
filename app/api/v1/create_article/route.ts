@@ -6,6 +6,8 @@ export async function POST(req: NextRequest) {
     // Parse incoming request data
     const data = await req.json();
     const {
+      article_name,
+      customer_id,
       article_nominal,
       article_min,
       article_max,
@@ -13,13 +15,14 @@ export async function POST(req: NextRequest) {
       user_id,
     } = data;
 
-    console.log(
-      "Received Data:",
-      article_nominal,
-      article_min,
-      article_max,
-      number_control,
-      user_id
+    console.log("Recieve data"
+    ,article_name,
+    customer_id,
+    article_nominal,
+    article_min,
+    article_max,
+    number_control,
+    user_id
     );
 
     // Create Supabase client
@@ -30,6 +33,8 @@ export async function POST(req: NextRequest) {
       .from("tbl_article")
       .insert([
         {
+          article_name: article_name || null,
+          customer_id: customer_id,
           article_nominal: article_nominal,
           article_min: article_min,
           article_max: article_max,
@@ -49,35 +54,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Insert Result:", insertResult);
 
     // Retrieve the inserted ID (assuming only one row is inserted)
     const insertedId = insertResult[0]?.id;
 
-    if (!insertedId) {
-      throw new Error("Failed to retrieve the inserted ID.");
-    }
+    // if (!insertedId) {
+    //   throw new Error("Failed to retrieve the inserted ID.");
+    // }
 
-    // Update the article_name to include the ID
-    const { data: updateResult, error: updateError } = await supabase
-      .from("tbl_article")
-      .update({ article_name: `article ${insertedId}` })
-      .eq("id", insertedId);
+    // // Update the article_name to include the ID
+    // const { data: updateResult, error: updateError } = await supabase
+    //   .from("tbl_article")
+    //   .update({ article_name: `article ${insertedId}` })
+    //   .eq("id", insertedId);
 
-    // Handle update errors
-    if (updateError) {
-      console.error("Error updating article_name:", updateError.message);
-      return NextResponse.json(
-        { error: updateError.message },
-        { status: 500 }
-      );
-    }
+    // // Handle update errors
+    // if (updateError) {
+    //   console.error("Error updating article_name:", updateError.message);
+    //   return NextResponse.json(
+    //     { error: updateError.message },
+    //     { status: 500 }
+    //   );
+    // }
 
-    console.log("Update Result:", updateResult);
+   
 
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted and updated successfully", id: insertedId, data: updateResult },
+      { message: "Data inserted and updated successfully", id: insertedId },
       { status: 200 }
     );
   } catch (err) {

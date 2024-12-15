@@ -16,9 +16,9 @@ export default function EditUserList(params: any) {
 
   const [initialValues, setInitialValues] = useState({
     firstname: "",
-    middlename: "",
+    // middlename: "",
     lastname: "",
-    suffix: "",
+    // suffix: "",
     role: "",
     email: "",
   });
@@ -48,9 +48,9 @@ export default function EditUserList(params: any) {
       const user = userData[0];
       setInitialValues({
         firstname: user.first_name || "",
-        middlename: user.middle_name || "",
+        // middlename: user.middle_name || "",
         lastname: user.last_name || "",
-        suffix: user.suffix || "",
+        // suffix: user.suffix || "",
         role: user.role || "",
         email: user.email || "",
       });
@@ -67,10 +67,10 @@ export default function EditUserList(params: any) {
         body: JSON.stringify({
           email: data.email,
           first_name: data.firstname,
-          middle_name: data.middlename,
+          // middle_name: data.middlename,
           last_name: data.lastname,
           role: data.role,
-          suffix: data.suffix,
+          // suffix: data.suffix,
         }),
       });
       const responseData = await response.json();
@@ -139,13 +139,13 @@ export default function EditUserList(params: any) {
     firstname: Yup.string()
         .required("First Name is required"),
     
-      middlename: Yup.string(),
+      // middlename: Yup.string(),
     
       lastname: Yup.string()
         .required("Last Name is required"),
     
-      suffix: Yup.string()
-        .required("Suffix is required"),
+      // suffix: Yup.string()
+      //   .required("Suffix is required"),
     
       role: Yup.string().required("Role is required"),
     
@@ -218,7 +218,7 @@ export default function EditUserList(params: any) {
              
             </div>
 
-            <div>
+            {/* <div>
               <label className="form-control w-96 max-w-lg">
                <FormInput
                   tooltip="Input of the Middle Name. This is required."
@@ -229,7 +229,7 @@ export default function EditUserList(params: any) {
                   touched={touched.middlename ? "true" : ""}
                 />
               </label>
-            </div>
+            </div> */}
 
             <div>
               <label className="form-control w-96 max-w-lg">
@@ -244,7 +244,7 @@ export default function EditUserList(params: any) {
               </label>
             </div>
 
-            <div>
+            {/* <div>
               <label className="form-control w-96 max-w-lg">
                 <FormSelect
                   tooltip="Select the Suffix name from the dropdown"
@@ -263,7 +263,7 @@ export default function EditUserList(params: any) {
                   touched={touched.role ? "true" : ""}
                 />
               </label>
-            </div>
+            </div> */}
 
             <div>
               <label className="form-control w-96 max-w-lg">

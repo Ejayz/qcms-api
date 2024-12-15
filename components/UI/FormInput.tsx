@@ -12,6 +12,7 @@ export function FormInput({
   label,
   type,
   readonly,
+  additionalClass
 }: {
   errors: string | undefined;
   touched: string | undefined;
@@ -21,6 +22,7 @@ export function FormInput({
   label: string;
   type?: string;
   readonly?: boolean;
+  additionalClass?: string;
 }) {
   return (
     <div className="w-11/12 block ml-4 bg-white">
@@ -37,7 +39,7 @@ export function FormInput({
           type={type}
           placeholder={placeholder}
           name={name}
-          className={`input bg-white input-bordered w-auto max-w-md ${
+          className={`input bg-white input-bordered w-auto max-w-md ${additionalClass} ${
             errors && touched ? "input-error" : ""
           }`}
           readOnly={readonly}

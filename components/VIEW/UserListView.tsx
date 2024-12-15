@@ -15,7 +15,9 @@ export default function UserListView() {
     queryKey: ["get_users", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_users?page=${page}&search=${encodeURIComponent(
+          search
+        )}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -37,7 +39,6 @@ export default function UserListView() {
   });
 
   return (
-    
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
@@ -56,7 +57,13 @@ export default function UserListView() {
               type="text"
               ref={searchInput}
               className="grow w-full"
-              placeholder="Search"
+              placeholder="Search Email or Name"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setSearch(searchInput.current?.value || "");
+                  setPage(1);
+                }
+              }}
             />
             <button
               onClick={() => {
@@ -80,7 +87,7 @@ export default function UserListView() {
         <table className="table text-center">
           <thead>
             <tr className="">
-              <th></th>
+              {/* <th></th> */}
               {/* <th>UUID</th> */}
               <th>Email</th>
               <th>Name</th>
@@ -101,15 +108,13 @@ export default function UserListView() {
                   Something went wrong while fetching site list.
                 </td>
               </tr>
-            ) : data.length > 0 ? (
-              data?.map((get_users: any, index: any) => (
+            ) : data?.data?.length > 0 ? (
+              data.data.map((get_users: any, index: any) => (
                 <tr key={index}>
-                  <th>{index + 1}</th>
+                  {/* <th>{index + 1}</th> */}
                   {/* <td className="text-xs">{get_users.uuid}</td> */}
                   <td>{get_users.email}</td>
-                  <td>{`${get_users.last_name} ${
-                    get_users.suffix ? get_users.suffix : ""
-                  }, ${get_users.first_name} ${get_users.middle_name}`}</td>
+                  <td>{`${get_users.last_name} ${get_users.first_name}`}</td>
                   <td>{get_users.role}</td>
                   <td className="justify-center items-center flex gap-4">
                     <Link
@@ -118,7 +123,7 @@ export default function UserListView() {
                     >
                       <Pencil className="text-warning" /> Edit
                     </Link>
-                  
+
                     <Link
                       href={`/dashboard/viewuser/${get_users.uuid}`}
                       className="link flex"
@@ -136,34 +141,46 @@ export default function UserListView() {
               </tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={4}>
+                <span className="text-sm">
+                  {data?.total_count
+                    ? `${(page - 1) * limit + 1}-${Math.min(
+                        page * limit,
+                        data.total_count
+                      )} of ${data.total_count} Users Found`
+                    : "No Results"}
+                </span>
+              </td>
+            </tr>
+          </tfoot>
         </table>
-        <div className="join mx-auto">
-          <button
-            onClick={() => {
-              if (page !== 1) {
-                setPage(page - 1);
+        {/* Pagination */}
+        <div className="flex justify-between gap-4 items-center mx-auto">
+          <div className="join">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              className={`join-item btn ${page === 1 ? "disabled" : ""}`}
+              disabled={page === 1}
+            >
+              «
+            </button>
+            <button className="join-item btn">Page {page}</button>
+            <button
+              onClick={() =>
+                setPage((prev) =>
+                  prev * limit < (data?.total_count || 0) ? prev + 1 : prev
+                )
               }
-            }}
-            className="join-item btn"
-          >
-            «
-          </button>
-          <button className="join-item btn">Page {page}</button>
-          <button
-            onClick={() => {
-              if (!isLoading && !isFetching && data?.length === limit) {
-                setPage(page + 1);
-              }
-            }}
-            className={`join-item btn ${
-              !isLoading && !isFetching && data?.length < limit
-                ? "disabled"
-                : ""
-            }`}
-            disabled={!isLoading && !isFetching && data?.length < limit}
-          >
-            »
-          </button>
+              className={`join-item btn ${
+                page * limit >= (data?.total_count || 0) ? "disabled" : ""
+              }`}
+              disabled={page * limit >= (data?.total_count || 0)}
+            >
+              »
+            </button>
+          </div>
         </div>
       </div>
     </div>

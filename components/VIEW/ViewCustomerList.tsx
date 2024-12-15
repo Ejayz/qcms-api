@@ -2,7 +2,14 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Pencil, Plus, TriangleAlert } from "lucide-react";
+import {
+  CircleCheckBig,
+  CircleHelp,
+  Pencil,
+  Plus,
+  Trash2,
+  TriangleAlert,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -10,14 +17,15 @@ import * as Yup from "yup";
 import { FormInput, FormSelect } from "../UI/FormInput";
 import { useEffect, useState } from "react";
 import { create } from "domain";
-export default function EditCustomerList(params:any) {
-  const router = useRouter();
-const id=params.params;
+export default function EditCustomerList(params: any) {
+  const navigator = useRouter();
+  const id = params.params;
   const [initialValues, setInitialValues] = useState({
-    firstname: "",
-    middlename: "",
-    lastname: "",
-    email: "",
+    // firstname: "",
+    // middlename: "",
+    // lastname: "",
+    // email: "",
+    company_name: "",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,22 +40,23 @@ const id=params.params;
     queryFn: async () => {
       const response = await fetch(`/api/v1/getonecustomer/?id=${id}`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch user data: ${response.status}`);
+        throw new Error(`Failed to fetch customer data: ${response.status}`);
       }
       return response.json(); // Expecting an array
     },
     enabled: !!id, // Only fetch data if id exists
   });
-  console.log("Gatherd data:",userData);
+  console.log("Gatherd data:", userData);
   useEffect(() => {
     if (isSuccess && userData && userData.length > 0) {
       const user = userData[0]; // Get the first user object
       setInitialValues((prev) => ({
         ...prev,
-        firstname: user.first_name || "",
-        middlename: user.middle_name || "",
-        lastname: user.last_name || "",
-        email: user.email || "",
+        // firstname: user.first_name || "",
+        // middlename: user.middle_name || "",
+        // lastname: user.last_name || "",
+        // email: user.email || "",
+        company_name: user.company_name || "",
       }));
     }
   }, [isSuccess, userData]);
@@ -60,35 +69,66 @@ const id=params.params;
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: data.email,
-          first_name: data.firstname,
-          middle_name: data.middlename,
-          last_name: data.lastname,
-      }),
-    });
-      return response.json();
+          // email: data.email,
+          // first_name: data.firstname,
+          // middle_name: data.middlename,
+          // last_name: data.lastname,
+          company_name: data.company_name,
+        }),
+      });
+     const result = await response.json();
     },
-    onError: (error) => { 
+    onError: (error) => {
       toast.error("Failed to edit customer");
     },
     onSuccess: (data) => {
-      toast.success("Customer edited successfully");
-      router.push("/dashboard/customer_management");
+        toast.success("Customer editted successfully");
+        // Delay navigation by 2 seconds (2000 milliseconds)
+        setTimeout(() => {
+          navigator.push("/dashboard/customer_management");
+        }, 2000);
+     
+      }
+   
+  });
+  const Add_Customer_Validator = Yup.object().shape({
+    // firstname: Yup.string().required("First Name is required"),
+    // lastname: Yup.string().required("Last Name is required"),
+    // email: Yup.string().email("Invalid email").required("Email is required"),
+    company_name: Yup.string().required("Company Name is required"),
+  });
+
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+
+  const removeCustomerMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/v1/remove_customer?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_exist: data.is_exist,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(
+          (await response.json())?.error || "Failed to remove customer"
+        );
+      }
+
+      return response.json();
     },
-    onMutate: (data) => {
-      return data;
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to remove customer");
+    },
+    onSuccess: (data) => {
+      toast.success("Customer removed successfully");
+      navigator.push("/dashboard/customer_management");
     },
   });
 
-  const Add_Customer_Validator = Yup.object().shape({
-    firstname: Yup.string().required("First Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    middlename: Yup.string().required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    lastname: Yup.string().required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-});
-
- 
-  
   return (
     <div className="flex flex-col w-11/12 mx-auto bg-base-200 text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
@@ -101,6 +141,7 @@ const id=params.params;
           </li>
         </ul>
       </div>
+      
       <Formik
         initialValues={initialValues}
         enableReinitialize={true}
@@ -117,81 +158,32 @@ const id=params.params;
                 <div className="grid lg:grid-cols-2 gap-6 w-full place-content-center grid-cols-1">
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                    <FormInput
-                        tooltip="Input of the First Name. This is required."
-                        name="firstname"
-                        placeholder="First Name"
-                        label="First Name"
-                        errors={errors.firstname ? errors.firstname : ""}
-                        touched={touched.firstname ? "true" : ""}
-                        readonly={true}
-                      />
-                    </label>
-
-                  </div>
-
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
                       <FormInput
-                        tooltip="Input of the Middle Name. This is required."
-                        name="middlename"
-                        placeholder="Middle Name"
-                        label="Middle Name"
-                        errors={errors.middlename ? errors.middlename : ""}
-                        touched={touched.middlename ? "true" : ""}
+                        tooltip="Input of the Company Name. This is required."
+                        name="company_name"
+                        placeholder="Enter Company Name"
+                        label="Company Name"
+                        errors={errors.company_name ? errors.company_name : ""}
+                        touched={touched.company_name ? "true" : ""}
                         readonly={true}
                       />
                     </label>
-                  </div>
-
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormInput
-                        tooltip="Input of the Last Name. This is required."
-                        name="lastname"
-                        placeholder="Last Name"
-                        label="Last Name"
-                        errors={errors.lastname ? errors.lastname : ""}
-                        touched={touched.lastname ? "true" : ""}
-                        readonly={true}
-                      />
-                    </label>
-
-                  </div>
-                  <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormInput
-                        tooltip="Input of the Email. This is required."
-                        name="email"
-                        placeholder="Email"
-                        label="Email"
-                        errors={errors.email ? errors.email : ""}
-                        touched={touched.email ? "true" : ""}
-                        readonly={true}
-                      />
-                    </label>
-
                   </div>
                 </div>
-                
-  <div>
-                  
-            </div>
-              </div>
-          
-        
-        
-            </div>
-            <div className="modal-action p-6">
-        
+              </div>  
+              <div className="modal-action p-6">
+           
           <button
             type="button"
-            onClick={() => router.push("/dashboard/customer_management")}
+            onClick={() => navigator.push("/dashboard/customer_management")}
             className="btn btn-accent btn-md"
           >
             BACK
           </button>
             </div>
+        
+            </div>
+           
           </Form>
         )}
       </Formik>

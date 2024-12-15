@@ -7,12 +7,7 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const { order_form_id,user_id } = data;
 
-    console.log(
-      "Received Data:",
-      order_form_id,
-      user_id
 
-    );
 
     // Create Supabase client
     const supabase = await createClient();
@@ -33,7 +28,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (existingEmail) {
-      console.log("Email already exists:", user_id);
+   
       return NextResponse.json(
         { message: "Email already exists" },
         { status: 409 } // Conflict status code
@@ -61,7 +56,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("Insert Result:", insertResult);
 
     // Return success response
     return NextResponse.json(

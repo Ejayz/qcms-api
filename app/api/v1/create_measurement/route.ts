@@ -19,19 +19,7 @@ export async function POST(req: NextRequest) {
       user_id,
     } = data;
 
-    console.log(
-      "Received Data:",
-      order_id,
-      length,
-      inside_diameter,
-      outside_diameter,
-      flat_crush,
-      h20,
-      radial,
-      number_control,
-      pallete_count,
-      remarks,
-    );
+   
 
     // Create Supabase client
     const supabase = await createClient();
@@ -71,8 +59,6 @@ export async function POST(req: NextRequest) {
         { status: 500 }
       );
     }
-
-    console.log("Insert Result:", insertResult);
 
     // Return success response
     return NextResponse.json(

@@ -13,14 +13,7 @@ export async function POST(req: NextRequest) {
       user_id,
     } = data;
 
-    console.log(
-      "Received Data:",
-      order_form_id,
-      entry_date_time,
-      exit_date_time,
-      user_id,
-    );
-
+   
     // Create Supabase client
     const supabase = await createClient();
 

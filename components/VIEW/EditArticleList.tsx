@@ -16,7 +16,8 @@ export default function EditArticleListCopy(params:any) {
   const [initialValues,setInitialValues] = useState({ 
     rows: [
       {
-        // article_name: "",
+        article_name: "",
+        customer_id: "",
         LengthNominal: "",
         LengthMin: "",
         LengthMax: "",
@@ -64,12 +65,19 @@ export default function EditArticleListCopy(params:any) {
   useEffect(() => {
     if (isArticleSuccess && articleData && articleData.length > 0) {
       const user = articleData[0];
+
       setNominalID(user.article_nominal);
       setMinID(user.article_min);
       setMaxID(user.article_max);
       setInitialValues((prev) => ({
         ...prev,
         number_control: user.number_control,
+        rows: prev.rows.map((row) => ({
+          ...row,
+          article_name: user.article_name,
+          customer_id: user.customer_id,
+          NumberControl: user.number_control,
+        })),
       }));
       }
   }, [isArticleSuccess, articleData]);
@@ -245,6 +253,67 @@ export default function EditArticleListCopy(params:any) {
     },
   });
   
+  const UpdateArticleMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/v1/edit_article/?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      return response.json();
+    },
+    onError: (error) => {
+      toast.error("Failed to update article");
+    },
+    onSuccess: (data) => {
+      toast.success("Article updated Successfully");
+      router.push("/dashboard/article_management");
+    },
+    onMutate: (data) => {
+      return data;
+    },
+  });
+
+  const [page, setPage] = useState(1);
+    const searchInput = useRef<HTMLInputElement>(null);
+    const [limit] = useState(10);
+    const [search, setSearch] = useState("");
+  
+    const [asssing_id, setAssign_id] = useState<string | null>(null);
+   const { data: customerData } = useQuery({
+      queryKey: ["get_customer", page, search, limit],
+      queryFn: async () => {
+        console.log("Fetching Data with:", { page, search, limit }); // Debug
+        const response = await fetch(`/api/v1/get_customer`, {
+          method: "GET",
+          headers: {
+            Accept: "*/*",
+            "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+          },
+          redirect: "follow",
+        });
+        const result = await response.json();
+  
+        console.log("API Response:", result); // Debug Response
+        if (response.ok) {
+          return result;
+        } else {
+          throw new Error("Something went wrong while fetching customer list.");
+        }
+      },
+      retry: 1,
+    });
+    
+    console.log("Customer Data:", customerData);
+  
+    const customerOptions =
+      customerData?.data?.map((customer: any) => ({
+        value: customer.id,
+        label: `${customer.company_name}`,
+      })) || [];
+  
   
   return (
     <div className="flex flex-col w-full p-12 mx-auto text-black">
@@ -252,7 +321,7 @@ export default function EditArticleListCopy(params:any) {
         <ul>
           <li>
             <Link href="/dashboard/measurement_management">
-              Measurement Management
+              Article Management
             </Link>
           </li>
         </ul>
@@ -284,7 +353,14 @@ export default function EditArticleListCopy(params:any) {
         flat_crush: row.FlatCrushMax,
         h20: row.H20Max,
       }),
+      UpdateArticleMutation.mutateAsync({
+        article_name: row.article_name,
+        customer_id: row.customer_id,
+        number_control: row.NumberControl,
+      }),
+      
     ])
+
   );
 
   await Promise.all(mutationPromises);
@@ -303,15 +379,56 @@ export default function EditArticleListCopy(params:any) {
                 name="rows"
                 render={(arrayHelpers) => (
                   <div>
-                    <div className="flex place-content-end gap-3">
+                    <div className="flex place-content-start gap-6">
+                                          {values.rows.map((row, index) => (
+                                            <div key={index} className="flex gap-4">
+                                              <div className="inline gap-2">
+                                              <label className="label">Product Name</label>
+                                              <Field
+                                                name={`rows.${index}.article_name`}
+                                                type="text"
+                                                placeholder="Enter Product Name"
+                                                className="input input-bordered"
+                                              />
+                                              </div>
+                                              <div className="inline gap-2">
+                      <label className="label">Customer Name</label>
                       <Field
-                      readOnly
-                        name="number_control"
-                        type="number"
-                        placeholder=""
-                        className="input input-bordered"
-                      />
-                     
+                        as="select"
+                        name={`rows.${index}.customer_id`}
+                        className="select select-bordered"
+                        defaultValue=""
+                        onChange={(e:any) => {
+                          // Update Formik state directly
+                          setFieldValue(`rows.${index}.customer_id`, e.target.value);
+                        }}
+                      >
+                        <option value="" disabled>
+                          Select Customer
+                        </option>
+                        {customerOptions?.map((option: any) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </Field>
+                    </div>
+                    
+                                              <div className="inline gap-2">
+                                              <label className="label">Number of Control</label>
+                                              <Field
+                                                name={`rows.${index}.NumberControl`}
+                                                type="number"
+                                                placeholder="Enter Number Of Control"
+                                                className="input input-bordered"
+                                              />
+                                              </div>
+                                              
+                                            </div>
+                                          ))}
+                                        </div>
+                    <div className="flex place-content-end gap-3">
+                  
                       {/* <button>Remove</button> */}
                       <button className="btn btn-primary" type="submit">
                         Edit Article

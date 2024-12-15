@@ -32,7 +32,7 @@ export default function AddArticleListCopy() {
     };
 
     fetchUserEmail();
-  }, []);
+  }, [supabase.auth]);
 
   console.log("the user id is:", userID);
 
@@ -40,6 +40,8 @@ export default function AddArticleListCopy() {
     rows: [
       {
         // article_name: "",
+        article_name: "",
+        customer_id: "",
         LengthNominal: "",
         LengthMin: "",
         LengthMax: "",
@@ -166,15 +168,51 @@ export default function AddArticleListCopy() {
   });
 
   // console.log("orders data  ",measurementsData);
-  console.log("max id", maxId+"min id", minId+"nominal id", nominalId);
+  console.log("max id", maxId + "min id", minId + "nominal id", nominalId);
+const [page, setPage] = useState(1);
+  const searchInput = useRef<HTMLInputElement>(null);
+  const [limit] = useState(10);
+  const [search, setSearch] = useState("");
+
+  const [asssing_id, setAssign_id] = useState<string | null>(null);
+ const { data: customerData } = useQuery({
+    queryKey: ["get_customer", page, search, limit],
+    queryFn: async () => {
+      console.log("Fetching Data with:", { page, search, limit }); // Debug
+      const response = await fetch(`/api/v1/get_customer`, {
+        method: "GET",
+        headers: {
+          Accept: "*/*",
+          "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+        },
+        redirect: "follow",
+      });
+      const result = await response.json();
+
+      console.log("API Response:", result); // Debug Response
+      if (response.ok) {
+        return result;
+      } else {
+        throw new Error("Something went wrong while fetching customer list.");
+      }
+    },
+    retry: 1,
+  });
+  
+  console.log("Customer Data:", customerData);
+
+  const customerOptions =
+    customerData?.data?.map((customer: any) => ({
+      value: customer.id,
+      label: `${customer.company_name}`,
+    })) || [];
+
   return (
     <div className="flex flex-col w-full p-12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/measurement_management">
-              Measurement Management
-            </Link>
+            <Link href="/dashboard/article_management">Article Management</Link>
           </li>
         </ul>
       </div>
@@ -184,62 +222,65 @@ export default function AddArticleListCopy() {
           for (const row of values.rows) {
             try {
               // Run Nominal, Min, and Max Mutations in parallel
-              const [nominalResponse, minResponse, maxResponse] = await Promise.all([
-                new Promise((resolve, reject) => {
-                  AddNominalMutation.mutate(
-                    {
-                      length: row.LengthNominal,
-                      inside_diameter: row.InsideDiameterNominal,
-                      outside_diameter: row.OutsideDiameterNominal,
-                      flat_crush: row.FlatCrushNominal,
-                      h20: row.H20Nominal,
-                      user_id: userID,
-                    },
-                    { onSuccess: resolve, onError: reject }
-                  );
-                }),
-                new Promise((resolve, reject) => {
-                  AddMinMutation.mutate(
-                    {
-                      length: row.LengthMin,
-                      inside_diameter: row.InsideDiameterMin,
-                      outside_diameter: row.OutsideDiameterMin,
-                      flat_crush: row.FlatCrushMin,
-                      h20: row.H20Min,
-                      user_id: userID,
-                    },
-                    { onSuccess: resolve, onError: reject }
-                  );
-                }),
-                new Promise((resolve, reject) => {
-                  AddMaxMutation.mutate(
-                    {
-                      length: row.LengthMax,
-                      inside_diameter: row.InsideDiameterMax,
-                      outside_diameter: row.OutsideDiameterMax,
-                      flat_crush: row.FlatCrushMax,
-                      h20: row.H20Max,
-                      user_id: userID,
-                    },
-                    { onSuccess: resolve, onError: reject }
-                  );
-                }),
-              ]);
-        
+              const [nominalResponse, minResponse, maxResponse] =
+                await Promise.all([
+                  new Promise((resolve, reject) => {
+                    AddNominalMutation.mutate(
+                      {
+                        length: row.LengthNominal,
+                        inside_diameter: row.InsideDiameterNominal,
+                        outside_diameter: row.OutsideDiameterNominal,
+                        flat_crush: row.FlatCrushNominal,
+                        h20: row.H20Nominal,
+                        user_id: userID,
+                      },
+                      { onSuccess: resolve, onError: reject }
+                    );
+                  }),
+                  new Promise((resolve, reject) => {
+                    AddMinMutation.mutate(
+                      {
+                        length: row.LengthMin,
+                        inside_diameter: row.InsideDiameterMin,
+                        outside_diameter: row.OutsideDiameterMin,
+                        flat_crush: row.FlatCrushMin,
+                        h20: row.H20Min,
+                        user_id: userID,
+                      },
+                      { onSuccess: resolve, onError: reject }
+                    );
+                  }),
+                  new Promise((resolve, reject) => {
+                    AddMaxMutation.mutate(
+                      {
+                        length: row.LengthMax,
+                        inside_diameter: row.InsideDiameterMax,
+                        outside_diameter: row.OutsideDiameterMax,
+                        flat_crush: row.FlatCrushMax,
+                        h20: row.H20Max,
+                        user_id: userID,
+                      },
+                      { onSuccess: resolve, onError: reject }
+                    );
+                  }),
+                ]);
+
               // Extract IDs
               const nominalId = (nominalResponse as { id: string })?.id;
               const minId = (minResponse as { id: string })?.id;
               const maxId = (maxResponse as { id: string })?.id;
-        
+
               // Ensure all IDs are valid before proceeding
               if (!nominalId || !minId || !maxId) {
                 throw new Error("One or more required IDs are missing");
               }
-        
+
               // Add Article Mutation
               await new Promise((resolve, reject) => {
                 AddArticleMutation.mutate(
                   {
+                    article_name: row.article_name,
+                    customer_id: row.customer_id,
                     article_nominal: nominalId,
                     article_min: minId,
                     article_max: maxId,
@@ -249,15 +290,12 @@ export default function AddArticleListCopy() {
                   { onSuccess: resolve, onError: reject }
                 );
               });
-        
-              
             } catch (error) {
               toast.error("Failed to add article");
               console.error("Error in mutation chain:", error);
             }
           }
         }}
-        
       >
         {({ values, setFieldValue }) => (
           <Form>
@@ -266,43 +304,57 @@ export default function AddArticleListCopy() {
                 name="rows"
                 render={(arrayHelpers) => (
                   <div>
-                    <div className="flex place-content-end gap-3">
+                    <div className="flex place-content-start gap-6">
                       {values.rows.map((row, index) => (
-                        <Field
-                          key={index}
-                          name={`rows.${index}.NumberControl`}
-                          type="number"
-                          placeholder="Enter Number Of Control"
-                          className="input input-bordered"
-                        />
+                        <div key={index} className="flex gap-4">
+                          <div className="inline gap-2">
+                          <label className="label">Product Name</label>
+                          <Field
+                            name={`rows.${index}.article_name`}
+                            type="text"
+                            placeholder="Enter Product Name"
+                            className="input input-bordered"
+                          />
+                          </div>
+                          <div className="inline gap-2">
+  <label className="label">Customer Name</label>
+  <Field
+    as="select"
+    name={`rows.${index}.customer_id`}
+    className="select select-bordered"
+    defaultValue=""
+    onChange={(e:any) => {
+      // Update Formik state directly
+      setFieldValue(`rows.${index}.customer_id`, e.target.value);
+    }}
+  >
+    <option value="" disabled>
+      Select Customer
+    </option>
+    {customerOptions?.map((option: any) => (
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </Field>
+</div>
+
+                          <div className="inline gap-2">
+                          <label className="label">Number of Control</label>
+                          <Field
+                            name={`rows.${index}.NumberControl`}
+                            type="number"
+                            placeholder="Enter Number Of Control"
+                            className="input input-bordered"
+                          />
+                          </div>
+                          
+                        </div>
                       ))}
-                      {/* <button
-                        className="btn btn-info"
-                        type="button"
-                        onClick={() =>
-                          arrayHelpers.push({
-                            // article_name: "",
-                            LengthNominal: "",
-                            LengthMin: "",
-                            LengthMax: "",
-                            InsideDiameterNominal: "",
-                            InsideDiameterMin: "",
-                            InsideDiameterMax: "",
-                            OutsideDiameterNominal: "",
-                            OutsideDiameterMin: "",
-                            OutsideDiameterMax: "",
-                            FlatCrushNominal: "",
-                            FlatCrushMin: "",
-                            FlatCrushMax: "",
-                            H20Nominal: "",
-                            H20Min: "",
-                            H20Max: "",
-                            NumberControl: "",
-                          })
-                        }
-                      >
-                        Add Row
-                      </button> */}
+                    </div>
+
+                    <div className="flex place-content-end gap-3">
+
                       <button className="btn btn-primary" type="submit">
                         Add Article
                       </button>
@@ -325,10 +377,10 @@ export default function AddArticleListCopy() {
                             {/* <th>Action</th> */}
                           </tr>
                         </thead>
-                        {/* tbody for length */}   {values.rows.map((row, index) => (
-                            <React.Fragment key={index}>
-                        <tbody>
-                       
+                        {/* tbody for length */}{" "}
+                        {values.rows.map((row, index) => (
+                          <React.Fragment key={index}>
+                            <tbody>
                               <tr>
                                 <td>Length</td>
                                 <td>
@@ -363,11 +415,9 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                         
-                        </tbody>
-                        {/* tbody for inside diameter */}
-                        <tbody>
-                        
+                            </tbody>
+                            {/* tbody for inside diameter */}
+                            <tbody>
                               <tr>
                                 <td>Inside Diameter</td>
                                 <td>
@@ -402,11 +452,9 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                          
-                        </tbody>
-                        {/* tbody for outside diameter */}
-                        <tbody>
-                        
+                            </tbody>
+                            {/* tbody for outside diameter */}
+                            <tbody>
                               <tr>
                                 <td>Outside Diameter</td>
                                 <td>
@@ -441,36 +489,35 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                          
-                        </tbody>
-                        {/* tbody for flat crush */}
-                        <tbody>
-                          {values.rows.map((row, index) => (
-                            <React.Fragment key={index}>
-                              <tr>
-                                <td>Flat Crush</td>
-                                <td>
-                                  <Field
-                                    name={`rows.${index}.FlatCrushNominal`}
-                                    type="number"
-                                    className="input input-bordered"
-                                  />
-                                </td>
-                                <td>
-                                  <Field
-                                    name={`rows.${index}.FlatCrushMin`}
-                                    type="number"
-                                    className="input input-bordered"
-                                  />
-                                </td>
-                                <td>
-                                  <Field
-                                    name={`rows.${index}.FlatCrushMax`}
-                                    type="number"
-                                    className="input input-bordered"
-                                  />
-                                </td>
-{/* 
+                            </tbody>
+                            {/* tbody for flat crush */}
+                            <tbody>
+                              {values.rows.map((row, index) => (
+                                <React.Fragment key={index}>
+                                  <tr>
+                                    <td>Flat Crush</td>
+                                    <td>
+                                      <Field
+                                        name={`rows.${index}.FlatCrushNominal`}
+                                        type="number"
+                                        className="input input-bordered"
+                                      />
+                                    </td>
+                                    <td>
+                                      <Field
+                                        name={`rows.${index}.FlatCrushMin`}
+                                        type="number"
+                                        className="input input-bordered"
+                                      />
+                                    </td>
+                                    <td>
+                                      <Field
+                                        name={`rows.${index}.FlatCrushMax`}
+                                        type="number"
+                                        className="input input-bordered"
+                                      />
+                                    </td>
+                                    {/* 
                                 <td>
                                   <button
                                     className="btn btn-danger"
@@ -480,13 +527,12 @@ export default function AddArticleListCopy() {
                                     Remove
                                   </button>
                                 </td> */}
-                              </tr>
-                            </React.Fragment>
-                          ))}
-                        </tbody>
-                        {/* tbody for h20 */}
-                        <tbody>
-                         
+                                  </tr>
+                                </React.Fragment>
+                              ))}
+                            </tbody>
+                            {/* tbody for h20 */}
+                            <tbody>
                               <tr>
                                 <td>H20</td>
                                 <td>
@@ -521,9 +567,9 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                          
-                        </tbody>  </React.Fragment>
-                          ))}
+                            </tbody>{" "}
+                          </React.Fragment>
+                        ))}
                       </table>
                     </div>
                   </div>

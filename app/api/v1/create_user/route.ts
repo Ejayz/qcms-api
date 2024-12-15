@@ -6,10 +6,10 @@ export async function POST(req: NextRequest) {
   const {
     email,
     first_name,
-    middle_name,
+    // middle_name,
     last_name,
     role,
-    suffix,
+    // suffix,
     password,
   } = await req.json();
 
@@ -30,9 +30,9 @@ export async function POST(req: NextRequest) {
     email_confirm: true,
     user_metadata:{
       first_name: first_name,
-      middle_name: middle_name,
+      // middle_name: middle_name,
       last_name: last_name,
-      suffix: suffix,
+      // suffix: suffix,
       role: role,
     }
   });
@@ -64,16 +64,16 @@ export async function POST(req: NextRequest) {
       uuid: data.user?.id,
       email: email,
       first_name: first_name,
-      middle_name: middle_name,
+      // middle_name: middle_name,
       last_name: last_name,
       role: role,
-      suffix: suffix,
+      // suffix: suffix,
       is_exist: true,
     },
   ]);
 
   console.log("User details inserted:", insertUserDetails);
-  if (insertUserDetails.error) {
+  if (insertUserDetails.error) {  
     return NextResponse.json(
       { error: insertUserDetails.error.message },
       { status: 500 }
