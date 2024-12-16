@@ -651,11 +651,11 @@ export default function OrderListView() {
     // Handle error inside the query function
   });
 
-  // const customerOptions =
-  //   customerData?.map((customer: any) => ({
-  //     value: customer.uuid,
-  //     label: `${customer.first_name} ${customer.last_name}`,
-  //   })) || [];
+  const customerOptions =
+    customerData?.data.map((customer: any) => ({
+      value: customer.uuid,
+      label: `${customer.first_name} ${customer.last_name}`,
+    })) || [];
 
   const AssignOrderMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -2127,7 +2127,7 @@ export default function OrderListView() {
               <div className="flex flex-col gap-y-4">
                 <div className="flex flex-col gap-y-4">
                   <label className="label">Assign Order</label>
-                  {/* <select
+                  <select
             className="select select-bordered"
             onChange={(e) => {
               setAssign_id(e.target.value);
@@ -2139,7 +2139,7 @@ export default function OrderListView() {
                 {option.label}
               </option>
             ))}
-          </select> */}
+          </select>
                 </div>
                 <div className="flex gap-4 place-content-end">
                   <button
