@@ -19,7 +19,7 @@ export default function LoginView() {
   const mutateManangementLogin = useMutation({
     mutationFn: async (values: { email: string }) => {
       const response = await fetch("/api/send", {
-        method: "GET",
+        method: "POST",  // Change GET to POST
         headers: {
           "Content-Type": "application/json",
         },
@@ -27,7 +27,7 @@ export default function LoginView() {
       });
   
       if (!response.ok) {
-        // You can handle specific error status codes here
+        // Handle specific error status codes here
         const errorData = await response.json();
         throw new Error(errorData?.message || "An error occurred while logging in");
       }
@@ -35,21 +35,16 @@ export default function LoginView() {
       return response.json();
     },
     onError: (error) => {
-      console.log("Login error:", error);  // Inspect the error structure
+      console.log("Login error:", error);
       toast.error("Invalid email or password");
       //toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: (data) => {
-    //  if(data.db_record.is_verified === false){
-    //     toast.error("Email is not verified");
-    //     route.push("/verify_email");
-    //     return;
-    //  }
       toast.success("Confirming ");
       // route.push("/dashboard");
-      // }
     },
   });
+  
   
 
   return (
