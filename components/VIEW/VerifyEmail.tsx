@@ -13,13 +13,13 @@ export default function LoginView() {
     email: Yup.string()
       .email("Enter a valid email address.")
       .required("Email Address is required."),
-    password: Yup.string().required("Password is required."),
+    
   });
 
   const mutateManangementLogin = useMutation({
-    mutationFn: async (values: { email: string; password: string }) => {
-      const response = await fetch("/api/authentication/", {
-        method: "POST",
+    mutationFn: async (values: { email: string }) => {
+      const response = await fetch("/api/send", {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
@@ -40,23 +40,14 @@ export default function LoginView() {
       //toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: (data) => {
-      // Save the user's role in localStorage
-      const userRole = data.user.user_metadata?.role; 
-      localStorage.setItem("userRole", userRole);
-      const checkemail = data.user.user_metadata?.email_verified;
-      console.log("email chekse:",checkemail);
-      const userid=data.user.id;
-      localStorage.setItem("userid", userid);
-    
-      const useremail=data.user.email;
-      console.log("emails:",useremail);
-      if(checkemail===false){
-        toast.error("Email is not verified");
-        route.push("/verify_email");
-      }else{
-      toast.success("Login Successful");
-      route.push("/dashboard");
-      }
+    //  if(data.db_record.is_verified === false){
+    //     toast.error("Email is not verified");
+    //     route.push("/verify_email");
+    //     return;
+    //  }
+      toast.success("Confirming ");
+      // route.push("/dashboard");
+      // }
     },
   });
   
@@ -86,7 +77,7 @@ export default function LoginView() {
           <Formik
             initialValues={{
               email: "",
-              password: "",
+              // password: "",
             }}
             validationSchema={loginSchema}
             validateOnBlur={true}
@@ -101,7 +92,7 @@ export default function LoginView() {
           >
             {({ errors, touched }) => (
               <Form className="w-full justify-evenly gap-y-2 flex flex-col p-4 mx-auto my-auto bg-transparent">
-                
+              
                 <FormInput
                   
                   errors={errors.email}
@@ -111,6 +102,7 @@ export default function LoginView() {
                   placeholder="youremail@mail.domain"
                   label="Email Address"
                 />
+               
 
                 <div className="mx-auto w-3/4 flex">
                   <button

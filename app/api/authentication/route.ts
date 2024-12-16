@@ -23,7 +23,14 @@ export async function POST(req: NextRequest) {
       { status: 401, statusText: "Login Failed" }
     );
   }
+  // console.log("User Information", userinformation.data[0]);
 
+  // if(userinformation.data[0].is_verified === false){
+  //   return NextResponse.json(
+  //     { error: "Email is not verified" },
+  //     { status: 401, statusText: "Login Failed" }
+  //   );
+  // }
   const JoinData = { ...data, db_record:{...userinformation.data[0]} };
 
 
