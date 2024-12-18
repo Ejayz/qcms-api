@@ -237,22 +237,9 @@ export default function Sidebar({
                       }`}
                     >
                       <FolderKanban />
-                      Order Fabrication     Management
+                      Order Fabrication Management
                     </Link>
                   </li>
-            <li>
-              <Link
-                href="/dashboard/laboratory_management"
-                className={`${
-                  query == "/dashboard/laboratory_management"
-                    ? "bg-primary"
-                    : ""
-                }`}
-              >
-                <Microscope color="#000000" />
-                Laboratory Management
-              </Link>
-            </li>
             <li>
               <Link
                 href="/dashboard/production_management"
