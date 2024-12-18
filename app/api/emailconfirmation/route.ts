@@ -26,7 +26,16 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { status: 401 }
     );
   }
-
+  const codeExpiration = new Date(data.code_expiration);
+  const now = new Date();
+  
+  if (now > codeExpiration) {
+    return NextResponse.json(
+      { error: "Code expired." },
+      { status: 402 }
+    );
+  }
+  
 
  const updateuser = await supabase
       .from("tbl_users")
