@@ -3,10 +3,13 @@
 import { Form, Formik } from "formik";
 import { FormInput } from "../UI/FormInputLogin";
 import * as Yup from "yup";
-import { useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 export default function LoginView() {
   const route = useRouter();
   const loginSchema = Yup.object({
@@ -15,7 +18,7 @@ export default function LoginView() {
       .required("Email Address is required."),
     
   });
-
+  const [useremail, setUseremail] = useState<string | null>(null);
   const mutateManangementLogin = useMutation({
     mutationFn: async (values: { email: string }) => {
       const response = await fetch("/api/send", {
@@ -36,16 +39,19 @@ export default function LoginView() {
     },
     onError: (error) => {
       console.log("Login error:", error);
-      toast.error("Invalid email or password");
+      toast.error("Invalid email or the email is existing");
       //toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: (data) => {
-      toast.success("Confirming ");
-      // route.push("/dashboard");
+      // console.log("Setting email in localStorage:", data.data);
+
+localStorage.setItem("email", data.data);
+
+      toast.success("Sent code successfully");
+      route.push("/email_confirmation");
+
     },
   });
-  
-  
 
   return (
     <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-no-repeat"
@@ -88,13 +94,18 @@ export default function LoginView() {
             {({ errors, touched }) => (
               <Form className="w-full justify-evenly gap-y-2 flex flex-col p-4 mx-auto my-auto bg-transparent">
               
+                <h1 className="text-2xl text-center font-bold text-black">
+                  Email Verification
+                </h1>
+                <p className="text-center text-white">
+                We will send a verification code via this email address.</p>
                 <FormInput
                   
                   errors={errors.email}
                   touched={touched.email?.toString()}
                   tooltip="Enter your email address"
                   name="email"
-                  placeholder="youremail@mail.domain"
+                  placeholder="Enter Your Email"
                   label="Email Address"
                 />
                
@@ -114,7 +125,7 @@ export default function LoginView() {
                         Authenticating...
                       </div>
                     ) : (
-                      "Continue with Email"
+                      "Send code via email"
                     )}
                   </button>
                 </div>

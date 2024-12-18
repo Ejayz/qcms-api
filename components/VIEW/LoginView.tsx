@@ -7,6 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useState } from "react";
 export default function LoginView() {
   const route = useRouter();
   const loginSchema = Yup.object({
@@ -15,7 +16,10 @@ export default function LoginView() {
       .required("Email Address is required."),
     password: Yup.string().required("Password is required."),
   });
-
+  const [useremail, setUseremail] = useState<string | null>(null);
+  // const [userRole, setUserRole] = useState<string | null>(null);
+  const [userCode, setUserCode] = useState<string | null>(null);
+  const [codeExpired, setCodeExpired] = useState<boolean>(false);
   const mutateManangementLogin = useMutation({
     mutationFn: async (values: { email: string; password: string }) => {
       const response = await fetch("/api/authentication/", {
@@ -40,17 +44,17 @@ export default function LoginView() {
       //toast.error(error?.message || "An unknown error occurred");
     },
     onSuccess: (data) => {
-     if(data.db_record.is_verified === false){
+      if(data.db_record.is_verified == false){
         toast.error("Email is not verified");
         route.push("/verify_email");
         return;
      }
+
       toast.success("Login Successful");
       route.push("/dashboard");
-      // }
-    },
+      }
+
   });
-  
 
   return (
     <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-no-repeat"
