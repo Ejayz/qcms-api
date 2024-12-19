@@ -3,21 +3,21 @@
 import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 
-export default function AddProductionList() {
+export default function EditProductionList(params: any) {
   const navigator = useRouter();
   const [assignId, setAssignId] = useState("");
   const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
-
+  const id = params.params;
   const [userID, setUserID] = useState<string | null>(null);
   const supabase = createClient();
     useEffect(() => {
@@ -57,31 +57,103 @@ export default function AddProductionList() {
     entry_date_time: Yup.string().required("Entry Date Time is required"),
     exit_date_time: Yup.string().required("Exit Date Time is required"),
   });
-
-  const AddOrderMutation = useMutation({
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toISOString().split("T")[0]; // Converts to 'YYYY-MM-DD'
+  };
+  
+  const [initialValues, setInitialValues] = useState({
+    order_form_id: "",
+    entry_date_time: "",
+    exit_date_time: "",
+  });
+  const {
+    data: productionData,
+    isLoading: isproductionLoading,
+    isSuccess: isproductionSuccess,
+    isError: isproductionError,
+    error: productionError,
+  } = useQuery({
+    queryKey: ["get_prodution", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/v1/getoneproductionform/?id=${id}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch production data: ${response.status}`);
+      }
+      return response.json(); // Expecting an array
+    },
+    enabled: !!id, // Only fetch data if id exists
+  });
+  console.log("Gatherd data:", productionData);
+  useEffect(() => {
+    if (isproductionSuccess && productionData && productionData.length > 0) {
+      const user = productionData[0]; // Get the first user object
+      setInitialValues((prev) => ({
+        ...prev,
+        order_form_id: user.order_form_id || "",
+        entry_date_time: user.entry_date_time ? formatDate(user.entry_date_time) : "",
+        exit_date_time: user.exit_date_time ? formatDate(user.exit_date_time) : "",
+      }));
+    }
+  }, [isproductionSuccess, productionData]);
+  
+  const updateProductionMutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch("/api/v1/create_production", {
-        method: "POST",
+      const response = await fetch(`/api/v1/edit_production?id=${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          order_form_id: data.order_form_id,
+          entry_date_time: data.entry_date_time,
+          exit_date_time: data.exit_date_time,
+          // updated_by: userID,
+        }),
       });
       if (!response.ok) {
-        throw new Error("Failed to add production");
+        throw new Error(
+          (await response.json())?.error || "Failed to update production"
+        );
       }
       return response.json();
     },
-    onError: (error) => {
-      toast.error("Failed to add production");
-      console.error(error);
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update production");
     },
     onSuccess: (data) => {
-      toast.success("Production Added Successfully");
+      toast.success("Production updated successfully");
       navigator.push("/dashboard/production_management");
     },
   });
 
+const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const removeProductionMutation = useMutation({
+    mutationFn: async (data:any) => {
+      const response = await fetch(`/api/v1/remove_production?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_exist: data.is_exist,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(
+          (await response.json())?.error || "Failed to remove production"
+        );
+      }
+      return response.json();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to remove production");
+    },
+    onSuccess: (data) => {
+      toast.success("Production removed successfully");
+      navigator.push("/dashboard/production_management");
+    },
+  });
   return (
     <div className="flex flex-col w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
@@ -92,19 +164,17 @@ export default function AddProductionList() {
             </Link>
           </li>
           <li>
-            <span>Add Production</span>
+            <span>Edit Production</span>
           </li>
         </ul>
       </div>
+     
       <Formik
-        initialValues={{
-          order_form_id: "",
-          entry_date_time: "",
-          exit_date_time: "",
-        }}
+      enableReinitialize={true}
+        initialValues={initialValues}
         validationSchema={Validation}
         onSubmit={(values) => {
-          // alert(JSON.stringify(values, null, 2));
+         updateProductionMutation.mutate(values);
         }}
       >
         {({ errors, touched ,values }) => (
@@ -121,6 +191,7 @@ export default function AddProductionList() {
     <span className="text-red-500">Failed to load orders.</span>
   ) : (
     <Field
+    disabled
       as="select"
       name="order_form_id"
       className="select select-bordered"
@@ -138,6 +209,7 @@ export default function AddProductionList() {
   )}
                     <label className="label">Entry Date Time</label>
                     <Field
+                    readOnly
                       type="date"
                       name="entry_date_time"
                       placeholder="Entry Date Time"
@@ -149,6 +221,7 @@ export default function AddProductionList() {
 
                     <label className="label">Exit Date Time</label>
                     <Field
+                    readOnly
                       type="date"
                       name="exit_date_time"
                       placeholder="Exit Date Time"
@@ -162,19 +235,7 @@ export default function AddProductionList() {
               </div>
             </div>
             <div className="modal-action p-6">
-              <button
-                type="submit"
-                className="btn btn-primary btn-md flex items-center"
-                  onClick={() => AddOrderMutation.mutate({
-                    user_id: userID,
-                    order_form_id: values.order_form_id,
-                    entry_date_time: values.entry_date_time,
-                    exit_date_time: values.exit_date_time,
-                  }
-                )}
-              >
-                <Plus className="mr-2" /> Add Production
-              </button>
+           
               <Link
                 className="btn btn-accent"
                 href="/dashboard/production_management"
@@ -185,6 +246,43 @@ export default function AddProductionList() {
           </Form>
         )}
       </Formik>
+      {/* Remove User Modal */}
+      {isRemoveModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="text-lg font-bold">Confirm Removal</h3>
+            <p>
+              Are you sure you want to remove this production? This action cannot
+              be undone.
+            </p>
+            <div className="modal-action">
+              <button
+                onClick={() => {
+                  removeProductionMutation.mutate({ is_exist: false });
+                }}
+                className={`btn btn-error ${
+                  removeProductionMutation.isPending ? "loading" : ""
+                }`}
+              >
+                {removeProductionMutation.isPending ? (
+                  <>
+                    <span className="loading loading-dots loading-sm"></span>{" "}
+                    Removing Production...
+                  </>
+                ) : (
+                  "Remove Production"
+                )}
+              </button>
+              <button
+                onClick={() => setIsRemoveModalOpen(false)}
+                className="btn btn-accent"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

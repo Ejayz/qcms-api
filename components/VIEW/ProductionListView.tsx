@@ -1,9 +1,7 @@
 "use client";
-import { createClient } from "@/utils/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Search } from "lucide-react";
+import { Eye, Pencil, Search } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import React, { useState, useRef } from "react";
 import { DateTime } from "luxon";
 
@@ -34,8 +32,7 @@ export default function OrderListView() {
       const response = await fetch(`/api/v1/get_production?${queryParams}`, {
         method: "GET",
         headers: {
-          Accept: "*/*",
-          "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+          Accept: "application/json",
         },
       });
 
@@ -45,19 +42,21 @@ export default function OrderListView() {
 
       return response.json();
     },
+    staleTime: 5000, // Keep previous data for 5 seconds while fetching new data
+    retry: 1, // Retry once after 1 second  
   });
 
-  const navigator = useRouter();
+  const handleSearch = () => {
+    setSearch(searchInput.current?.value || "");
+    setPage(1); // Reset to the first page after a search
+  };
 
   return (
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/"> </Link>
-          </li>
-          <li>
-            <span>Order Fabrication Management</span>
+            <span>Production Management</span>
           </li>
         </ul>
       </div>
@@ -72,17 +71,11 @@ export default function OrderListView() {
                 className="grow w-full"
                 placeholder="Search OF ID"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    setSearch(searchInput.current?.value || "");
-                    setPage(1);
-                  }
+                  if (e.key === "Enter") handleSearch();
                 }}
               />
               <button
-                onClick={() => {
-                  setSearch(searchInput.current?.value || "");
-                  setPage(1);
-                }}
+                onClick={handleSearch}
                 className="btn btn-sm h-full drop-shadow-2xl flex items-center gap-2"
               >
                 <Search color="#000000" /> Search
@@ -93,6 +86,7 @@ export default function OrderListView() {
               <label className="text-black">Start Date:</label>
               <input
                 type="date"
+                value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="input input-bordered"
               />
@@ -101,16 +95,17 @@ export default function OrderListView() {
               <label className="text-black">End Date:</label>
               <input
                 type="date"
+                value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="input input-bordered"
               />
             </div>
-            <div className="flex flex-col">
-              <label className="text-black invisible">Add:</label>
-              <Link href="/dashboard/addorder" className="btn btn-primary">
-                Add Production
-              </Link>
-            </div>
+          </div>
+          <div className="flex flex-col place-content-end">
+            <label className="text-black invisible">Add:</label>
+            <Link href="/dashboard/addproduction" className="btn btn-primary">
+              Add Production
+            </Link>
           </div>
         </div>
 
@@ -139,19 +134,33 @@ export default function OrderListView() {
               ordersData.data.map((order: any, index: number) => (
                 <tr key={index}>
                   <td>{order.order_form_id}</td>
-                  <td>{DateTime.fromISO(order.entry_date_time).toFormat("dd/MM/yy hh:mm a")}</td>
-                  <td>{DateTime.fromISO(order.exit_date_time).toFormat("dd/MM/yy hh:mm a")}</td>
+                  <td>
+                    {DateTime.fromISO(order.entry_date_time).toFormat(
+                      "dd/MM/yy hh:mm a"
+                    )}
+                  </td>
+                  <td>
+                    {DateTime.fromISO(order.exit_date_time).toFormat(
+                      "dd/MM/yy hh:mm a"
+                    )}
+                  </td>
                   <td>
                     {DateTime.fromISO(order.created_at).toFormat(
                       "dd/MM/yy hh:mm a"
                     )}
                   </td>
-                  <td>
+                  <td className="flex flex-row gap-4 justify-center">
                     <Link
-                      href={`/dashboard/editorder/${order.id}`}
+                      href={`/dashboard/editproduction/${order.id}`}
                       className="link flex"
                     >
                       <Pencil className="text-warning" /> Edit
+                    </Link>
+                    <Link
+                      href={`/dashboard/view_production/${order.id}`}
+                      className="link flex"
+                    >
+                      <Eye className="text-info" /> View
                     </Link>
                   </td>
                 </tr>
