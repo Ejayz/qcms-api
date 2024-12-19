@@ -171,7 +171,49 @@ export default function OrderListView() {
               </tr>
             )}
           </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={7}>
+                <span className="text-xs">
+                  {ordersData?.total_count
+                    ? `${(page - 1) * limit + 1}-${Math.min(
+                        page * limit,
+                        ordersData.total_count
+                      )} of ${ordersData.total_count} Production Found`
+                    : "No Results"}
+                </span>
+              </td>
+            </tr>
+          </tfoot>
         </table>
+         {/* Pagination */}
+         <div className="flex justify-between gap-4 items-center mx-auto">
+          <div className="join">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              className={`join-item btn ${page === 1 ? "disabled" : ""}`}
+              disabled={page === 1}
+            >
+              «
+            </button>
+            <button className="join-item btn">Page {page}</button>
+            <button
+              onClick={() =>
+                setPage((prev) =>
+                  prev * limit < (ordersData?.total_count || 0)
+                    ? prev + 1
+                    : prev
+                )
+              }
+              className={`join-item btn ${
+                page * limit >= (ordersData?.total_count || 0) ? "disabled" : ""
+              }`}
+              disabled={page * limit >= (ordersData?.total_count || 0)}
+            >
+              »
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
