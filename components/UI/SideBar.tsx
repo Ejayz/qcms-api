@@ -240,7 +240,7 @@ export default function Sidebar({
                       Order Fabrication Management
                     </Link>
                   </li>
-            <li>
+            {/* <li>
               <Link
                 href="/dashboard/production_management"
                 className={`${
@@ -276,7 +276,7 @@ export default function Sidebar({
                 <FileChartColumnIncreasing color="#000000" />
                 Report
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>
