@@ -168,14 +168,14 @@ export default function Sidebar({
 
           <ul className="menu bg-white text-black min-h-full w-80 p-4">
             {/* Sidebar content here */}
-            <li>
+            {/* <li>
               <Link
                 href="dashboard"
                 className={`${query == "/dashboard" ? "bg-primary" : ""}`}
               >
                 <LayoutDashboard></LayoutDashboard> Dashboard{" "}
               </Link>
-            </li>
+            </li> */}
             {userRole == "Super Admin" ? (
               <>
                 <li>
