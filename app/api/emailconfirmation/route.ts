@@ -1,7 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest) {  // Remove 'res' parameter
   const { email, code } = await req.json();
 
   const supabase = await createClient();
@@ -35,9 +35,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { status: 402 }
     );
   }
-  
 
- const updateuser = await supabase
+  const updateuser = await supabase
       .from("tbl_users")
       .update({ is_verified: true })
       .eq("email", email)
