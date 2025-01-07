@@ -20,13 +20,13 @@ export async function PUT(req: NextRequest) {
     const supabase = await createClient();
 
     // Verify user role
-    const current_role = await roleExtractor(supabase);
-    if (current_role !== "Super Admin") {
-      return NextResponse.json(
-        { error: "No permission to perform this action" },
-        { status: 401 }
-      );
-    }
+    // const current_role = await roleExtractor(supabase);
+    // if (current_role !== "Super Admin") {
+    //   return NextResponse.json(
+    //     { error: "No permission to perform this action" },
+    //     { status: 401 }
+    //   );
+    // }
 
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase

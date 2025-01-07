@@ -13,13 +13,13 @@ export async function PUT(req: NextRequest) {
     const supabase = await createClient();
 
     // Verify user role
-    const current_role = await roleExtractor(supabase);
-    if (current_role !== "Super Admin") {
-      return NextResponse.json(
-        { error: "No permission to perform this action" },
-        { status: 401 }
-      );
-    }
+    // const current_role = await roleExtractor(supabase);
+    // if (current_role !== "Super Admin") {
+    //   return NextResponse.json(
+    //     { error: "No permission to perform this action" },
+    //     { status: 401 }
+    //   );
+    // }
 
     // // Fetch the existing user by ID
     // const { data: existingUser, error: userFetchError } = await supabase

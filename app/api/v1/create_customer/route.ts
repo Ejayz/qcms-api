@@ -12,14 +12,14 @@ export async function POST(req: NextRequest) {
     // Create Supabase client
     const supabase = await createClient();
 
-    // Verify user role
-    const current_role = await roleExtractor(supabase);
-    if (current_role !== "Super Admin") {
-      return NextResponse.json(
-        { error: "No permission to perform this action" },
-        { status: 401 }
-      );
-    }
+    // // Verify user role
+    // const current_role = await roleExtractor(supabase);
+    // if (current_role !== "Super Admin") {
+    //   return NextResponse.json(
+    //     { error: "No permission to perform this action" },
+    //     { status: 401 }
+    //   );
+    // }
 
   
     // Insert data into tbl_customer

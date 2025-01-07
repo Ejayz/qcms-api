@@ -97,7 +97,7 @@ export default function AddCustomerList() {
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashbaord/customer_management">
+            <Link href="/dashboard/customer_management">
               Customer Management
             </Link>
           </li>
