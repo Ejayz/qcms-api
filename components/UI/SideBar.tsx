@@ -168,14 +168,14 @@ export default function Sidebar({
 
           <ul className="menu bg-white text-black min-h-full w-80 p-4">
             {/* Sidebar content here */}
-            <li>
+            {/* <li>
               <Link
                 href="dashboard"
                 className={`${query == "/dashboard" ? "bg-primary" : ""}`}
               >
                 <LayoutDashboard></LayoutDashboard> Dashboard{" "}
               </Link>
-            </li>
+            </li> */}
             {userRole == "Super Admin" ? (
               <>
                 <li>
@@ -237,23 +237,10 @@ export default function Sidebar({
                       }`}
                     >
                       <FolderKanban />
-                      Order Fabrication     Management
+                      Order Fabrication Management
                     </Link>
                   </li>
-            <li>
-              <Link
-                href="/dashboard/laboratory_management"
-                className={`${
-                  query == "/dashboard/laboratory_management"
-                    ? "bg-primary"
-                    : ""
-                }`}
-              >
-                <Microscope color="#000000" />
-                Laboratory Management
-              </Link>
-            </li>
-            <li>
+            {/* <li>
               <Link
                 href="/dashboard/production_management"
                 className={`${
@@ -289,7 +276,7 @@ export default function Sidebar({
                 <FileChartColumnIncreasing color="#000000" />
                 Report
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </div>

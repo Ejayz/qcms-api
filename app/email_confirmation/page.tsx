@@ -1,11 +1,11 @@
 import IndexHeader from "@/components/UI/IndexHeader";
 import IndexWithoutHeader from "@/components/UI/IndexWithoutHeader";
-import VerifyEmail from "@/components/VIEW/VerifyEmail";
+import EmailConfirmation from "@/components/VIEW/EmailConfirmation";
 
 export default function Home() {
   return (
     <IndexWithoutHeader>
-      <VerifyEmail />
+      <EmailConfirmation />
     </IndexWithoutHeader>
   );
 }

@@ -2,13 +2,14 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Field, Form, Formik } from "formik";
-import { CircleCheckBig, CircleHelp, Plus, TriangleAlert } from "lucide-react";
+import { CircleCheckBig, CircleHelp, Eye, EyeClosed, Plus, TriangleAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormInput, FormSelect } from "../UI/FormInput";
 import { useState } from "react";
+
 export default function AddUserList() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -21,16 +22,11 @@ export default function AddUserList() {
 
   const Add_User_Validator = Yup.object().shape({
     firstname: Yup.string()
-      .required("First Name is required").matches(/^[A-Za-z ]+$/, "Only alphabets are allowed"), // Regex for no special characters
-
-    // middlename: Yup.string()
-    //   .required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"), // Regex for no special characters
-
+      .required("First Name is required").matches(/^[A-Za-z ]+$/, "Only alphabets are allowed"),
+    
     lastname: Yup.string()
-      .required("Last Name is required").matches(/^[A-Za-z ]+$/, "Only alphabets are allowed"), // Regex for no special characters
-
-    // suffix: Yup.string().required("Suffix is required"),
-
+      .required("Last Name is required").matches(/^[A-Za-z ]+$/, "Only alphabets are allowed"),
+    
     role: Yup.string().required("Role is required"),
 
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -58,7 +54,6 @@ export default function AddUserList() {
 
       const responseData = await response.json();
 
-      // Return status and response data
       return {
         status: response.status,
         data: responseData,
@@ -69,20 +64,13 @@ export default function AddUserList() {
     },
     onSuccess: ({ status, data }) => {
       if (status === 200) {
-        // Handle success for user creation
         toast.success("User added successfully");
-
-        // Delay navigation by 2 seconds (2000 milliseconds)
         setTimeout(() => {
           navigator.push("/dashboard/user_management");
         }, 2000);
       } else if (status === 409) {
-        // Handle conflict (e.g., user already exists)
-        toast.error(
-          "The email is already registered. Please use a different email and try again."
-        );
+        toast.error("The email is already registered. Please use a different email and try again.");
       } else {
-        // Handle other non-success statuses
         toast.error("An unexpected error occurred. Please try again.");
       }
     },
@@ -93,7 +81,7 @@ export default function AddUserList() {
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashbaord/user_management">User Management</Link>
+            <Link href="/dashboard/user_management">User Management</Link>
           </li>
           <li>
             <span>Add User</span>
@@ -103,9 +91,7 @@ export default function AddUserList() {
       <Formik
         initialValues={{
           firstname: "",
-          // middlename: "",
           lastname: "",
-          // suffix: "",
           role: "",
           email: "",
           password: "",
@@ -115,9 +101,7 @@ export default function AddUserList() {
         onSubmit={async (e, actions) => {
           mutateNewSite.mutate({
             first_name: e.firstname,
-            // middle_name: e.middlename,
             last_name: e.lastname,
-            // suffix: e.suffix,
             role: e.role,
             email: e.email,
             password: e.password,
@@ -125,7 +109,7 @@ export default function AddUserList() {
           });
         }}
       >
-        {({ errors, touched, values }) => (
+        {({ errors, touched }) => (
           <Form>
             <div className="place-content-center flex flex-col gap-y-6">
               <div className="border p-12 rounded-md bg-white">
@@ -144,19 +128,6 @@ export default function AddUserList() {
                     </label>
                   </div>
 
-                  {/* <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormInput
-                        tooltip="Input of the Middle Name. This is required."
-                        name="middlename"
-                        placeholder="Middle Name"
-                        label="Middle Name"
-                        errors={errors.middlename ? errors.middlename : ""}
-                        touched={touched.middlename ? "true" : ""}
-                      />
-                    </label>
-                  </div> */}
-
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormInput
@@ -169,27 +140,6 @@ export default function AddUserList() {
                       />
                     </label>
                   </div>
-
-                  {/* <div>
-                    <label className="form-control w-96 max-w-lg">
-                      <FormSelect
-                        tooltip="Select the Suffix name from the dropdown"
-                        name="suffix"
-                        placeholder="Choose a Suffix"
-                        label="Suffix Name"
-                        options={[
-                          { value: "Jr", label: "Jr" },
-                          { value: "Sr", label: "Sr" },
-                          { value: "II", label: "II" },
-                          { value: "III", label: "III" },
-                          { value: "IV", label: "IV" },
-                          { value: "N/A", label: "N/A" },
-                        ]}
-                        errors={errors.role ? errors.role : ""}
-                        touched={touched.role ? "true" : ""}
-                      />
-                    </label>
-                  </div> */}
 
                   <div>
                     <label className="form-control w-96 max-w-lg">
@@ -220,7 +170,7 @@ export default function AddUserList() {
                   </div>
 
                   <div>
-                    <label className="form-control w-96 max-w-lg">
+                    <label className="relative form-control w-96 max-w-lg">
                       <FormInput
                         tooltip="Input of the Password. This is required."
                         name="password"
@@ -230,21 +180,34 @@ export default function AddUserList() {
                         errors={errors.password ? errors.password : ""}
                         touched={touched.password ? "true" : ""}
                       />
+                      {/* Show/Hide Password Icon */}
+                      <span
+                        onClick={togglePasswordVisibility}
+                        className="absolute right-5 top-16 transform -translate-y-1/2 cursor-pointer"
+                      >
+                        {showPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
+                      </span>
                     </label>
                   </div>
+
                   <div>
-                    <label className="form-control w-96 max-w-lg">
+                    <label className="relative form-control w-96 max-w-lg">
                       <FormInput
                         tooltip="Input of the Confirm Password. This is required."
                         name="confirmpassword"
                         placeholder="Confirm Password"
                         label="Confirm Password"
                         type={showConfirmPassword ? "text" : "password"}
-                        errors={
-                          errors.confirmpassword ? errors.confirmpassword : ""
-                        }
+                        errors={errors.confirmpassword ? errors.confirmpassword : ""}
                         touched={touched.confirmpassword ? "true" : ""}
                       />
+                      {/* Show/Hide Confirm Password Icon */}
+                      <span
+                        onClick={toggleConfirmPasswordVisibility}
+                        className="absolute right-5 top-16 transform -translate-y-1/2 cursor-pointer"
+                      >
+                        {showConfirmPassword ? <EyeClosed size={20} /> : <Eye size={20} />}
+                      </span>
                     </label>
                   </div>
                 </div>
@@ -253,14 +216,11 @@ export default function AddUserList() {
             <div className="modal-action p-6">
               <button
                 type="submit"
-                className={`btn ${
-                  mutateNewSite.isPending ? "btn-disabled" : "btn-primary"
-                } btn-md`}
+                className={`btn ${mutateNewSite.isPending ? "btn-disabled" : "btn-primary"} btn-md`}
               >
                 {mutateNewSite.isPending ? (
                   <>
-                    <span className="loading loading-dots loading-sm"></span>{" "}
-                    Adding User...
+                    <span className="loading loading-dots loading-sm"></span> Adding User...
                   </>
                 ) : (
                   <>

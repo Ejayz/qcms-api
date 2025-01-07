@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
       { status: 401, statusText: "Login Failed" }
     );
   }
-
   const JoinData = { ...data, db_record:{...userinformation.data[0]} };
 
 

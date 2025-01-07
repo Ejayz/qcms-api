@@ -91,6 +91,7 @@ export default function IndexHeader(){
             alt="logo"
             width={214}
             height={85}
+            onClick={() => router.push("/dashboard/order_management")}
           />
         </div>
         <div className="flex-none gap-2">
