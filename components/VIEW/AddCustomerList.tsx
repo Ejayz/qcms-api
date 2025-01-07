@@ -153,7 +153,7 @@ export default function AddCustomerList() {
                       <FormInput
                         tooltip="Input of the Company Name. This is required."
                         name="company_name"
-                        placeholder="Entera a Company Name"
+                        placeholder="Enter a Company Name"
                         label="Company Name"
                         errors={errors.company_name ? errors.company_name : ""}
                         touched={touched.company_name ? "true" : ""}
