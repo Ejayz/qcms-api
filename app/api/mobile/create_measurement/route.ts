@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const {data:PalleteData, error:PalleteError} = await supabase.from("tbl_measurement").select("pallete_count").eq("order_form_id", order_id).eq("is_exist", true);
+    const {data:PalleteData, error:PalleteError} = await supabase.from("tbl_measurement").select("pallete_count").eq("order_form_id", order_id).eq("is_exist", true).eq("pallete_count",pallete_count);
     if(PalleteError){
       return NextResponse.json(
         { error: PalleteError.message },
