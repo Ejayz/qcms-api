@@ -126,11 +126,11 @@ export default function AddOrderList(params:any) {
     retry: 2,
   });
 
-  const customerOptions = customerData?.map((customer: any) => ({
+  const customerOptions = customerData?.data?.map((customer: any) => ({
     value: customer.id,
-    label: `${customer.first_name} ${customer.last_name}`,
+    label: `${customer.company_name}`,
   })) || [];
-
+console.log("Customer Data:",customerOptions);
   const {
     data: articleData,
     isFetching: isFetchingArticles,
@@ -158,7 +158,7 @@ export default function AddOrderList(params:any) {
     retry: 2,
   });
 
-  const articleOptions = articleData?.map((article: any) => ({
+  const articleOptions = articleData?.data?.map((article: any) => ({
     value: article.id,
     label: `${article.article_name}`,
   })) || [];
