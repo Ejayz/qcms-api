@@ -50,7 +50,7 @@ export default function AddOrderList(params:any) {
         product_name: user.product_name || "",
         CustomerName: user.customer_id || "",
         ArticleName: user.article_id || "",
-        PalleteCount: user.pallete_count ||"",
+        PalleteCount: user.pallete_count ||"0",
       }));
     }
   }, [isSuccess, userData]);
@@ -75,10 +75,10 @@ export default function AddOrderList(params:any) {
       return response.json();
     },
     onError: (error) => { 
-      toast.error("Failed to add order");
+      toast.error("Failed to Edit order");
     },
     onSuccess: (data) => {
-      toast.success("Order Added Successfully");
+      toast.success("Order Edit Successfully");
       router.push("/dashboard/order_management");
     },
     onMutate: (data) => {
