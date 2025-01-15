@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Formik, Form, FieldArray, Field, ErrorMessage } from "formik";
-import { Eye, Pencil, Search, Trash } from "lucide-react";
+import { Eye, Pencil, Search, Slice, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
@@ -230,6 +230,9 @@ export default function OrderListView() {
         production_entry_date_time: Yup.date()
           .required("Entry Date & Time is required")
           .typeError("Invalid date format"),
+        production_exit_date_time: Yup.date()
+          .required("Exit Date & Time is required")
+          .typeError("Invalid date format"),
       })
     ),
   });
@@ -238,6 +241,9 @@ export default function OrderListView() {
       Yup.object().shape({
         proofing_entry_date_time: Yup.date()
           .required("Entry Date & Time is required")
+          .typeError("Invalid date format"),
+        proofing_exit_date_time: Yup.date()
+          .required("Exit Date & Time is required")
           .typeError("Invalid date format"),
         proofing_num_pallete: Yup.number().required(
           "Number of Pallets is required"
@@ -300,7 +306,8 @@ export default function OrderListView() {
         })),
       }));
     }
-  }, [fetchedProductionData]);
+  }, [fetchedProductionData,refetchProductionData]);
+  // console.log("fetchedProductionData", fetchedProductionData?.length);
 
   const updateProductionMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -365,6 +372,7 @@ export default function OrderListView() {
       refetchProductionData();
     },
   });
+  
 
   // proofing
   const AddProofingMutation = useMutation({
@@ -418,6 +426,7 @@ export default function OrderListView() {
       }));
     }
   }, [fetchedProofingData]);
+  // console.log("fetchedProofingData", fetchedProofingData?.length);
 
   const updateProofingMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -715,37 +724,33 @@ export default function OrderListView() {
       </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
         <div className="w-full flex flex-row justify-between items-center">
-  
-
           <div className="flex gap-4">
+            <label className="input mt-auto pr-0 input-bordered flex flex-row justify-center items-center">
+              <input
+                type="text"
+                ref={searchInput}
+                className="grow w-full"
+                placeholder="Search OF ID"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const searchValue = searchInput.current?.value || "";
+                    console.log("Search Triggered:", searchValue); // Debug
+                    setSearch(searchValue);
+                    setPage(1); // Reset to page 1
+                  }
+                }}
+              />
 
-          <label className="input mt-auto pr-0 input-bordered flex flex-row justify-center items-center">
-    
-            <input
-              type="text"
-              ref={searchInput}
-              className="grow w-full"
-              placeholder="Search OF ID"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const searchValue = searchInput.current?.value || "";
-                  console.log("Search Triggered:", searchValue); // Debug
-                  setSearch(searchValue);
-                  setPage(1); // Reset to page 1
-                }
-              }}
-            />
-
-            <button
-              onClick={() => {
-                setSearch(searchInput.current?.value || "");
-                setPage(1);
-              }}
-              className="btn btn-sm h-full drop-shadow-2xl flex items-center gap-2"
-            >
-              <Search color="#000000" /> Search
-            </button>
-          </label>
+              <button
+                onClick={() => {
+                  setSearch(searchInput.current?.value || "");
+                  setPage(1);
+                }}
+                className="btn btn-sm h-full drop-shadow-2xl flex items-center gap-2"
+              >
+                <Search color="#000000" /> Search
+              </button>
+            </label>
             <div className="flex flex-col">
               <label className="text-black">Order By: </label>
               <select
@@ -778,6 +783,7 @@ export default function OrderListView() {
               <label className="text-black">Start Date: </label>
               <input
                 type="date"
+                value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="input input-bordered"
                 placeholder="Start Date"
@@ -787,6 +793,7 @@ export default function OrderListView() {
               <label className="text-black">End Date: </label>
               <input
                 type="date"
+                value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="input input-bordered"
                 placeholder="End Date"
@@ -794,11 +801,33 @@ export default function OrderListView() {
             </div>
             <div className="flex flex-col">
               <label className="text-black invisible">End Date: </label>
-               <Link href="/dashboard/addorder" className="btn my-auto btn-primary">
-            Add Order
-          </Link>
+              <Link
+                href="/dashboard/addorder"
+                className="btn my-auto btn-primary"
+              >
+                Add Order
+              </Link>
             </div>
-           
+            <div className="flex flex-col">
+              <label className="text-black invisible">End Date: </label>
+              <button
+                className="btn my-auto btn-info"
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setOrder("Order");
+                  setSort_by("Sort By");
+                  setSearch("");
+                  setPage(1);
+                  if (searchInput.current) {
+                    searchInput.current.value = "";
+                  }
+                }}
+              >
+                Refresh
+              </button>
+            </div>
+
             {/* <button
     onClick={() => {
       setSearch(searchInput.current?.value || "");
@@ -809,8 +838,6 @@ export default function OrderListView() {
     Search
   </button> */}
           </div>
-
-       
         </div>
 
         <table className="table text-center">
@@ -1005,7 +1032,6 @@ export default function OrderListView() {
                                       refetchMeasurentData();
                                       refetchProductionData();
                                       refetchProofingData();
-                                      window.location.reload();
                                     }}
                                   >
                                     Cancel
@@ -1040,7 +1066,7 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rows.${index}.production_entry_date_time`}
-                                                type="date"
+                                                type="datetime-local"
                                                 className={`input input-bordered ${
                                                   typeof errors.rows?.[
                                                     index
@@ -1062,11 +1088,25 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rows.${index}.production_exit_date_time`}
-                                                type="date"
-                                                className="input input-bordered"
+                                                type="datetime-local"
+                                                className={`input input-bordered ${
+                                                  typeof errors.rows?.[
+                                                    index
+                                                  ] === "object" &&
+                                                  errors.rows?.[index]
+                                                    ?.production_exit_date_time &&
+                                                  touched.rows?.[index]
+                                                    ?.production_exit_date_time
+                                                    ? "border-red-500"
+                                                    : ""
+                                                }`}
+                                              />
+                                              <ErrorMessage
+                                                name={`rows.${index}.production_exit_date_time`}
+                                                component="div"
+                                                className="text-red-500 text-sm"
                                               />
                                             </td>
-
                                             <td>
                                               <button
                                                 className="btn btn-danger"
@@ -1084,173 +1124,145 @@ export default function OrderListView() {
                                     ))}
 
                                     {/* second FieldArray */}
-                                    <FieldArray
-                                      name="rows2"
-                                      render={(arrayHelpers) => (
-                                        <tbody>
-                                          {values.rows2.map((row, index) => (
-                                            <tr key={index}>
-                                              {/* <td>
+                                    {
+                                    fetchedProductionData?.length === 0 ? (
+                                      <p className="text-center text-sm text-slate-600">
+                                        No Production Data Found
+                                      </p>
+                                    ) : (
+                                      <FieldArray
+  name="rows2"
+  render={(arrayHelpers) => (
+    <tbody>
+      <tr>
+        <td></td>
+      </tr>
+      {values.rows2.map((row, index) => (
+        <tr key={index}>
+          <td className="border-y border-slate-500">
             <Field
-              name={`rows2.${index}.production_id`}
+              name={`rows2.${index}.production_order_form_id`}
               type="text"
               className="input input-bordered"
               readOnly
             />
-          </td> */}
-                                              <td>
-                                                <Field
-                                                  name={`rows2.${index}.production_order_form_id`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows2.${index}.production_entry_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={
-                                                    new Date(
-                                                      values.rows2[
-                                                        index
-                                                      ].production_entry_date_time
-                                                    ).toLocaleDateString(
-                                                      "en-CA"
-                                                    ) // Format the initial value
-                                                  }
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows2.${index}.production_entry_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows2.${index}.production_exit_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={new Date(
-                                                    values.rows2[
-                                                      index
-                                                    ].production_exit_date_time
-                                                  ).toLocaleDateString("en-CA")}
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows2.${index}.production_exit_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <div className="flex gap-2">
-                                                  {editableRow === index ? (
-                                                    <>
-                                                      <button
-                                                        type="button"
-                                                        className="btn btn-success"
-                                                        onClick={async () => {
-                                                          try {
-                                                            // Trigger the mutation with updated values
-                                                            await updateProductionMutation.mutateAsync(
-                                                              {
-                                                                production_id:
-                                                                  values.rows2[
-                                                                    index
-                                                                  ]
-                                                                    .production_id,
-                                                                production_entry_date_time:
-                                                                  values.rows2[
-                                                                    index
-                                                                  ]
-                                                                    .production_entry_date_time,
-                                                                production_exit_date_time:
-                                                                  values.rows2[
-                                                                    index
-                                                                  ]
-                                                                    .production_exit_date_time,
-                                                              }
-                                                            );
-                                                            // alert("updated",updateProductionMutation.data);
-                                                          } catch (error) {
-                                                            console.error(
-                                                              "Error in mutation:",
-                                                              error
-                                                            );
-                                                          }
-                                                        }}
-                                                      >
-                                                        Save
-                                                      </button>
-                                                    </>
-                                                  ) : (
-                                                    <button
-                                                      type="button"
-                                                      className="btn btn-primary"
-                                                      onClick={() =>
-                                                        setEditableRow(index)
-                                                      }
-                                                    >
-                                                      Edit
-                                                    </button>
-                                                  )}
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const isConfirmed =
-                                                        window.confirm(
-                                                          "Are you sure you want to remove this production?"
-                                                        );
-                                                      if (isConfirmed) {
-                                                        removeProductionMutation.mutate(
-                                                          {
-                                                            production_id:
-                                                              values.rows2[
-                                                                index
-                                                              ].production_id,
-                                                            is_exist: false,
-                                                          }
-                                                        );
-                                                      }
-                                                    }}
-                                                    className={`btn btn-error ${
-                                                      removeProductionMutation.isPending
-                                                        ? "loading"
-                                                        : ""
-                                                    }`}
-                                                  >
-                                                    <Trash className="w-sm h-sm" />{" "}
-                                                    Remove
-                                                  </button>
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      )}
-                                    />
+          </td>
+          <td className="border-y border-slate-500">
+            <Field
+              name={`rows2.${index}.production_entry_date_time`}
+              type="datetime-local"
+              className="input input-bordered"
+              value={
+                values.rows2[index].production_entry_date_time
+                  ? values.rows2[index].production_entry_date_time.slice(0, 16)
+                  : ""
+              }
+              onChange={(e:any) => {
+                const newValue = e.target.value;
+                setFieldValue(`rows2.${index}.production_entry_date_time`, newValue);
+              }}
+              readOnly={editableRow !== index}
+            />
+          </td>
+          <td className="border-y border-slate-500">
+            <Field
+              name={`rows2.${index}.production_exit_date_time`}
+              type="datetime-local"
+              className="input input-bordered"
+              value={
+                values.rows2[index].production_exit_date_time
+                  ? values.rows2[index].production_exit_date_time.slice(0, 16)
+                  : ""
+              }
+              onChange={(e:any) => {
+                const newValue = e.target.value;
+                setFieldValue(`rows2.${index}.production_exit_date_time`, newValue);
+              }}
+              readOnly={editableRow !== index}
+            />
+          </td>
+
+          <td className="border-y border-slate-500">
+            <div className="flex gap-2">
+              {editableRow === index ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    onClick={async () => {
+                      try {
+                        await updateProductionMutation.mutateAsync({
+                          production_id: values.rows2[index].production_id,
+                          production_entry_date_time:
+                            values.rows2[index].production_entry_date_time,
+                          production_exit_date_time:
+                            values.rows2[index].production_exit_date_time,
+                        });
+                        setEditableRow(null); // Reset editable row after saving
+                      } catch (error) {
+                        console.error("Error in mutation:", error);
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+  
+  className="btn btn-primary"
+  onClick={() => {
+    // Alert first, then reset the editable row and refetch data
+    if (window.confirm("Are you sure you want to cancel?")) {
+      setEditableRow(null);  // Reset the editable state
+      refetchProductionData();  // Trigger the refetch
+      location.reload();
+      
+    }
+  }}
+>
+  Cancel
+</button>
+
+
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`btn btn-primary ${editableRow !== null ? "hidden" : ""}`}
+                    onClick={() => setEditableRow(index)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-error ${editableRow !== null ? "hidden" : ""} ${
+                      removeProductionMutation.isPending ? "loading" : ""
+                    }`}
+                    onClick={() => {
+                      const isConfirmed = window.confirm(
+                        "Are you sure you want to remove this production?"
+                      );
+                      if (isConfirmed) {
+                        removeProductionMutation.mutate({
+                          production_id: values.rows2[index].production_id,
+                          is_exist: false,
+                        });
+                      }
+                    }}
+                  >
+                    Remove
+                  </button>
+                </>
+              )}
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  )}
+/>
+
+                                    )}
                                   </table>
                                 </div>
                               </div>
@@ -1334,7 +1346,6 @@ export default function OrderListView() {
                                       refetchMeasurentData();
                                       refetchProductionData();
                                       refetchProofingData();
-                                      window.location.reload();
                                     }}
                                   >
                                     Cancel
@@ -1371,14 +1382,14 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_entry_date_time`}
-                                                type="date"
+                                                type="datetime-local"
                                                 className={`input input-bordered ${
-                                                  typeof errors.rowsproofing?.[
+                                                  typeof errors.rows3?.[
                                                     index
                                                   ] === "object" &&
-                                                  errors.rowsproofing?.[index]
+                                                  errors.rows3?.[index]
                                                     ?.proofing_entry_date_time &&
-                                                  touched.rowsproofing?.[index]
+                                                  touched.rows3?.[index]
                                                     ?.proofing_entry_date_time
                                                     ? "border-red-500"
                                                     : ""
@@ -1393,8 +1404,23 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_exit_date_time`}
-                                                type="date"
-                                                className="input input-bordered"
+                                                type="datetime-local"
+                                                className={`input input-bordered ${
+                                                  typeof errors.rows3?.[
+                                                    index
+                                                  ] === "object" &&
+                                                  errors.rows3?.[index]
+                                                    ?.proofing_exit_date_time &&
+                                                  touched.rows3?.[index]
+                                                    ?.proofing_exit_date_time
+                                                    ? "border-red-500"
+                                                    : ""
+                                                }`}
+                                              />
+                                              <ErrorMessage
+                                                name={`rowsproofing.${index}.proofing_exit_date_time`}
+                                                component="div"
+                                                className="text-red-500 text-sm"
                                               />
                                             </td>
                                             <td>
@@ -1428,199 +1454,157 @@ export default function OrderListView() {
                                     ))}
 
                                     {/* second FieldArray */}
-                                    <FieldArray
-                                      name="rows3"
-                                      render={(arrayHelpers) => (
-                                        <tbody>
-                                          {values.rows3.map((row, index) => (
-                                            <tr key={index}>
-                                              {/* <td>
-            <Field
-              name={`rows2.${index}.production_id`}
-              type="text"
-              className="input input-bordered"
-              readOnly
-            />
-          </td> */}
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_order_form_id`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_entry_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={
-                                                    new Date(
-                                                      values.rows3[
-                                                        index
-                                                      ].proofing_entry_date_time
-                                                    ).toLocaleDateString(
-                                                      "en-CA"
-                                                    ) // Format the initial value
-                                                  }
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows3.${index}.proofing_entry_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_exit_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={new Date(
-                                                    values.rows3[
-                                                      index
-                                                    ].proofing_exit_date_time
-                                                  ).toLocaleDateString("en-CA")}
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows3.${index}.proofing_exit_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_num_pallete`}
-                                                  type="number"
-                                                  className="input input-bordered"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_program_name`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <div className="flex gap-2">
-                                                  {editableRow === index ? (
-                                                    <>
-                                                      <button
-                                                        type="button"
-                                                        className="btn btn-success"
-                                                        onClick={async () => {
-                                                          try {
-                                                            // Trigger the mutation with updated values
-                                                            await updateProofingMutation.mutateAsync(
-                                                              {
-                                                                proofing_id:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ].proofing_id,
-                                                                proofing_entry_date_time:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_entry_date_time,
-                                                                proofing_exit_date_time:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_exit_date_time,
-                                                                proofing_num_pallete:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_num_pallete,
-                                                                proofing_program_name:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_program_name,
-                                                              }
-                                                            );
-                                                          } catch (error) {
-                                                            console.error(
-                                                              "Error in mutation:",
-                                                              error
-                                                            );
-                                                          }
-                                                        }}
-                                                      >
-                                                        Save
-                                                      </button>
-                                                    </>
-                                                  ) : (
-                                                    <button
-                                                      type="button"
-                                                      className="btn btn-primary"
-                                                      onClick={() =>
-                                                        setEditableRow(index)
-                                                      }
-                                                    >
-                                                      Edit
-                                                    </button>
-                                                  )}
-                                                  <button
-                                                    onClick={() => {
-                                                      const isConfirmed =
-                                                        window.confirm(
-                                                          "Are you sure you want to remove this proofing?"
-                                                        );
-                                                      if (isConfirmed) {
-                                                        removeProofingMutation.mutate(
-                                                          {
-                                                            proofing_id:
-                                                              values.rows3[
-                                                                index
-                                                              ].proofing_id,
-                                                            is_exist: false,
-                                                          }
-                                                        );
-                                                      }
-                                                    }}
-                                                    className={`btn btn-error ${
-                                                      removeProofingMutation.isPending
-                                                        ? "loading"
-                                                        : ""
-                                                    }`}
-                                                  >
-                                                    <Trash /> Remove
-                                                  </button>
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      )}
-                                    />
+                                    {fetchedProofingData?.length === 0 ? (
+  <p className="text-center text-sm text-slate-600">No Proofing Data Found</p>
+) : (
+  <FieldArray
+    name="rows3"
+    render={(arrayHelpers) => (
+      <tbody>
+        <tr>
+          <td></td>
+        </tr>
+        {values.rows3.map((row, index) => (
+          <tr key={index}>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_order_form_id`}
+                type="text"
+                className="input input-bordered"
+                readOnly
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_entry_date_time`}
+                type="datetime-local"
+                className="input input-bordered"
+                value={
+                  values.rows3[index].proofing_entry_date_time
+                    ? values.rows3[index].proofing_entry_date_time.slice(0, 16)
+                    : ""
+                }
+                onChange={(e:any) => {
+                  const newValue = e.target.value;
+                  setFieldValue(`rows3.${index}.proofing_entry_date_time`, newValue);
+                }}
+                readOnly={editableRow !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_exit_date_time`}
+                type="datetime-local"
+                className="input input-bordered"
+                value={
+                  values.rows3[index].proofing_exit_date_time
+                    ? values.rows3[index].proofing_exit_date_time.slice(0, 16)
+                    : ""
+                }
+                onChange={(e:any) => {
+                  const newValue = e.target.value;
+                  setFieldValue(`rows3.${index}.proofing_exit_date_time`, newValue);
+                }}
+                readOnly={editableRow !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_num_pallete`}
+                type="number"
+                className="input input-bordered"
+                readOnly={editableRow !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_program_name`}
+                type="text"
+                className="input input-bordered"
+                readOnly={editableRow !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <div className="flex gap-2">
+                {editableRow === index ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={async () => {
+                        try {
+                          await updateProofingMutation.mutateAsync({
+                            proofing_id: values.rows3[index].proofing_id,
+                            proofing_entry_date_time:
+                              values.rows3[index].proofing_entry_date_time,
+                            proofing_exit_date_time:
+                              values.rows3[index].proofing_exit_date_time,
+                            proofing_num_pallete:
+                              values.rows3[index].proofing_num_pallete,
+                            proofing_program_name:
+                              values.rows3[index].proofing_program_name,
+                          });
+                          setEditableRow(null); // Reset editable row after saving
+                          refetchProofingData(); // Refetch data after update
+                        } catch (error) {
+                          console.error("Error in mutation:", error);
+                        }
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                     
+                      className="btn btn-primary"
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to cancel?")) {
+                          setEditableRow(null); // Reset the editable state
+                          refetchProofingData(); // Refetch the proofing data
+                          location.reload();
+                        }
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => setEditableRow(index)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => {
+                        const isConfirmed = window.confirm(
+                          "Are you sure you want to remove this proofing?"
+                        );
+                        if (isConfirmed) {
+                          removeProofingMutation.mutate({
+                            proofing_id: values.rows3[index].proofing_id,
+                            is_exist: false,
+                          });
+                        }
+                      }}
+                      className={`btn btn-error ${
+                        removeProofingMutation.isPending ? "loading" : ""
+                      }`}
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    )}
+  />
+)}
+
                                   </table>
                                 </div>
                               </div>
@@ -1664,7 +1648,7 @@ export default function OrderListView() {
                       }
 
                       // await new Promise((r) => setTimeout(r, 500));
-                      // alert(JSON.stringify(values, null, 2));
+                      alert(JSON.stringify(values, null, 2));
                     }}
                   >
                     {({ values, setFieldValue }) => (
@@ -1692,13 +1676,13 @@ export default function OrderListView() {
                                       })
                                     }
                                   >
-                                    Add Row
+                                    Add Pallete
                                   </button>
                                   <button
                                     className="btn btn-primary"
                                     type="submit"
                                   >
-                                    Add Measurement
+                                    Save Measurement
                                   </button>
 
                                   <button
@@ -2128,18 +2112,20 @@ export default function OrderListView() {
                 <div className="flex flex-col gap-y-4">
                   <label className="label">Assign Order</label>
                   <select
-            className="select select-bordered"
-            onChange={(e) => {
-              setAssign_id(e.target.value);
-            }}
-          >
-            <option value="" disabled selected>Select Customer</option>
-            {customerOptions.map((option: any) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+                    className="select select-bordered"
+                    onChange={(e) => {
+                      setAssign_id(e.target.value);
+                    }}
+                  >
+                    <option value="" disabled selected>
+                      Select Customer
+                    </option>
+                    {customerOptions.map((option: any) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="flex gap-4 place-content-end">
                   <button
