@@ -193,7 +193,7 @@ export default function OrderListView() {
       {
         measurement_id: "",
         pallete_count: 1,
-        number_of_control: "",
+        number_of_control: 0,
         length: "",
         inside_diameter: "",
         outside_diameter: "",
@@ -219,6 +219,19 @@ export default function OrderListView() {
       },
     ],
   });
+
+useEffect(() => {
+  setInitialValuesMeasurement((prev) => ({
+    ...prev,
+    rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+      ...row,
+      number_of_control: numberControl,
+    })),
+  }));
+}, [numberControl]);
+
+console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
+  console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
   const initialValuesAssign = {
     user_id: "",
   };
@@ -1634,24 +1647,25 @@ export default function OrderListView() {
                     initialValues={initialValuesMeasurement}
                     enableReinitialize={true}
                     onSubmit={async (values) => {
-                      for (const row of values.rowsmeasurement) {
-                        AddMeasurementMutation.mutate({
-                          order_id: orderid,
-                          length: row.length,
-                          inside_diameter: row.inside_diameter,
-                          outside_diameter: row.outside_diameter,
-                          flat_crush: row.flat_crush,
-                          h20: row.h20,
-                          radial: row.radial,
-                          number_control: row.number_of_control,
-                          remarks: row.remarks,
-                          pallete_count: row.pallete_count,
-                          user_id: userID,
-                        });
-                      }
+                      // for (const row of values.rowsmeasurement) {
+                      //   AddMeasurementMutation.mutate({
+                      //     order_id: orderid,
+                      //     length: row.length,
+                      //     inside_diameter: row.inside_diameter,
+                      //     outside_diameter: row.outside_diameter,
+                      //     flat_crush: row.flat_crush,
+                      //     h20: row.h20,
+                      //     radial: row.radial,
+                      //     number_control: row.number_of_control,
+                      //     remarks: row.remarks,
+                      //     pallete_count: row.pallete_count,
+                      //     user_id: userID,
+                      //   });
+                      // }
 
                       // await new Promise((r) => setTimeout(r, 500));
                       alert(JSON.stringify(values, null, 2));
+                      console.log(JSON.stringify(values, null, 2));
                     }}
                   >
                     {({ values, setFieldValue }) => (
@@ -1734,7 +1748,7 @@ export default function OrderListView() {
                                     <tbody>
                                       {values.rowsmeasurement.map(
                                         (row, index) => (
-                                          <React.Fragment key={index}>
+                                          <React.Fragment key={index-1}>
                                             <tr>
                                              <td>
                                              <Field
@@ -1744,7 +1758,6 @@ export default function OrderListView() {
   className="input bg-white input-bordered w-20 max-w-md"
   onChange={(e: any) => {
     const newPalleteCount = parseInt(e.target.value, 10);
-
     // Update the `pallete_count` field
     setFieldValue(`rowsmeasurement.${index}.pallete_count`, newPalleteCount );
   }}
@@ -1754,57 +1767,18 @@ export default function OrderListView() {
 
 
 <td>
-  <Field
-    name={`rowsmeasurement.${index}.number_of_control`}
-    type="number"
-    placeholder="0"
-    className="input bg-white input-bordered w-20 max-w-md"
-    value={
-      // Check if the pallete_count is 0 and if the current row is a new row
-      values.rowsmeasurement[index].number_of_control === ""
-        ? numberControl  // Set the value to numberControl for new rows
-        : values.rowsmeasurement[index].number_of_control  // Otherwise, retain the existing value
-    }
-    onChange={(e: any) => {
-      const newCount = parseInt(e.target.value, 10);
-      const currentPallete = values.rowsmeasurement[index].pallete_count;
-      const currentRowsCount = values.rowsmeasurement.filter(
-        (r) => r.pallete_count === currentPallete
-      ).length;
+ <Field
+  name={`rowsmeasurement.${index}.number_of_control`}
+  type="number"
+  placeholder="0"
+  className="input bg-white input-bordered w-20 max-w-md"
+  onChange={(e: any) => {
+    const newControlNumber = parseInt(e.target.value, 10);
+    // Update the `number_of_control` field
+    setFieldValue(`rowsmeasurement.${index}.number_of_control`, newControlNumber);
+  }}
+/>
 
-      // Update `number_of_control`
-      setFieldValue(`rowsmeasurement.${index}.number_of_control`, newCount);
-
-      // Adjust rows based on the new count
-      const rowsToAdjust = newCount - currentRowsCount;
-      if (rowsToAdjust > 0) {
-        // Add rows if the number increased
-        for (let i = 0; i < rowsToAdjust; i++) {
-          arrayHelpers.insert(index + 1, {
-            pallete_count: currentPallete,
-            number_of_control: "",  // Empty initially
-            length: "",
-            inside_diameter: "",
-            outside_diameter: "",
-            flat_crush: "",
-            h20: "",
-            radial: "",
-            remarks: "",
-          });
-        }
-      } else if (rowsToAdjust < 0) {
-        // Remove rows if the number decreased
-        for (let i = 0; i < Math.abs(rowsToAdjust); i++) {
-          const rowIndex = values.rowsmeasurement.findIndex(
-            (r, idx) => idx > index && r.pallete_count === currentPallete
-          );
-          if (rowIndex !== -1) {
-            arrayHelpers.remove(rowIndex);
-          }
-        }
-      }
-    }}
-  />
 </td>
 
 
