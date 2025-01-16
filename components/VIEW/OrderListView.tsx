@@ -91,10 +91,13 @@ export default function OrderListView() {
   const [userID, setUserID] = useState<string | null>(null);
   const [orderid, setOrderid] = useState<string | null>(null);
   const [asssing_id, setAssign_id] = useState<string | null>(null);
-  const [editableRow, setEditableRow] = useState<number | null>(null);
+  const [editableRowProd, setEditableRowProd] = useState<number | null>(null);
+  const [editableRowProof, setEditableRowProof] = useState<number | null>(null);
+  const [editableRowMes, setEditableRowMes] = useState<number | null>(null);
   const [editproductionID, setEditproductionID] = useState<string | null>(null);
   const [countNumberControl, setCountNumberControl] = useState<number>(0);
   const [numberControl, setNumberControl] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState('tab1'); 
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -987,6 +990,9 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                   role="tab"
                   className="tab"
                   aria-label="Production"
+                  id="tab1"
+                  checked={selectedTab === 'tab1'}
+                  onChange={() => setSelectedTab('tab1')}
                 />
                 <div
                   role="tabpanel"
@@ -1031,18 +1037,19 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                                       })
                                     }
                                   >
-                                    Add Row
+                                    Add Production
                                   </button>
                                   <button
                                     className="btn btn-primary"
                                     type="submit"
                                     // onClick={() => setSubmitContext('rows')}
                                   >
-                                    Add Production
+                                    Save Production
                                   </button>
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      setEditableRowProd(null);
                                       setIsModalOpen(false);
                                       setOrderid(null);
                                       refetchMeasurentData();
@@ -1177,7 +1184,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                 const newValue = e.target.value;
                 setFieldValue(`rows2.${index}.production_entry_date_time`, newValue);
               }}
-              readOnly={editableRow !== index}
+              readOnly={editableRowProd !== index}
             />
           </td>
           <td className="border-y border-slate-500">
@@ -1194,13 +1201,13 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                 const newValue = e.target.value;
                 setFieldValue(`rows2.${index}.production_exit_date_time`, newValue);
               }}
-              readOnly={editableRow !== index}
+              readOnly={editableRowProd !== index}
             />
           </td>
 
           <td className="border-y border-slate-500">
             <div className="flex gap-2">
-              {editableRow === index ? (
+              {editableRowProd === index ? (
                 <>
                   <button
                     type="button"
@@ -1214,7 +1221,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                           production_exit_date_time:
                             values.rows2[index].production_exit_date_time,
                         });
-                        setEditableRow(null); // Reset editable row after saving
+                        setEditableRowProd(null); // Reset editable row after saving
                       } catch (error) {
                         console.error("Error in mutation:", error);
                       }
@@ -1228,9 +1235,16 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
   onClick={() => {
     // Alert first, then reset the editable row and refetch data
     if (window.confirm("Are you sure you want to cancel?")) {
-      setEditableRow(null);  // Reset the editable state
+      setEditableRowProd(null);  // Reset the editable state
       refetchProductionData();  // Trigger the refetch
-      location.reload();
+       // Close the modal first
+    setIsModalOpen(false);
+
+    // Reopen it after a small delay
+    setTimeout(() => {
+      setIsModalOpen(true);
+      setSelectedTab('tab1');
+    }, 100); // Delay of 100ms to ensure the close transition happens
       
     }
   }}
@@ -1244,14 +1258,14 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                 <>
                   <button
                     type="button"
-                    className={`btn btn-primary ${editableRow !== null ? "hidden" : ""}`}
-                    onClick={() => setEditableRow(index)}
+                    className={`btn btn-primary ${editableRowProd !== null ? "hidden" : ""}`}
+                    onClick={() => setEditableRowProd(index)}
                   >
                     Edit
                   </button>
                   <button
                     type="button"
-                    className={`btn btn-error ${editableRow !== null ? "hidden" : ""} ${
+                    className={`btn btn-error ${editableRowProd !== null ? "hidden" : ""} ${
                       removeProductionMutation.isPending ? "loading" : ""
                     }`}
                     onClick={() => {
@@ -1296,7 +1310,9 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                   role="tab"
                   className="tab"
                   aria-label="Proofing"
-                  defaultChecked
+                  defaultChecked id="tab2"
+                  checked={selectedTab === 'tab2'}
+                  onChange={() => setSelectedTab('tab2')}
                 />
                 <div
                   role="tabpanel"
@@ -1345,18 +1361,19 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                                       })
                                     }
                                   >
-                                    Add Row
+                                    Add Proofing
                                   </button>
                                   <button
                                     className="btn btn-primary"
                                     type="submit"
                                     // onClick={() => setSubmitContext('rows')}
                                   >
-                                    Add Proofing
+                                    Save Proofing
                                   </button>
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      setEditableRowProof(null);
                                       setIsModalOpen(false);
                                       setOrderid(null);
                                       refetchMeasurentData();
@@ -1504,7 +1521,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                   const newValue = e.target.value;
                   setFieldValue(`rows3.${index}.proofing_entry_date_time`, newValue);
                 }}
-                readOnly={editableRow !== index}
+                readOnly={editableRowProof !== index}
               />
             </td>
             <td className="border-y border-slate-500">
@@ -1521,7 +1538,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                   const newValue = e.target.value;
                   setFieldValue(`rows3.${index}.proofing_exit_date_time`, newValue);
                 }}
-                readOnly={editableRow !== index}
+                readOnly={editableRowProof !== index}
               />
             </td>
             <td className="border-y border-slate-500">
@@ -1529,7 +1546,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                 name={`rows3.${index}.proofing_num_pallete`}
                 type="number"
                 className="input input-bordered"
-                readOnly={editableRow !== index}
+                readOnly={editableRowProof !== index}
               />
             </td>
             <td className="border-y border-slate-500">
@@ -1537,12 +1554,12 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                 name={`rows3.${index}.proofing_program_name`}
                 type="text"
                 className="input input-bordered"
-                readOnly={editableRow !== index}
+                readOnly={editableRowProof !== index}
               />
             </td>
             <td className="border-y border-slate-500">
               <div className="flex gap-2">
-                {editableRow === index ? (
+                {editableRowProof === index ? (
                   <>
                     <button
                       type="button"
@@ -1560,7 +1577,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                             proofing_program_name:
                               values.rows3[index].proofing_program_name,
                           });
-                          setEditableRow(null); // Reset editable row after saving
+                          setEditableRowProof(null); // Reset editable row after saving
                           refetchProofingData(); // Refetch data after update
                         } catch (error) {
                           console.error("Error in mutation:", error);
@@ -1574,9 +1591,14 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                       className="btn btn-primary"
                       onClick={() => {
                         if (window.confirm("Are you sure you want to cancel?")) {
-                          setEditableRow(null); // Reset the editable state
+                          setEditableRowProof(null); // Reset the editable state
                           refetchProofingData(); // Refetch the proofing data
-                          location.reload();
+                          // location.reload();
+                          setIsModalOpen(false);
+                          setTimeout(() => {
+                            setIsModalOpen(true);
+                            setSelectedTab('tab2');
+                          }, 100);
                         }
                       }}
                     >
@@ -1587,12 +1609,17 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                   <>
                     <button
                       type="button"
-                      className="btn btn-primary"
-                      onClick={() => setEditableRow(index)}
+                     
+                      className={`btn btn-primary ${editableRowProof !== null ? "hidden" : ""}`}
+                      onClick={() => setEditableRowProof(index)}
                     >
                       Edit
                     </button>
                     <button
+                     type="button"
+                     className={`btn btn-error ${editableRowProof !== null ? "hidden" : ""} ${
+                       removeProofingMutation.isPending ? "loading" : ""
+                     }`}
                       onClick={() => {
                         const isConfirmed = window.confirm(
                           "Are you sure you want to remove this proofing?"
@@ -1604,9 +1631,6 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                           });
                         }
                       }}
-                      className={`btn btn-error ${
-                        removeProofingMutation.isPending ? "loading" : ""
-                      }`}
                     >
                       Remove
                     </button>
@@ -1638,6 +1662,10 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                   role="tab"
                   className="tab"
                   aria-label="Measurement"
+                  id="tab3"
+                  checked={selectedTab === 'tab3'}
+                  onChange={() => setSelectedTab('tab3')}
+
                 />
                 <div
                   role="tabpanel"
@@ -1647,21 +1675,21 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                     initialValues={initialValuesMeasurement}
                     enableReinitialize={true}
                     onSubmit={async (values) => {
-                      // for (const row of values.rowsmeasurement) {
-                      //   AddMeasurementMutation.mutate({
-                      //     order_id: orderid,
-                      //     length: row.length,
-                      //     inside_diameter: row.inside_diameter,
-                      //     outside_diameter: row.outside_diameter,
-                      //     flat_crush: row.flat_crush,
-                      //     h20: row.h20,
-                      //     radial: row.radial,
-                      //     number_control: row.number_of_control,
-                      //     remarks: row.remarks,
-                      //     pallete_count: row.pallete_count,
-                      //     user_id: userID,
-                      //   });
-                      // }
+                      for (const row of values.rowsmeasurement) {
+                        AddMeasurementMutation.mutate({
+                          order_id: orderid,
+                          length: row.length,
+                          inside_diameter: row.inside_diameter,
+                          outside_diameter: row.outside_diameter,
+                          flat_crush: row.flat_crush,
+                          h20: row.h20,
+                          radial: row.radial,
+                          number_control: row.number_of_control,
+                          remarks: row.remarks,
+                          pallete_count: row.pallete_count,
+                          user_id: userID,
+                        });
+                      }
 
                       // await new Promise((r) => setTimeout(r, 500));
                       alert(JSON.stringify(values, null, 2));
@@ -1878,7 +1906,180 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                                       )}
                                     </tbody>
                                     {/* second Feild Array */}
-                                    
+                                    {fetchedMeasurementData?.length === 0 ? (
+  <p className="text-center text-sm text-slate-600">No Measurement Data Found</p>
+) : (
+  <FieldArray
+    name="rows4"
+    render={(arrayHelpers) => (
+      <tbody>
+        {values.rows4.map((row, index) => (
+          <tr key={index}>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.pallete_count`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.number_of_control`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.length`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.inside_diameter`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.outside_diameter`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.flat_crush`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.h20`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.radial`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.remarks`}
+                type="text"
+                className="input input-bordered"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <div className="flex gap-2">
+                {editableRowMes === index ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={async () => {
+                        try {
+                          await updateMeasurementMutation.mutateAsync({
+                            measurement_id: values.rows4[index].measurement_id,
+                            pallete_count: values.rows4[index].pallete_count,
+                            number_of_control: values.rows4[index].number_of_control,
+                            length: values.rows4[index].length,
+                            inside_diameter: values.rows4[index].inside_diameter,
+                            outside_diameter: values.rows4[index].outside_diameter,
+                            flat_crush: values.rows4[index].flat_crush,
+                            h20: values.rows4[index].h20,
+                            radial: values.rows4[index].radial,
+                            remarks: values.rows4[index].remarks,
+                          });
+                          setEditableRowMes(null); // Reset editable row after saving
+                          refetchMeasurentData(); // Refetch data after update
+                        } catch (error) {
+                          console.error("Error in mutation:", error);
+                        }
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to cancel?")) {
+                          setEditableRowMes(null); // Reset the editable state
+                          refetchMeasurentData(); // Refetch measurement data
+                          // location.reload();
+                          setIsModalOpen(false);
+                          setTimeout(() => {
+                            setIsModalOpen(true);
+                            setSelectedTab('tab3');
+                          }, 100);
+                        }
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {!editableRowMes && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => setEditableRowMes(index)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const isConfirmed = window.confirm(
+                              "Are you sure you want to remove this measurement?"
+                            );
+                            if (isConfirmed) {
+                              removeMeasurementMutation.mutate({
+                                measurement_id: values.rows4[index].measurement_id,
+                                is_exist: false,
+                              });
+                            }
+                          }}
+                          className={`btn btn-error ${
+                            removeMeasurementMutation.isPending ? "loading" : ""
+                          }`}
+                        >
+                          <Trash /> Remove
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    )}
+  />
+)}
+
+
                                   </table>
                                 </div>
                               </div>
