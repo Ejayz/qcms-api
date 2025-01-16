@@ -2,7 +2,7 @@
 import { createClient } from "@/utils/supabase/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Formik, Form, FieldArray, Field, ErrorMessage } from "formik";
-import { Eye, Pencil, Search, Trash } from "lucide-react";
+import { Eye, Pencil, Search, Slice, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState, useRef } from "react";
@@ -91,8 +91,13 @@ export default function OrderListView() {
   const [userID, setUserID] = useState<string | null>(null);
   const [orderid, setOrderid] = useState<string | null>(null);
   const [asssing_id, setAssign_id] = useState<string | null>(null);
-  const [editableRow, setEditableRow] = useState<number | null>(null);
+  const [editableRowProd, setEditableRowProd] = useState<number | null>(null);
+  const [editableRowProof, setEditableRowProof] = useState<number | null>(null);
+  const [editableRowMes, setEditableRowMes] = useState<number | null>(null);
   const [editproductionID, setEditproductionID] = useState<string | null>(null);
+  const [countNumberControl, setCountNumberControl] = useState<number>(0);
+  const [numberControl, setNumberControl] = useState<number>(0);
+  const [selectedTab, setSelectedTab] = useState('tab1'); 
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -190,8 +195,8 @@ export default function OrderListView() {
     rowsmeasurement: [
       {
         measurement_id: "",
-        pallete_count: "",
-        number_of_control: "",
+        pallete_count: 1,
+        number_of_control: 0,
         length: "",
         inside_diameter: "",
         outside_diameter: "",
@@ -217,6 +222,19 @@ export default function OrderListView() {
       },
     ],
   });
+
+useEffect(() => {
+  setInitialValuesMeasurement((prev) => ({
+    ...prev,
+    rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+      ...row,
+      number_of_control: numberControl,
+    })),
+  }));
+}, [numberControl]);
+
+console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
+  console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
   const initialValuesAssign = {
     user_id: "",
   };
@@ -230,6 +248,9 @@ export default function OrderListView() {
         production_entry_date_time: Yup.date()
           .required("Entry Date & Time is required")
           .typeError("Invalid date format"),
+        production_exit_date_time: Yup.date()
+          .required("Exit Date & Time is required")
+          .typeError("Invalid date format"),
       })
     ),
   });
@@ -238,6 +259,9 @@ export default function OrderListView() {
       Yup.object().shape({
         proofing_entry_date_time: Yup.date()
           .required("Entry Date & Time is required")
+          .typeError("Invalid date format"),
+        proofing_exit_date_time: Yup.date()
+          .required("Exit Date & Time is required")
           .typeError("Invalid date format"),
         proofing_num_pallete: Yup.number().required(
           "Number of Pallets is required"
@@ -300,7 +324,8 @@ export default function OrderListView() {
         })),
       }));
     }
-  }, [fetchedProductionData]);
+  }, [fetchedProductionData,refetchProductionData]);
+  // console.log("fetchedProductionData", fetchedProductionData?.length);
 
   const updateProductionMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -365,6 +390,7 @@ export default function OrderListView() {
       refetchProductionData();
     },
   });
+  
 
   // proofing
   const AddProofingMutation = useMutation({
@@ -418,6 +444,7 @@ export default function OrderListView() {
       }));
     }
   }, [fetchedProofingData]);
+  // console.log("fetchedProofingData", fetchedProofingData?.length);
 
   const updateProofingMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -715,37 +742,33 @@ export default function OrderListView() {
       </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
         <div className="w-full flex flex-row justify-between items-center">
-  
-
           <div className="flex gap-4">
+            <label className="input mt-auto pr-0 input-bordered flex flex-row justify-center items-center">
+              <input
+                type="text"
+                ref={searchInput}
+                className="grow w-full"
+                placeholder="Search OF ID"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    const searchValue = searchInput.current?.value || "";
+                    console.log("Search Triggered:", searchValue); // Debug
+                    setSearch(searchValue);
+                    setPage(1); // Reset to page 1
+                  }
+                }}
+              />
 
-          <label className="input mt-auto pr-0 input-bordered flex flex-row justify-center items-center">
-    
-            <input
-              type="text"
-              ref={searchInput}
-              className="grow w-full"
-              placeholder="Search OF ID"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const searchValue = searchInput.current?.value || "";
-                  console.log("Search Triggered:", searchValue); // Debug
-                  setSearch(searchValue);
-                  setPage(1); // Reset to page 1
-                }
-              }}
-            />
-
-            <button
-              onClick={() => {
-                setSearch(searchInput.current?.value || "");
-                setPage(1);
-              }}
-              className="btn btn-sm h-full drop-shadow-2xl flex items-center gap-2"
-            >
-              <Search color="#000000" /> Search
-            </button>
-          </label>
+              <button
+                onClick={() => {
+                  setSearch(searchInput.current?.value || "");
+                  setPage(1);
+                }}
+                className="btn btn-sm h-full drop-shadow-2xl flex items-center gap-2"
+              >
+                <Search color="#000000" /> Search
+              </button>
+            </label>
             <div className="flex flex-col">
               <label className="text-black">Order By: </label>
               <select
@@ -778,6 +801,7 @@ export default function OrderListView() {
               <label className="text-black">Start Date: </label>
               <input
                 type="date"
+                value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 className="input input-bordered"
                 placeholder="Start Date"
@@ -787,6 +811,7 @@ export default function OrderListView() {
               <label className="text-black">End Date: </label>
               <input
                 type="date"
+                value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 className="input input-bordered"
                 placeholder="End Date"
@@ -794,11 +819,33 @@ export default function OrderListView() {
             </div>
             <div className="flex flex-col">
               <label className="text-black invisible">End Date: </label>
-               <Link href="/dashboard/addorder" className="btn my-auto btn-primary">
-            Add Order
-          </Link>
+              <Link
+                href="/dashboard/addorder"
+                className="btn my-auto btn-primary"
+              >
+                Add Order
+              </Link>
             </div>
-           
+            <div className="flex flex-col">
+              <label className="text-black invisible">End Date: </label>
+              <button
+                className="btn my-auto btn-info"
+                onClick={() => {
+                  setStartDate("");
+                  setEndDate("");
+                  setOrder("Order");
+                  setSort_by("Sort By");
+                  setSearch("");
+                  setPage(1);
+                  if (searchInput.current) {
+                    searchInput.current.value = "";
+                  }
+                }}
+              >
+                Refresh
+              </button>
+            </div>
+
             {/* <button
     onClick={() => {
       setSearch(searchInput.current?.value || "");
@@ -809,8 +856,6 @@ export default function OrderListView() {
     Search
   </button> */}
           </div>
-
-       
         </div>
 
         <table className="table text-center">
@@ -846,6 +891,7 @@ export default function OrderListView() {
                     onClick={() => {
                       setIsModalOpen(true);
                       setOrderid(order.id);
+                      setNumberControl(order.tbl_article.number_control);
                     }}
                   >
                     {order.id}
@@ -944,6 +990,9 @@ export default function OrderListView() {
                   role="tab"
                   className="tab"
                   aria-label="Production"
+                  id="tab1"
+                  checked={selectedTab === 'tab1'}
+                  onChange={() => setSelectedTab('tab1')}
                 />
                 <div
                   role="tabpanel"
@@ -988,24 +1037,24 @@ export default function OrderListView() {
                                       })
                                     }
                                   >
-                                    Add Row
+                                    Add Production
                                   </button>
                                   <button
                                     className="btn btn-primary"
                                     type="submit"
                                     // onClick={() => setSubmitContext('rows')}
                                   >
-                                    Add Production
+                                    Save Production
                                   </button>
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      setEditableRowProd(null);
                                       setIsModalOpen(false);
                                       setOrderid(null);
                                       refetchMeasurentData();
                                       refetchProductionData();
                                       refetchProofingData();
-                                      window.location.reload();
                                     }}
                                   >
                                     Cancel
@@ -1040,7 +1089,7 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rows.${index}.production_entry_date_time`}
-                                                type="date"
+                                                type="datetime-local"
                                                 className={`input input-bordered ${
                                                   typeof errors.rows?.[
                                                     index
@@ -1062,11 +1111,25 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rows.${index}.production_exit_date_time`}
-                                                type="date"
-                                                className="input input-bordered"
+                                                type="datetime-local"
+                                                className={`input input-bordered ${
+                                                  typeof errors.rows?.[
+                                                    index
+                                                  ] === "object" &&
+                                                  errors.rows?.[index]
+                                                    ?.production_exit_date_time &&
+                                                  touched.rows?.[index]
+                                                    ?.production_exit_date_time
+                                                    ? "border-red-500"
+                                                    : ""
+                                                }`}
+                                              />
+                                              <ErrorMessage
+                                                name={`rows.${index}.production_exit_date_time`}
+                                                component="div"
+                                                className="text-red-500 text-sm"
                                               />
                                             </td>
-
                                             <td>
                                               <button
                                                 className="btn btn-danger"
@@ -1084,173 +1147,152 @@ export default function OrderListView() {
                                     ))}
 
                                     {/* second FieldArray */}
-                                    <FieldArray
-                                      name="rows2"
-                                      render={(arrayHelpers) => (
-                                        <tbody>
-                                          {values.rows2.map((row, index) => (
-                                            <tr key={index}>
-                                              {/* <td>
+                                    {
+                                    fetchedProductionData?.length === 0 ? (
+                                      <p className="text-center text-sm text-slate-600">
+                                        No Production Data Found
+                                      </p>
+                                    ) : (
+                                      <FieldArray
+  name="rows2"
+  render={(arrayHelpers) => (
+    <tbody>
+      <tr>
+        <td></td>
+      </tr>
+      {values.rows2.map((row, index) => (
+        <tr key={index}>
+          <td className="border-y border-slate-500">
             <Field
-              name={`rows2.${index}.production_id`}
+              name={`rows2.${index}.production_order_form_id`}
               type="text"
               className="input input-bordered"
               readOnly
             />
-          </td> */}
-                                              <td>
-                                                <Field
-                                                  name={`rows2.${index}.production_order_form_id`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows2.${index}.production_entry_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={
-                                                    new Date(
-                                                      values.rows2[
-                                                        index
-                                                      ].production_entry_date_time
-                                                    ).toLocaleDateString(
-                                                      "en-CA"
-                                                    ) // Format the initial value
-                                                  }
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows2.${index}.production_entry_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows2.${index}.production_exit_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={new Date(
-                                                    values.rows2[
-                                                      index
-                                                    ].production_exit_date_time
-                                                  ).toLocaleDateString("en-CA")}
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows2.${index}.production_exit_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <div className="flex gap-2">
-                                                  {editableRow === index ? (
-                                                    <>
-                                                      <button
-                                                        type="button"
-                                                        className="btn btn-success"
-                                                        onClick={async () => {
-                                                          try {
-                                                            // Trigger the mutation with updated values
-                                                            await updateProductionMutation.mutateAsync(
-                                                              {
-                                                                production_id:
-                                                                  values.rows2[
-                                                                    index
-                                                                  ]
-                                                                    .production_id,
-                                                                production_entry_date_time:
-                                                                  values.rows2[
-                                                                    index
-                                                                  ]
-                                                                    .production_entry_date_time,
-                                                                production_exit_date_time:
-                                                                  values.rows2[
-                                                                    index
-                                                                  ]
-                                                                    .production_exit_date_time,
-                                                              }
-                                                            );
-                                                            // alert("updated",updateProductionMutation.data);
-                                                          } catch (error) {
-                                                            console.error(
-                                                              "Error in mutation:",
-                                                              error
-                                                            );
-                                                          }
-                                                        }}
-                                                      >
-                                                        Save
-                                                      </button>
-                                                    </>
-                                                  ) : (
-                                                    <button
-                                                      type="button"
-                                                      className="btn btn-primary"
-                                                      onClick={() =>
-                                                        setEditableRow(index)
-                                                      }
-                                                    >
-                                                      Edit
-                                                    </button>
-                                                  )}
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const isConfirmed =
-                                                        window.confirm(
-                                                          "Are you sure you want to remove this production?"
-                                                        );
-                                                      if (isConfirmed) {
-                                                        removeProductionMutation.mutate(
-                                                          {
-                                                            production_id:
-                                                              values.rows2[
-                                                                index
-                                                              ].production_id,
-                                                            is_exist: false,
-                                                          }
-                                                        );
-                                                      }
-                                                    }}
-                                                    className={`btn btn-error ${
-                                                      removeProductionMutation.isPending
-                                                        ? "loading"
-                                                        : ""
-                                                    }`}
-                                                  >
-                                                    <Trash className="w-sm h-sm" />{" "}
-                                                    Remove
-                                                  </button>
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      )}
-                                    />
+          </td>
+          <td className="border-y border-slate-500">
+            <Field
+              name={`rows2.${index}.production_entry_date_time`}
+              type="datetime-local"
+              className="input input-bordered"
+              value={
+                values.rows2[index].production_entry_date_time
+                  ? values.rows2[index].production_entry_date_time.slice(0, 16)
+                  : ""
+              }
+              onChange={(e:any) => {
+                const newValue = e.target.value;
+                setFieldValue(`rows2.${index}.production_entry_date_time`, newValue);
+              }}
+              readOnly={editableRowProd !== index}
+            />
+          </td>
+          <td className="border-y border-slate-500">
+            <Field
+              name={`rows2.${index}.production_exit_date_time`}
+              type="datetime-local"
+              className="input input-bordered"
+              value={
+                values.rows2[index].production_exit_date_time
+                  ? values.rows2[index].production_exit_date_time.slice(0, 16)
+                  : ""
+              }
+              onChange={(e:any) => {
+                const newValue = e.target.value;
+                setFieldValue(`rows2.${index}.production_exit_date_time`, newValue);
+              }}
+              readOnly={editableRowProd !== index}
+            />
+          </td>
+
+          <td className="border-y border-slate-500">
+            <div className="flex gap-2">
+              {editableRowProd === index ? (
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-success"
+                    onClick={async () => {
+                      try {
+                        await updateProductionMutation.mutateAsync({
+                          production_id: values.rows2[index].production_id,
+                          production_entry_date_time:
+                            values.rows2[index].production_entry_date_time,
+                          production_exit_date_time:
+                            values.rows2[index].production_exit_date_time,
+                        });
+                        setEditableRowProd(null); // Reset editable row after saving
+                      } catch (error) {
+                        console.error("Error in mutation:", error);
+                      }
+                    }}
+                  >
+                    Save
+                  </button>
+                  <button
+  
+  className="btn btn-primary"
+  onClick={() => {
+    // Alert first, then reset the editable row and refetch data
+    if (window.confirm("Are you sure you want to cancel?")) {
+      setEditableRowProd(null);  // Reset the editable state
+      refetchProductionData();  // Trigger the refetch
+       // Close the modal first
+    setIsModalOpen(false);
+
+    // Reopen it after a small delay
+    setTimeout(() => {
+      setIsModalOpen(true);
+      setSelectedTab('tab1');
+    }, 100); // Delay of 100ms to ensure the close transition happens
+      
+    }
+  }}
+>
+  Cancel
+</button>
+
+
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`btn btn-primary ${editableRowProd !== null ? "hidden" : ""}`}
+                    onClick={() => setEditableRowProd(index)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn btn-error ${editableRowProd !== null ? "hidden" : ""} ${
+                      removeProductionMutation.isPending ? "loading" : ""
+                    }`}
+                    onClick={() => {
+                      const isConfirmed = window.confirm(
+                        "Are you sure you want to remove this production?"
+                      );
+                      if (isConfirmed) {
+                        removeProductionMutation.mutate({
+                          production_id: values.rows2[index].production_id,
+                          is_exist: false,
+                        });
+                      }
+                    }}
+                  >
+                    Remove
+                  </button>
+                </>
+              )}
+            </div>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  )}
+/>
+
+                                    )}
                                   </table>
                                 </div>
                               </div>
@@ -1268,7 +1310,9 @@ export default function OrderListView() {
                   role="tab"
                   className="tab"
                   aria-label="Proofing"
-                  defaultChecked
+                  defaultChecked id="tab2"
+                  checked={selectedTab === 'tab2'}
+                  onChange={() => setSelectedTab('tab2')}
                 />
                 <div
                   role="tabpanel"
@@ -1317,24 +1361,24 @@ export default function OrderListView() {
                                       })
                                     }
                                   >
-                                    Add Row
+                                    Add Proofing
                                   </button>
                                   <button
                                     className="btn btn-primary"
                                     type="submit"
                                     // onClick={() => setSubmitContext('rows')}
                                   >
-                                    Add Proofing
+                                    Save Proofing
                                   </button>
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      setEditableRowProof(null);
                                       setIsModalOpen(false);
                                       setOrderid(null);
                                       refetchMeasurentData();
                                       refetchProductionData();
                                       refetchProofingData();
-                                      window.location.reload();
                                     }}
                                   >
                                     Cancel
@@ -1371,14 +1415,14 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_entry_date_time`}
-                                                type="date"
+                                                type="datetime-local"
                                                 className={`input input-bordered ${
-                                                  typeof errors.rowsproofing?.[
+                                                  typeof errors.rows3?.[
                                                     index
                                                   ] === "object" &&
-                                                  errors.rowsproofing?.[index]
+                                                  errors.rows3?.[index]
                                                     ?.proofing_entry_date_time &&
-                                                  touched.rowsproofing?.[index]
+                                                  touched.rows3?.[index]
                                                     ?.proofing_entry_date_time
                                                     ? "border-red-500"
                                                     : ""
@@ -1393,8 +1437,23 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_exit_date_time`}
-                                                type="date"
-                                                className="input input-bordered"
+                                                type="datetime-local"
+                                                className={`input input-bordered ${
+                                                  typeof errors.rows3?.[
+                                                    index
+                                                  ] === "object" &&
+                                                  errors.rows3?.[index]
+                                                    ?.proofing_exit_date_time &&
+                                                  touched.rows3?.[index]
+                                                    ?.proofing_exit_date_time
+                                                    ? "border-red-500"
+                                                    : ""
+                                                }`}
+                                              />
+                                              <ErrorMessage
+                                                name={`rowsproofing.${index}.proofing_exit_date_time`}
+                                                component="div"
+                                                className="text-red-500 text-sm"
                                               />
                                             </td>
                                             <td>
@@ -1428,199 +1487,164 @@ export default function OrderListView() {
                                     ))}
 
                                     {/* second FieldArray */}
-                                    <FieldArray
-                                      name="rows3"
-                                      render={(arrayHelpers) => (
-                                        <tbody>
-                                          {values.rows3.map((row, index) => (
-                                            <tr key={index}>
-                                              {/* <td>
-            <Field
-              name={`rows2.${index}.production_id`}
-              type="text"
-              className="input input-bordered"
-              readOnly
-            />
-          </td> */}
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_order_form_id`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_entry_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={
-                                                    new Date(
-                                                      values.rows3[
-                                                        index
-                                                      ].proofing_entry_date_time
-                                                    ).toLocaleDateString(
-                                                      "en-CA"
-                                                    ) // Format the initial value
-                                                  }
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows3.${index}.proofing_entry_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_exit_date_time`}
-                                                  type="date"
-                                                  className="input input-bordered"
-                                                  value={new Date(
-                                                    values.rows3[
-                                                      index
-                                                    ].proofing_exit_date_time
-                                                  ).toLocaleDateString("en-CA")}
-                                                  onChange={(
-                                                    e: React.ChangeEvent<HTMLInputElement>
-                                                  ) => {
-                                                    const newValue =
-                                                      e.target.value;
-                                                    setFieldValue(
-                                                      `rows3.${index}.proofing_exit_date_time`,
-                                                      new Date(
-                                                        newValue
-                                                      ).toISOString()
-                                                    );
-                                                  }}
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  } // Read-only unless the row is being edited
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_num_pallete`}
-                                                  type="number"
-                                                  className="input input-bordered"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows3.${index}.proofing_program_name`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <div className="flex gap-2">
-                                                  {editableRow === index ? (
-                                                    <>
-                                                      <button
-                                                        type="button"
-                                                        className="btn btn-success"
-                                                        onClick={async () => {
-                                                          try {
-                                                            // Trigger the mutation with updated values
-                                                            await updateProofingMutation.mutateAsync(
-                                                              {
-                                                                proofing_id:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ].proofing_id,
-                                                                proofing_entry_date_time:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_entry_date_time,
-                                                                proofing_exit_date_time:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_exit_date_time,
-                                                                proofing_num_pallete:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_num_pallete,
-                                                                proofing_program_name:
-                                                                  values.rows3[
-                                                                    index
-                                                                  ]
-                                                                    .proofing_program_name,
-                                                              }
-                                                            );
-                                                          } catch (error) {
-                                                            console.error(
-                                                              "Error in mutation:",
-                                                              error
-                                                            );
-                                                          }
-                                                        }}
-                                                      >
-                                                        Save
-                                                      </button>
-                                                    </>
-                                                  ) : (
-                                                    <button
-                                                      type="button"
-                                                      className="btn btn-primary"
-                                                      onClick={() =>
-                                                        setEditableRow(index)
-                                                      }
-                                                    >
-                                                      Edit
-                                                    </button>
-                                                  )}
-                                                  <button
-                                                    onClick={() => {
-                                                      const isConfirmed =
-                                                        window.confirm(
-                                                          "Are you sure you want to remove this proofing?"
-                                                        );
-                                                      if (isConfirmed) {
-                                                        removeProofingMutation.mutate(
-                                                          {
-                                                            proofing_id:
-                                                              values.rows3[
-                                                                index
-                                                              ].proofing_id,
-                                                            is_exist: false,
-                                                          }
-                                                        );
-                                                      }
-                                                    }}
-                                                    className={`btn btn-error ${
-                                                      removeProofingMutation.isPending
-                                                        ? "loading"
-                                                        : ""
-                                                    }`}
-                                                  >
-                                                    <Trash /> Remove
-                                                  </button>
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      )}
-                                    />
+                                    {fetchedProofingData?.length === 0 ? (
+  <p className="text-center text-sm text-slate-600">No Proofing Data Found</p>
+) : (
+  <FieldArray
+    name="rows3"
+    render={(arrayHelpers) => (
+      <tbody>
+        <tr>
+          <td></td>
+        </tr>
+        {values.rows3.map((row, index) => (
+          <tr key={index}>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_order_form_id`}
+                type="text"
+                className="input input-bordered"
+                readOnly
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_entry_date_time`}
+                type="datetime-local"
+                className="input input-bordered"
+                value={
+                  values.rows3[index].proofing_entry_date_time
+                    ? values.rows3[index].proofing_entry_date_time.slice(0, 16)
+                    : ""
+                }
+                onChange={(e:any) => {
+                  const newValue = e.target.value;
+                  setFieldValue(`rows3.${index}.proofing_entry_date_time`, newValue);
+                }}
+                readOnly={editableRowProof !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_exit_date_time`}
+                type="datetime-local"
+                className="input input-bordered"
+                value={
+                  values.rows3[index].proofing_exit_date_time
+                    ? values.rows3[index].proofing_exit_date_time.slice(0, 16)
+                    : ""
+                }
+                onChange={(e:any) => {
+                  const newValue = e.target.value;
+                  setFieldValue(`rows3.${index}.proofing_exit_date_time`, newValue);
+                }}
+                readOnly={editableRowProof !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_num_pallete`}
+                type="number"
+                className="input input-bordered"
+                readOnly={editableRowProof !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows3.${index}.proofing_program_name`}
+                type="text"
+                className="input input-bordered"
+                readOnly={editableRowProof !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <div className="flex gap-2">
+                {editableRowProof === index ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={async () => {
+                        try {
+                          await updateProofingMutation.mutateAsync({
+                            proofing_id: values.rows3[index].proofing_id,
+                            proofing_entry_date_time:
+                              values.rows3[index].proofing_entry_date_time,
+                            proofing_exit_date_time:
+                              values.rows3[index].proofing_exit_date_time,
+                            proofing_num_pallete:
+                              values.rows3[index].proofing_num_pallete,
+                            proofing_program_name:
+                              values.rows3[index].proofing_program_name,
+                          });
+                          setEditableRowProof(null); // Reset editable row after saving
+                          refetchProofingData(); // Refetch data after update
+                        } catch (error) {
+                          console.error("Error in mutation:", error);
+                        }
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                     
+                      className="btn btn-primary"
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to cancel?")) {
+                          setEditableRowProof(null); // Reset the editable state
+                          refetchProofingData(); // Refetch the proofing data
+                          // location.reload();
+                          setIsModalOpen(false);
+                          setTimeout(() => {
+                            setIsModalOpen(true);
+                            setSelectedTab('tab2');
+                          }, 100);
+                        }
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                     
+                      className={`btn btn-primary ${editableRowProof !== null ? "hidden" : ""}`}
+                      onClick={() => setEditableRowProof(index)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                     type="button"
+                     className={`btn btn-error ${editableRowProof !== null ? "hidden" : ""} ${
+                       removeProofingMutation.isPending ? "loading" : ""
+                     }`}
+                      onClick={() => {
+                        const isConfirmed = window.confirm(
+                          "Are you sure you want to remove this proofing?"
+                        );
+                        if (isConfirmed) {
+                          removeProofingMutation.mutate({
+                            proofing_id: values.rows3[index].proofing_id,
+                            is_exist: false,
+                          });
+                        }
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    )}
+  />
+)}
+
                                   </table>
                                 </div>
                               </div>
@@ -1638,12 +1662,16 @@ export default function OrderListView() {
                   role="tab"
                   className="tab"
                   aria-label="Measurement"
+                  id="tab3"
+                  checked={selectedTab === 'tab3'}
+                  onChange={() => setSelectedTab('tab3')}
+
                 />
                 <div
                   role="tabpanel"
                   className="tab-content bg-base-100 border-base-300 rounded-box p-6"
                 >
-                  <Formik
+                 <Formik
                     initialValues={initialValuesMeasurement}
                     enableReinitialize={true}
                     onSubmit={async (values) => {
@@ -1664,7 +1692,8 @@ export default function OrderListView() {
                       }
 
                       // await new Promise((r) => setTimeout(r, 500));
-                      // alert(JSON.stringify(values, null, 2));
+                      alert(JSON.stringify(values, null, 2));
+                      console.log(JSON.stringify(values, null, 2));
                     }}
                   >
                     {({ values, setFieldValue }) => (
@@ -1675,30 +1704,45 @@ export default function OrderListView() {
                             render={(arrayHelpers) => (
                               <div>
                                 <div className="flex place-content-end gap-3">
-                                  <button
-                                    className="btn btn-info"
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.push({
-                                        pallete_count: "",
-                                        number_of_control: "",
-                                        length: "",
-                                        inside_diameter: "",
-                                        outside_diameter: "",
-                                        flat_crush: "",
-                                        h20: "",
-                                        radial: "",
-                                        remarks: "",
-                                      })
-                                    }
-                                  >
-                                    Add Row
-                                  </button>
+                                <button
+  className="btn btn-info"
+  type="button"
+  onClick={() => {
+    const currentMaxPallete = values.rowsmeasurement.reduce(
+      (max, row) => Math.max(max, row.pallete_count || 0),
+      0
+    );
+
+    const newControlNumber = prompt("Enter a new control number:");
+    if (newControlNumber && !isNaN(parseInt(newControlNumber, 10))) {
+      arrayHelpers.push({
+        pallete_count: currentMaxPallete + 1, // Incremented pallete_count
+        number_of_control: parseInt(newControlNumber, 10), // User input
+        length: "",
+        inside_diameter: "",
+        outside_diameter: "",
+        flat_crush: "",
+        h20: "",
+        radial: "",
+        remarks: "",
+      });
+    } else {
+      alert("Please enter a valid number for the control number.");
+    }
+  }}
+>
+  Add Pallete
+</button>
+
+
+
+
+
                                   <button
                                     className="btn btn-primary"
                                     type="submit"
                                   >
-                                    Add Measurement
+                                    Save Measurement
                                   </button>
 
                                   <button
@@ -1709,7 +1753,6 @@ export default function OrderListView() {
                                       refetchMeasurentData();
                                       refetchProductionData();
                                       refetchProofingData();
-                                      window.location.reload();
                                     }}
                                   >
                                     Cancel
@@ -1733,101 +1776,40 @@ export default function OrderListView() {
                                     <tbody>
                                       {values.rowsmeasurement.map(
                                         (row, index) => (
-                                          <React.Fragment key={index}>
+                                          <React.Fragment key={index-1}>
                                             <tr>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.pallete_count`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.number_of_control`}
-                                                  type="number"
-                                                  placeholder="0"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                  onChange={(e: any) => {
-                                                    const newCount = parseInt(
-                                                      e.target.value,
-                                                      10
-                                                    );
-                                                    const currentPallete =
-                                                      values.rowsmeasurement[
-                                                        index
-                                                      ].pallete_count;
-                                                    const currentRowsCount =
-                                                      values.rowsmeasurement.filter(
-                                                        (r) =>
-                                                          r.pallete_count ===
-                                                          currentPallete
-                                                      ).length;
+                                             <td>
+                                             <Field
+  name={`rowsmeasurement.${index}.pallete_count`}
+  placeholder="0"
+  type="number"
+  className="input bg-white input-bordered w-20 max-w-md"
+  onChange={(e: any) => {
+    const newPalleteCount = parseInt(e.target.value, 10);
+    // Update the `pallete_count` field
+    setFieldValue(`rowsmeasurement.${index}.pallete_count`, newPalleteCount );
+  }}
+/>
 
-                                                    // Update `number_of_control`
-                                                    setFieldValue(
-                                                      `rowsmeasurement.${index}.number_of_control`,
-                                                      newCount
-                                                    );
+</td>
 
-                                                    // Calculate rows to adjust
-                                                    const rowsToAdjust =
-                                                      newCount -
-                                                      currentRowsCount;
 
-                                                    if (rowsToAdjust > 0) {
-                                                      // Add rows if the number increased
-                                                      for (
-                                                        let i = 0;
-                                                        i < rowsToAdjust;
-                                                        i++
-                                                      ) {
-                                                        arrayHelpers.insert(
-                                                          index + 1,
-                                                          {
-                                                            pallete_count:
-                                                              currentPallete,
-                                                            number_of_control:
-                                                              "",
-                                                            length: "",
-                                                            inside_diameter: "",
-                                                            outside_diameter:
-                                                              "",
-                                                            flat_crush: "",
-                                                            h20: "",
-                                                            radial: "",
-                                                            remarks: "",
-                                                          }
-                                                        );
-                                                      }
-                                                    } else if (
-                                                      rowsToAdjust < 0
-                                                    ) {
-                                                      // Remove rows if the number decreased
-                                                      for (
-                                                        let i = 0;
-                                                        i <
-                                                        Math.abs(rowsToAdjust);
-                                                        i++
-                                                      ) {
-                                                        const rowIndex =
-                                                          values.rowsmeasurement.findIndex(
-                                                            (r, idx) =>
-                                                              idx > index &&
-                                                              r.pallete_count ===
-                                                                currentPallete
-                                                          );
-                                                        if (rowIndex !== -1) {
-                                                          arrayHelpers.remove(
-                                                            rowIndex
-                                                          );
-                                                        }
-                                                      }
-                                                    }
-                                                  }}
-                                                />
-                                              </td>
+<td>
+ <Field
+  name={`rowsmeasurement.${index}.number_of_control`}
+  type="number"
+  placeholder="0"
+  className="input bg-white input-bordered w-20 max-w-md"
+  onChange={(e: any) => {
+    const newControlNumber = parseInt(e.target.value, 10);
+    // Update the `number_of_control` field
+    setFieldValue(`rowsmeasurement.${index}.number_of_control`, newControlNumber);
+  }}
+/>
+
+</td>
+
+
                                               <td>
                                                 <Field
                                                   name={`rowsmeasurement.${index}.length`}
@@ -1885,228 +1867,219 @@ export default function OrderListView() {
                                                 />
                                               </td>
                                               <td>
-                                                <button
-                                                  type="button"
-                                                  className="btn btn-error"
-                                                  onClick={() =>
-                                                    arrayHelpers.remove(index)
-                                                  }
-                                                >
-                                                  Remove
-                                                </button>
-                                              </td>
+  {/* Add Row Button */}
+  {values.rowsmeasurement.filter(
+    (r) => r.number_of_control === row.number_of_control
+  ).length < Number(row.number_of_control) && (
+    <button
+      className="btn btn-success mt-2"
+      type="button"
+      onClick={() =>
+        arrayHelpers.push({
+          pallete_count: row.pallete_count,
+          number_of_control: row.number_of_control, // Keep the same control number
+          length: "",
+          inside_diameter: "",
+          outside_diameter: "",
+          flat_crush: "",
+          h20: "",
+          radial: "",
+          remarks: "",
+        })
+      }
+    >
+      +
+    </button>
+  )}
+  <button
+    type="button"
+    className="btn btn-error"
+    onClick={() => arrayHelpers.remove(index)}
+  >
+    Remove
+  </button>
+</td>
+
                                             </tr>
                                           </React.Fragment>
                                         )
                                       )}
                                     </tbody>
                                     {/* second Feild Array */}
-                                    <FieldArray
-                                      name="rows4"
-                                      render={(arrayHelpers) => (
-                                        <tbody>
-                                          {values.rows4.map((row, index) => (
-                                            <tr key={index}>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.pallete_count`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.number_of_control`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.length`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.inside_diameter`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.outside_diameter`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.flat_crush`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.h20`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.radial`}
-                                                  type="number"
-                                                  className="input input-bordered w-20 max-w-md"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rows4.${index}.remarks`}
-                                                  type="text"
-                                                  className="input input-bordered"
-                                                  readOnly={
-                                                    editableRow !== index
-                                                  }
-                                                />
-                                              </td>
-                                              <td>
-                                                <div className="flex gap-2">
-                                                  {editableRow === index ? (
-                                                    <>
-                                                      <button
-                                                        type="button"
-                                                        className="btn btn-success"
-                                                        onClick={async () => {
-                                                          try {
-                                                            // Trigger the mutation with updated values
-                                                            await updateMeasurementMutation.mutateAsync(
-                                                              {
-                                                                measurement_id:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ]
-                                                                    .measurement_id,
-                                                                pallete_count:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ]
-                                                                    .pallete_count,
-                                                                number_of_control:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ]
-                                                                    .number_of_control,
-                                                                length:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ].length,
-                                                                inside_diameter:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ]
-                                                                    .inside_diameter,
-                                                                outside_diameter:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ]
-                                                                    .outside_diameter,
-                                                                flat_crush:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ].flat_crush,
-                                                                h20: values
-                                                                  .rows4[index]
-                                                                  .h20,
-                                                                radial:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ].radial,
-                                                                remarks:
-                                                                  values.rows4[
-                                                                    index
-                                                                  ].remarks,
-                                                              }
-                                                            );
-                                                          } catch (error) {
-                                                            console.error(
-                                                              "Error in mutation:",
-                                                              error
-                                                            );
-                                                          }
-                                                        }}
-                                                      >
-                                                        Save
-                                                      </button>
-                                                    </>
-                                                  ) : (
-                                                    <button
-                                                      type="button"
-                                                      className="btn btn-primary"
-                                                      onClick={() =>
-                                                        setEditableRow(index)
-                                                      }
-                                                    >
-                                                      Edit
-                                                    </button>
-                                                  )}
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const isConfirmed =
-                                                        window.confirm(
-                                                          "Are you sure you want to remove this production?"
-                                                        );
-                                                      if (isConfirmed) {
-                                                        removeMeasurementMutation.mutate(
-                                                          {
-                                                            measurement_id:
-                                                              values.rows4[
-                                                                index
-                                                              ].measurement_id,
-                                                            is_exist: false,
-                                                          }
-                                                        );
-                                                      }
-                                                    }}
-                                                    className={`btn btn-error ${
-                                                      removeMeasurementMutation.isPending
-                                                        ? "loading"
-                                                        : ""
-                                                    }`}
-                                                  >
-                                                    <Trash /> Remove
-                                                  </button>
-                                                </div>
-                                              </td>
-                                            </tr>
-                                          ))}
-                                        </tbody>
-                                      )}
-                                    />
+                                    {fetchedMeasurementData?.length === 0 ? (
+  <p className="text-center text-sm text-slate-600">No Measurement Data Found</p>
+) : (
+  <FieldArray
+    name="rows4"
+    render={(arrayHelpers) => (
+      <tbody>
+        {values.rows4.map((row, index) => (
+          <tr key={index}>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.pallete_count`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.number_of_control`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.length`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.inside_diameter`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.outside_diameter`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.flat_crush`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.h20`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.radial`}
+                type="number"
+                className="input input-bordered w-20 max-w-md"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <Field
+                name={`rows4.${index}.remarks`}
+                type="text"
+                className="input input-bordered"
+                readOnly={editableRowMes !== index}
+              />
+            </td>
+            <td className="border-y border-slate-500">
+              <div className="flex gap-2">
+                {editableRowMes === index ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={async () => {
+                        try {
+                          await updateMeasurementMutation.mutateAsync({
+                            measurement_id: values.rows4[index].measurement_id,
+                            pallete_count: values.rows4[index].pallete_count,
+                            number_of_control: values.rows4[index].number_of_control,
+                            length: values.rows4[index].length,
+                            inside_diameter: values.rows4[index].inside_diameter,
+                            outside_diameter: values.rows4[index].outside_diameter,
+                            flat_crush: values.rows4[index].flat_crush,
+                            h20: values.rows4[index].h20,
+                            radial: values.rows4[index].radial,
+                            remarks: values.rows4[index].remarks,
+                          });
+                          setEditableRowMes(null); // Reset editable row after saving
+                          refetchMeasurentData(); // Refetch data after update
+                        } catch (error) {
+                          console.error("Error in mutation:", error);
+                        }
+                      }}
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to cancel?")) {
+                          setEditableRowMes(null); // Reset the editable state
+                          refetchMeasurentData(); // Refetch measurement data
+                          // location.reload();
+                          setIsModalOpen(false);
+                          setTimeout(() => {
+                            setIsModalOpen(true);
+                            setSelectedTab('tab3');
+                          }, 100);
+                        }
+                      }}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    {!editableRowMes && (
+                      <>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => setEditableRowMes(index)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const isConfirmed = window.confirm(
+                              "Are you sure you want to remove this measurement?"
+                            );
+                            if (isConfirmed) {
+                              removeMeasurementMutation.mutate({
+                                measurement_id: values.rows4[index].measurement_id,
+                                is_exist: false,
+                              });
+                            }
+                          }}
+                          className={`btn btn-error ${
+                            removeMeasurementMutation.isPending ? "loading" : ""
+                          }`}
+                        >
+                          <Trash /> Remove
+                        </button>
+                      </>
+                    )}
+                  </>
+                )}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    )}
+  />
+)}
+
+
                                   </table>
                                 </div>
                               </div>
@@ -2128,18 +2101,20 @@ export default function OrderListView() {
                 <div className="flex flex-col gap-y-4">
                   <label className="label">Assign Order</label>
                   <select
-            className="select select-bordered"
-            onChange={(e) => {
-              setAssign_id(e.target.value);
-            }}
-          >
-            <option value="" disabled selected>Select Customer</option>
-            {customerOptions.map((option: any) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+                    className="select select-bordered"
+                    onChange={(e) => {
+                      setAssign_id(e.target.value);
+                    }}
+                  >
+                    <option value="" disabled selected>
+                      Select Customer
+                    </option>
+                    {customerOptions.map((option: any) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="flex gap-4 place-content-end">
                   <button
