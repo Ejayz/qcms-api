@@ -848,7 +848,7 @@ export default function OrderListView() {
                       setOrderid(order.id);
                     }}
                   >
-                    {order.order_fabrication_control}
+                    {order.id}
                   </td>
                   <td>{order.product_name}</td>
                   <td className="text-xs">{order.tbl_customer.company_name}</td>
