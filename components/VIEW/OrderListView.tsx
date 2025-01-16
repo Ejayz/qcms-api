@@ -2042,13 +2042,16 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                       <>
                         <button
                           type="button"
-                          className="btn btn-primary"
+                          className={`btn btn-primary ${editableRowMes !== null ? "hidden" : ""}`}
                           onClick={() => setEditableRowMes(index)}
                         >
                           Edit
                         </button>
                         <button
                           type="button"
+                          className={`btn btn-error ${editableRowMes !== null ? "hidden" : ""} ${
+                            removeMeasurementMutation.isPending ? "loading" : ""
+                          }`}
                           onClick={() => {
                             const isConfirmed = window.confirm(
                               "Are you sure you want to remove this measurement?"
@@ -2060,9 +2063,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                               });
                             }
                           }}
-                          className={`btn btn-error ${
-                            removeMeasurementMutation.isPending ? "loading" : ""
-                          }`}
+                        
                         >
                           <Trash /> Remove
                         </button>
