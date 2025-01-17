@@ -641,7 +641,7 @@ export default function OrderListView() {
 
       console.log("All Pallete Counts:", palleteCounts);
       console.log("Highest Pallete Count:", maxPalleteCount);
-      setLastpalleteCount(maxPalleteCount+1);
+      setLastpalleteCount(maxPalleteCount);
     }
     else{
       setLastpalleteCount(1)
@@ -1789,22 +1789,41 @@ export default function OrderListView() {
               
               onClick={() => {
                 console.log("enablepallete:", enablepallete); // Debug
-                const currentMaxPallete = values.rowsmeasurement.reduce(
+                let currentMaxPallete = values.rowsmeasurement.reduce(
                   (max, row) => Math.max(max, row.pallete_count || 0),
                   0
                 );
+              
+                // Fallback to lastpalleteCount if currentMaxPallete is 0
+                if (currentMaxPallete === 0) {
+                  currentMaxPallete = lastpalleteCount;
+                }
+              
                 console.log("Current Max Pallete:", currentMaxPallete); // Debug
                 // console.log("number_control val",values.rowsmeasurement.filter(
                 //   (r) => r.number_of_control === row.number_of_control))
                 console.log("Values are: ",values.rowsmeasurement);
+                
+                 // Remove rows where pallete_count and number_of_control are 0
+    
+
                 const hasInvalidRow = values.rowsmeasurement.some(
                   (row) => row.number_of_control === 0 && row.pallete_count === 0
                 );
               
                 if (enablepallete === true || hasInvalidRow) {
+
+
                 const newControlNumber = prompt("Enter a new control number:");
                 
                 if (newControlNumber && !isNaN(parseInt(newControlNumber, 10))) {
+                  
+                  values.rowsmeasurement.forEach((row, index) => {
+      if (row.pallete_count === 0 && row.number_of_control === 0) {
+        console.log(`Removing row at index ${index}:`, row); // Debug
+        arrayHelpers.remove(index); // Trigger the "Remove" button functionality
+      }
+    });
                   arrayHelpers.push({
                     pallete_count: currentMaxPallete + 1, // Incremented pallete_count
                     number_of_control: parseInt(newControlNumber, 10), // User input
@@ -1824,18 +1843,6 @@ export default function OrderListView() {
                 alert("Please finish the current pallete before adding a new one.");
               }
 
-              // const filteredRows = values.rowsmeasurement.filter(
-              //   (row) => !(row.pallete_count === 0 && row.number_of_control === 0)
-              // );
-        
-              // // Update the state with the filtered rows
-              // setInitialValuesMeasurement({
-              //   ...values,
-              //   rowsmeasurement: filteredRows,
-              // });
-        
-              // console.log("Updated rows:", filteredRows);
-              
               }}
 
             >
