@@ -100,6 +100,7 @@ export default function OrderListView() {
   const [selectedTab, setSelectedTab] = useState('tab1'); 
   const [filterPalleteCount, setFilterPalleteCount] = useState(1); 
   const [enablepallete, setEnablePallete] = useState(false);
+  const [lastpalleteCount, setLastpalleteCount] = useState<number | 1>(1);
 
   console.log("current enablepallete: ", enablepallete);
 
@@ -199,7 +200,7 @@ export default function OrderListView() {
     rowsmeasurement: [
       {
         measurement_id: "",
-        pallete_count: 1,
+        pallete_count: lastpalleteCount,
         number_of_control: 0,
         length: "",
         inside_diameter: "",
@@ -236,6 +237,15 @@ useEffect(() => {
     })),
   }));
 }, [numberControl]);
+useEffect(() => {
+  setInitialValuesMeasurement((prev) => ({
+    ...prev,
+    rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+      ...row,
+      pallete_count: lastpalleteCount,
+    })),
+  }));
+}, [lastpalleteCount]);
 
 // console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
 //   console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
@@ -557,7 +567,6 @@ useEffect(() => {
 
   useEffect(() => {
     if (fetchedMeasurementData?.length > 0) {
-      const proofingData = fetchedMeasurementData[0];
       //setEditproductionID(proofingData.id);
       setInitialValuesMeasurement((prev) => ({
         ...prev,
@@ -576,6 +585,27 @@ useEffect(() => {
       }));
     }
   }, [fetchedMeasurementData]);
+  
+  useEffect(() => {
+    if (fetchedMeasurementData?.length > 0) {
+      // Extract pallete_count values
+      const palleteCounts = fetchedMeasurementData.map((item: any) => item.pallete_count || 0);
+
+      // Find the highest pallete_count
+      const maxPalleteCount = Math.max(...palleteCounts);
+
+      // Update the state
+      // setHighestPalleteCount(maxPalleteCount);
+
+      console.log("All Pallete Counts:", palleteCounts);
+      console.log("Highest Pallete Count:", maxPalleteCount);
+      setLastpalleteCount(maxPalleteCount+1);
+    }
+    else{
+      setLastpalleteCount(1)
+    }
+  }, [fetchedMeasurementData]); // Add fetchedMeasurementData as a dependency
+
 
   const updateMeasurementMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -1703,9 +1733,10 @@ useEffect(() => {
                     {({ values, setFieldValue }) => (
                    <Form>
   <div className="">
-    <FieldArray
+    <FieldArray 
       name="rowsmeasurement"
       render={(arrayHelpers) => (
+
         <div>
           <div className="flex place-content-end gap-3">
             <button
@@ -1792,6 +1823,7 @@ useEffect(() => {
                           name={`rowsmeasurement.${index}.pallete_count`}
                           placeholder="0"
                           type="number"
+                          readOnly
                           className="input bg-white input-bordered w-20 max-w-md"
                           onChange={(e: any) => {
                             const newPalleteCount = parseInt(e.target.value, 10);
@@ -1805,6 +1837,7 @@ useEffect(() => {
                           name={`rowsmeasurement.${index}.number_of_control`}
                           type="number"
                           placeholder="0"
+                          readOnly
                           className="input bg-white input-bordered w-20 max-w-md"
                           onChange={(e: any) => {
                             const newControlNumber = parseInt(e.target.value, 10);
@@ -1934,6 +1967,7 @@ useEffect(() => {
         </div>
       )}
     />
+
           {fetchedMeasurementData?.length === 0 ? (
   <p className="text-center text-sm text-slate-600">No Measurement Data Found</p>
 ) : (
