@@ -98,6 +98,10 @@ export default function OrderListView() {
   const [countNumberControl, setCountNumberControl] = useState<number>(0);
   const [numberControl, setNumberControl] = useState<number>(0);
   const [selectedTab, setSelectedTab] = useState('tab1'); 
+  const [filterPalleteCount, setFilterPalleteCount] = useState(1); 
+  const [enablepallete, setEnablePallete] = useState(false);
+
+  console.log("current enablepallete: ", enablepallete);
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -1675,222 +1679,243 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                     initialValues={initialValuesMeasurement}
                     enableReinitialize={true}
                     onSubmit={async (values) => {
-                      for (const row of values.rowsmeasurement) {
-                        AddMeasurementMutation.mutate({
-                          order_id: orderid,
-                          length: row.length,
-                          inside_diameter: row.inside_diameter,
-                          outside_diameter: row.outside_diameter,
-                          flat_crush: row.flat_crush,
-                          h20: row.h20,
-                          radial: row.radial,
-                          number_control: row.number_of_control,
-                          remarks: row.remarks,
-                          pallete_count: row.pallete_count,
-                          user_id: userID,
-                        });
-                      }
+                      // for (const row of values.rowsmeasurement) {
+                      //   AddMeasurementMutation.mutate({
+                      //     order_id: orderid,
+                      //     length: row.length,
+                      //     inside_diameter: row.inside_diameter,
+                      //     outside_diameter: row.outside_diameter,
+                      //     flat_crush: row.flat_crush,
+                      //     h20: row.h20,
+                      //     radial: row.radial,
+                      //     number_control: row.number_of_control,
+                      //     remarks: row.remarks,
+                      //     pallete_count: row.pallete_count,
+                      //     user_id: userID,
+                      //   });
+                      // }
 
-                      // await new Promise((r) => setTimeout(r, 500));
-                      // alert(JSON.stringify(values, null, 2));
-                      // console.log(JSON.stringify(values, null, 2));
+                      await new Promise((r) => setTimeout(r, 500));
+                      alert(JSON.stringify(values, null, 2));
+                      console.log(JSON.stringify(values, null, 2));
                     }}
                   >
                     {({ values, setFieldValue }) => (
-                      <Form>
-                        <div className="">
-                          <FieldArray
-                            name="rowsmeasurement"
-                            render={(arrayHelpers) => (
-                              <div>
-                                <div className="flex place-content-end gap-3">
-                                <button
-  className="btn btn-info"
-  type="button"
-  onClick={() => {
-    const currentMaxPallete = values.rowsmeasurement.reduce(
-      (max, row) => Math.max(max, row.pallete_count || 0),
-      0
-    );
+                   <Form>
+  <div className="">
+    <FieldArray
+      name="rowsmeasurement"
+      render={(arrayHelpers) => (
+        <div>
+          <div className="flex place-content-end gap-3">
+            <button
+              className="btn btn-info"
+              type="button"
+              
+              onClick={() => {
+                console.log("enablepallete:", enablepallete); // Debug
+                const currentMaxPallete = values.rowsmeasurement.reduce(
+                  (max, row) => Math.max(max, row.pallete_count || 0),
+                  0
+                );
+                console.log("Current Max Pallete:", currentMaxPallete); // Debug
+                
+                if(enablepallete ===true){
+                const newControlNumber = prompt("Enter a new control number:");
+                if (newControlNumber && !isNaN(parseInt(newControlNumber, 10))) {
+                  arrayHelpers.push({
+                    pallete_count: currentMaxPallete + 1, // Incremented pallete_count
+                    number_of_control: parseInt(newControlNumber, 10), // User input
+                    length: "",
+                    inside_diameter: "",
+                    outside_diameter: "",
+                    flat_crush: "",
+                    h20: "",
+                    radial: "",
+                    remarks: "",
+                  });
+                } else {
+                  alert("Please enter a valid number for the control number.");
+                }
+              }else{
+                alert("Please finish the current pallete before adding a new one.");
+              }
+              }}
+            >
+              Add Pallete
+            </button>
 
-    const newControlNumber = prompt("Enter a new control number:");
-    if (newControlNumber && !isNaN(parseInt(newControlNumber, 10))) {
-      arrayHelpers.push({
-        pallete_count: currentMaxPallete + 1, // Incremented pallete_count
-        number_of_control: parseInt(newControlNumber, 10), // User input
-        length: "",
-        inside_diameter: "",
-        outside_diameter: "",
-        flat_crush: "",
-        h20: "",
-        radial: "",
-        remarks: "",
-      });
-    } else {
-      alert("Please enter a valid number for the control number.");
-    }
-  }}
->
-  Add Pallete
-</button>
+            <button
+              className="btn btn-primary"
+              type="submit"
+            >
+              Save Measurement
+            </button>
 
+            <button
+              className="btn btn-accent"
+              onClick={() => {
+                setIsModalOpen(false);
+                setOrderid(null);
+                refetchMeasurentData();
+                refetchProductionData();
+                refetchProofingData();
+              }}
+            >
+              Cancel
+            </button>
+          </div>
 
+          <div className="text-black overflow-auto">
+            
+            <table className="table relative text-center overflow-auto">
+              <thead className="text-black text-sm">
+                <tr>
+                  <th>Pallete</th>
+                  <th>Number Of Control</th>
+                  <th>Length</th>
+                  <th>Inside Diameter</th>
+                  <th>Outside Diameter</th>
+                  <th>Flat Crush</th>
+                  <th>H20</th>
+                  <th>Radial</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody>
+                {values.rowsmeasurement.map((row, index) => (
+                  <React.Fragment key={index}>
+                    <tr>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.pallete_count`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                          onChange={(e: any) => {
+                            const newPalleteCount = parseInt(e.target.value, 10);
+                            setFieldValue(`rowsmeasurement.${index}.pallete_count`, newPalleteCount);
+                          }}
+                        />
+                      </td>
 
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.number_of_control`}
+                          type="number"
+                          placeholder="0"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                          onChange={(e: any) => {
+                            const newControlNumber = parseInt(e.target.value, 10);
+                            setFieldValue(`rowsmeasurement.${index}.number_of_control`, newControlNumber);
+                          }}
+                        />
+                      </td>
 
-
-                                  <button
-                                    className="btn btn-primary"
-                                    type="submit"
-                                  >
-                                    Save Measurement
-                                  </button>
-
-                                  <button
-                                    className="btn btn-accent"
-                                    onClick={() => {
-                                      setIsModalOpen(false);
-                                      setOrderid(null);
-                                      refetchMeasurentData();
-                                      refetchProductionData();
-                                      refetchProofingData();
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
-                                </div>
-                                <div className="text-black overflow-auto">
-                                  <table className="table relative text-center overflow-auto">
-                                    <thead className="text-black text-sm">
-                                      <tr>
-                                        <th>Pallete</th>
-                                        <th>Number Of Controll</th>
-                                        <th>Length</th>
-                                        <th>Inside Diameter</th>
-                                        <th>Outside Diameter</th>
-                                        <th>Flat Crush</th>
-                                        <th>H20</th>
-                                        <th>Radial </th>
-                                        <th>Remarks</th>
-                                      </tr>
-                                    </thead>
-                                    <tbody>
-                                      {values.rowsmeasurement.map(
-                                        (row, index) => (
-                                          <React.Fragment key={index-1}>
-                                            <tr>
-                                             <td>
-                                             <Field
-  name={`rowsmeasurement.${index}.pallete_count`}
-  placeholder="0"
-  type="number"
-  className="input bg-white input-bordered w-20 max-w-md"
-  onChange={(e: any) => {
-    const newPalleteCount = parseInt(e.target.value, 10);
-    // Update the `pallete_count` field
-    setFieldValue(`rowsmeasurement.${index}.pallete_count`, newPalleteCount );
-  }}
-/>
-
-</td>
-
-
-<td>
- <Field
-  name={`rowsmeasurement.${index}.number_of_control`}
-  type="number"
-  placeholder="0"
-  className="input bg-white input-bordered w-20 max-w-md"
-  onChange={(e: any) => {
-    const newControlNumber = parseInt(e.target.value, 10);
-    // Update the `number_of_control` field
-    setFieldValue(`rowsmeasurement.${index}.number_of_control`, newControlNumber);
-  }}
-/>
-
-</td>
-
-
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.length`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.inside_diameter`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.outside_diameter`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.flat_crush`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.h20`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.radial`}
-                                                  placeholder="0"
-                                                  type="number"
-                                                  className="input bg-white input-bordered w-20 max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-                                                <Field
-                                                  name={`rowsmeasurement.${index}.remarks`}
-                                                  placeholder="0"
-                                                  type="text"
-                                                  className="input bg-white input-bordered w-auto max-w-md"
-                                                />
-                                              </td>
-                                              <td>
-  {/* Add Row Button */}
-  {values.rowsmeasurement.filter(
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.length`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                        />
+                      </td>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.inside_diameter`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                        />
+                      </td>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.outside_diameter`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                        />
+                      </td>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.flat_crush`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                        />
+                      </td>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.h20`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                        />
+                      </td>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.radial`}
+                          placeholder="0"
+                          type="number"
+                          className="input bg-white input-bordered w-20 max-w-md"
+                        />
+                      </td>
+                      <td>
+                        <Field
+                          name={`rowsmeasurement.${index}.remarks`}
+                          placeholder="0"
+                          type="text"
+                          className="input bg-white input-bordered w-auto max-w-md"
+                        />
+                      </td>
+                      <td>
+  {/* Add Row Button */}{
+  values.rowsmeasurement.filter(
     (r) => r.number_of_control === row.number_of_control
-  ).length < Number(row.number_of_control) && (
+  ).length + 1 <= Number(row.number_of_control) ? (
     <button
       className="btn btn-success mt-2"
       type="button"
-      onClick={() =>
-        arrayHelpers.push({
-          pallete_count: row.pallete_count,
-          number_of_control: row.number_of_control, // Keep the same control number
-          length: "",
-          inside_diameter: "",
-          outside_diameter: "",
-          flat_crush: "",
-          h20: "",
-          radial: "",
-          remarks: "",
-        })
-      }
+      onClick={() => {
+        // Check if "Add Row" should be allowed
+        console.log(
+          "rowlength:",
+          values.rowsmeasurement.filter(
+            (r) => r.number_of_control === row.number_of_control
+          ).length + 1
+        ); // Debug
+
+        if (row.pallete_count > 0) {
+          arrayHelpers.push({
+            pallete_count: row.pallete_count,
+            number_of_control: row.number_of_control, // Keep the same control number
+            length: "",
+            inside_diameter: "",
+            outside_diameter: "",
+            flat_crush: "",
+            h20: "",
+            radial: "",
+            remarks: "",
+          });
+          console.log("number_of_control:", row.number_of_control); // Debug
+          console.log("pallete_count:", row.pallete_count); // Debug
+
+          setEnablePallete(false); // Set to false after adding a row
+        } else {
+          alert("Pallet count must be greater than 0 to add a row.");
+        }
+      }}
     >
       +
     </button>
-  )}
+  ) : (
+    (() => {
+      setEnablePallete(true); // Trigger useState in else
+      return null; // Render nothing in the UI
+    })()
+  )
+}
+
   <button
     type="button"
     className="btn btn-error"
@@ -1900,194 +1925,198 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
   </button>
 </td>
 
-                                            </tr>
-                                          </React.Fragment>
-                                        )
-                                      )}
-                                    </tbody>
-                                    {/* second Feild Array */}
-                                    {fetchedMeasurementData?.length === 0 ? (
+
+                    </tr>
+                  </React.Fragment>
+                ))}
+              </tbody>
+        
+            </table>
+          </div>
+        </div>
+      )}
+    />
+          {fetchedMeasurementData?.length === 0 ? (
   <p className="text-center text-sm text-slate-600">No Measurement Data Found</p>
 ) : (
   <FieldArray
     name="rows4"
-    render={(arrayHelpers) => (
-      <tbody>
-        {values.rows4.map((row, index) => (
-          <tr key={index}>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.pallete_count`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.number_of_control`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.length`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.inside_diameter`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.outside_diameter`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.flat_crush`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.h20`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.radial`}
-                type="number"
-                className="input input-bordered w-20 max-w-md"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows4.${index}.remarks`}
-                type="text"
-                className="input input-bordered"
-                readOnly={editableRowMes !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <div className="flex gap-2">
-                {editableRowMes === index ? (
-                  <>
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={async () => {
-                        try {
-                          await updateMeasurementMutation.mutateAsync({
-                            measurement_id: values.rows4[index].measurement_id,
-                            pallete_count: values.rows4[index].pallete_count,
-                            number_of_control: values.rows4[index].number_of_control,
-                            length: values.rows4[index].length,
-                            inside_diameter: values.rows4[index].inside_diameter,
-                            outside_diameter: values.rows4[index].outside_diameter,
-                            flat_crush: values.rows4[index].flat_crush,
-                            h20: values.rows4[index].h20,
-                            radial: values.rows4[index].radial,
-                            remarks: values.rows4[index].remarks,
-                          });
-                          setEditableRowMes(null); // Reset editable row after saving
-                          refetchMeasurentData(); // Refetch data after update
-                        } catch (error) {
-                          console.error("Error in mutation:", error);
-                        }
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => {
-                        if (window.confirm("Are you sure you want to cancel?")) {
-                          setEditableRowMes(null); // Reset the editable state
-                          refetchMeasurentData(); // Refetch measurement data
-                          // location.reload();
-                          setIsModalOpen(false);
-                          setTimeout(() => {
-                            setIsModalOpen(true);
-                            setSelectedTab('tab3');
-                          }, 100);
-                        }
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    {!editableRowMes && (
-                      <>
-                        <button
-                          type="button"
-                          className={`btn btn-primary ${editableRowMes !== null ? "hidden" : ""}`}
-                          onClick={() => setEditableRowMes(index)}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          className={`btn btn-error ${editableRowMes !== null ? "hidden" : ""} ${
-                            removeMeasurementMutation.isPending ? "loading" : ""
-                          }`}
-                          onClick={() => {
-                            const isConfirmed = window.confirm(
-                              "Are you sure you want to remove this measurement?"
-                            );
-                            if (isConfirmed) {
-                              removeMeasurementMutation.mutate({
-                                measurement_id: values.rows4[index].measurement_id,
-                                is_exist: false,
-                              });
-                            }
-                          }}
-                        
-                        >
-                          <Trash /> Remove
-                        </button>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    )}
+    render={(arrayHelpers) => {
+      // Sort rows by pallete_count
+      const groupedRows = [...values.rows4].sort(
+        (a, b) => Number(a.pallete_count) - Number(b.pallete_count)
+      );
+
+      return (
+        <tbody className="table relative text-center overflow-auto">
+          {groupedRows.map((row, index) => (
+            <tr key={index}>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.pallete_count`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.pallete_count}
+                  readOnly
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.number_of_control`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.number_of_control}
+                  readOnly
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.length`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.length}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.inside_diameter`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.inside_diameter}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.outside_diameter`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.outside_diameter}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.flat_crush`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.flat_crush}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.h20`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.h20}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.radial`}
+                  type="number"
+                  className="input input-bordered w-20 max-w-md"
+                  value={row.radial}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <Field
+                  name={`rows4.${index}.remarks`}
+                  type="text"
+                  className="input input-bordered"
+                  value={row.remarks}
+                  readOnly={editableRowMes !== index}
+                />
+              </td>
+              <td className="border-y border-slate-500">
+                <div className="flex gap-2">
+                  {editableRowMes === index ? (
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-success"
+                        onClick={async () => {
+                          try {
+                            await updateMeasurementMutation.mutateAsync({
+                              ...row,
+                            });
+                            setEditableRowMes(null); // Reset editable row after saving
+                            refetchMeasurentData(); // Refetch data after update
+                          } catch (error) {
+                            console.error("Error in mutation:", error);
+                          }
+                        }}
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => {
+                          if (window.confirm("Are you sure you want to cancel?")) {
+                            setEditableRowMes(null); // Reset the editable state
+                            refetchMeasurentData(); // Refetch measurement data
+                            setIsModalOpen(false);
+                            setTimeout(() => {
+                              setIsModalOpen(true);
+                              setSelectedTab("tab3");
+                            }, 100);
+                          }
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {!editableRowMes && (
+                        <>
+                          <button
+                            type="button"
+                            className={`btn btn-primary ${editableRowMes !== null ? "hidden" : ""}`}
+                            onClick={() => setEditableRowMes(index)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            type="button"
+                            className={`btn btn-error ${editableRowMes !== null ? "hidden" : ""} ${
+                              removeMeasurementMutation.isPending ? "loading" : ""
+                            }`}
+                            onClick={() => {
+                              const isConfirmed = window.confirm(
+                                "Are you sure you want to remove this measurement?"
+                              );
+                              if (isConfirmed) {
+                                removeMeasurementMutation.mutate({
+                                  measurement_id: row.measurement_id,
+                                  is_exist: false,
+                                });
+                              }
+                            }}
+                          >
+                            <Trash /> Remove
+                          </button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      );
+    }}
   />
 )}
+  </div>
+</Form>
 
-
-                                  </table>
-                                </div>
-                              </div>
-                            )}
-                          />
-                        </div>
-                      </Form>
                     )}
                   </Formik>
                 </div>
