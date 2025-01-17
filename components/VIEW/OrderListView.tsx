@@ -237,8 +237,8 @@ useEffect(() => {
   }));
 }, [numberControl]);
 
-console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
-  console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
+// console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
+//   console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
   const initialValuesAssign = {
     user_id: "",
   };
@@ -1737,6 +1737,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
                 } else {
                   alert("Please enter a valid number for the control number.");
                 }
+                setEnablePallete(false)
               }else{
                 alert("Please finish the current pallete before adding a new one.");
               }
@@ -1872,7 +1873,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
   {/* Add Row Button */}{
   values.rowsmeasurement.filter(
     (r) => r.number_of_control === row.number_of_control
-  ).length + 1 <= Number(row.number_of_control) ? (
+  ).length+1 <= Number(row.number_of_control) ? (
     <button
       className="btn btn-success mt-2"
       type="button"
@@ -1882,9 +1883,13 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
           "rowlength:",
           values.rowsmeasurement.filter(
             (r) => r.number_of_control === row.number_of_control
-          ).length + 1
+          ).length + 1 
         ); // Debug
-
+        if(values.rowsmeasurement.filter(
+          (r) => r.number_of_control === row.number_of_control
+        ).length + 1 == Number(row.number_of_control)){
+          setEnablePallete(true)
+        }
         if (row.pallete_count > 0) {
           arrayHelpers.push({
             pallete_count: row.pallete_count,
@@ -1898,9 +1903,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
             remarks: "",
           });
           console.log("number_of_control:", row.number_of_control); // Debug
-          console.log("pallete_count:", row.pallete_count); // Debug
-
-          setEnablePallete(false); // Set to false after adding a row
+          // console.log("pallete_count:", row.pallete_count); // Debug
         } else {
           alert("Pallet count must be greater than 0 to add a row.");
         }
@@ -1908,12 +1911,7 @@ console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].numb
     >
       +
     </button>
-  ) : (
-    (() => {
-      setEnablePallete(true); // Trigger useState in else
-      return null; // Render nothing in the UI
-    })()
-  )
+  ) :null
 }
 
   <button
