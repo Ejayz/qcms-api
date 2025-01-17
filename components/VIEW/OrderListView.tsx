@@ -228,24 +228,15 @@ export default function OrderListView() {
     ],
   });
 
-useEffect(() => {
-  setInitialValuesMeasurement((prev) => ({
-    ...prev,
-    rowsmeasurement: prev.rowsmeasurement.map((row) => ({
-      ...row,
-      number_of_control: numberControl,
-    })),
-  }));
-}, [numberControl]);
-useEffect(() => {
-  setInitialValuesMeasurement((prev) => ({
-    ...prev,
-    rowsmeasurement: prev.rowsmeasurement.map((row) => ({
-      ...row,
-      pallete_count: lastpalleteCount,
-    })),
-  }));
-}, [lastpalleteCount]);
+// useEffect(() => {
+//   setInitialValuesMeasurement((prev) => ({
+//     ...prev,
+//     rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+//       ...row,
+//       pallete_count: lastpalleteCount,
+//     })),
+//   }));
+// }, [lastpalleteCount]);
 
 // console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
 //   console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
@@ -586,6 +577,57 @@ useEffect(() => {
     }
   }, [fetchedMeasurementData]);
   
+  useEffect(() => {
+    if (fetchedMeasurementData?.length > 0) {
+      // If fetchedMeasurementData has data, update rowsmeasurement with numberControl
+      setInitialValuesMeasurement((prev) => ({
+        ...prev,
+        rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+          
+          ...row,
+          number_of_control: 0, // Set to the provided numberControl
+          pallete_count:0
+          
+        })),
+      }));
+    } else {
+      // If fetchedMeasurementData is empty or undefined, set number_of_control to 0
+      setInitialValuesMeasurement((prev) => ({
+        ...prev,
+        rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+          ...row,
+          number_of_control: numberControl, 
+          pallete_count:lastpalleteCount,
+        })),
+      }));
+    }
+  }, [numberControl, lastpalleteCount, fetchedMeasurementData]);
+  
+  useEffect(() => {
+    if (fetchedMeasurementData?.length > 0) {
+      // If fetchedMeasurementData has data, update rowsmeasurement with numberControl
+      setInitialValuesMeasurement((prev) => ({
+        ...prev,
+        rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+          
+          ...row,
+          number_of_control: 0, // Set to the provided numberControl
+          
+        })),
+      }));
+    } else {
+      // If fetchedMeasurementData is empty or undefined, set number_of_control to 0
+      setInitialValuesMeasurement((prev) => ({
+        ...prev,
+        rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+          ...row,
+          number_of_control: numberControl, // Reset to 0
+        })),
+      }));
+    }
+  }, [numberControl, fetchedMeasurementData]);
+
+
   useEffect(() => {
     if (fetchedMeasurementData?.length > 0) {
       // Extract pallete_count values
@@ -1728,6 +1770,8 @@ useEffect(() => {
                       await new Promise((r) => setTimeout(r, 500));
                       alert(JSON.stringify(values, null, 2));
                       console.log(JSON.stringify(values, null, 2));
+                      setLastpalleteCount(0)
+                      setNumberControl(0)
                     }}
                   >
                     {({ values, setFieldValue }) => (
@@ -1750,9 +1794,16 @@ useEffect(() => {
                   0
                 );
                 console.log("Current Max Pallete:", currentMaxPallete); // Debug
-                
-                if(enablepallete ===true){
+                // console.log("number_control val",values.rowsmeasurement.filter(
+                //   (r) => r.number_of_control === row.number_of_control))
+                console.log("Values are: ",values.rowsmeasurement);
+                const hasInvalidRow = values.rowsmeasurement.some(
+                  (row) => row.number_of_control === 0 && row.pallete_count === 0
+                );
+              
+                if (enablepallete === true || hasInvalidRow) {
                 const newControlNumber = prompt("Enter a new control number:");
+                
                 if (newControlNumber && !isNaN(parseInt(newControlNumber, 10))) {
                   arrayHelpers.push({
                     pallete_count: currentMaxPallete + 1, // Incremented pallete_count
@@ -1772,10 +1823,25 @@ useEffect(() => {
               }else{
                 alert("Please finish the current pallete before adding a new one.");
               }
+
+              // const filteredRows = values.rowsmeasurement.filter(
+              //   (row) => !(row.pallete_count === 0 && row.number_of_control === 0)
+              // );
+        
+              // // Update the state with the filtered rows
+              // setInitialValuesMeasurement({
+              //   ...values,
+              //   rowsmeasurement: filteredRows,
+              // });
+        
+              // console.log("Updated rows:", filteredRows);
+              
               }}
+
             >
               Add Pallete
             </button>
+
 
             <button
               className="btn btn-primary"
