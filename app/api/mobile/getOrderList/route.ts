@@ -12,22 +12,29 @@ export async function GET(req: NextRequest) {
   // Base query
   let query = supabase
     .from("tbl_orders_form")
-    .select("* ,tbl_customer(*),tbl_article(*)", { count: "exact" })
+    .select("* ,tbl_article(id,user_id,is_exist,article_max,article_min,article_name,number_control,article_nominal)", { count: "exact" })
     .eq("is_exist", true)
     .or(`order_fabrication_control.ilike.%${search}%`)
 
 
   // Add date filters
-  if (startDate && endDate) {
+
+  console.log(startDate, endDate);
+  if(startDate ){
     const adjustedStartDate = `${startDate}T00:00:00`; // Ensure start of the day
-    const adjustedEndDate = `${endDate}T23:59:59`; // Ensure end of the day
     query = query
       .gte("created_at", adjustedStartDate)
+  }
+
+
+  if ( endDate) {
+    const adjustedEndDate = `${endDate}T23:59:59`; // Ensure end of the day
+    query = query
       .lte("created_at", adjustedEndDate);
   }
 
   const { data, error, count } = await query;
-  console.log(data, error, count);
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   } else {
