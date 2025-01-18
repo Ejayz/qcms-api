@@ -1747,33 +1747,57 @@ export default function OrderListView() {
                   role="tabpanel"
                   className="tab-content bg-base-100 border-base-300 rounded-box p-6"
                 >
-                 <Formik
-                    initialValues={initialValuesMeasurement}
-                    enableReinitialize={true}
-                    onSubmit={async (values) => {
-                      // for (const row of values.rowsmeasurement) {
-                      //   AddMeasurementMutation.mutate({
-                      //     order_id: orderid,
-                      //     length: row.length,
-                      //     inside_diameter: row.inside_diameter,
-                      //     outside_diameter: row.outside_diameter,
-                      //     flat_crush: row.flat_crush,
-                      //     h20: row.h20,
-                      //     radial: row.radial,
-                      //     number_control: row.number_of_control,
-                      //     remarks: row.remarks,
-                      //     pallete_count: row.pallete_count,
-                      //     user_id: userID,
-                      //   });
-                      // }
+                <Formik
+  initialValues={initialValuesMeasurement}
+  enableReinitialize={true}
+  onSubmit={async (values) => {
+    // Check if all rows have 0 or empty values
+    const isAllEmptyOrZero = values.rowsmeasurement.every(
+      (row) =>
+        row.pallete_count === 0 &&
+        row.number_of_control === 0 &&
+        row.length === "" &&
+        row.inside_diameter === "" &&
+        row.outside_diameter === "" &&
+        row.flat_crush === "" &&
+        row.h20 === "" &&
+        row.radial === "" &&
+        row.remarks === ""
+    );
 
-                      await new Promise((r) => setTimeout(r, 500));
-                      alert(JSON.stringify(values, null, 2));
-                      console.log(JSON.stringify(values, null, 2));
-                      setLastpalleteCount(0)
-                      setNumberControl(0)
-                    }}
-                  >
+    if (isAllEmptyOrZero) {
+      alert("Cannot submit: All fields are empty or have a value of 0.");
+      return; // Prevent form submission
+    }
+
+    // Proceed with submission logic if validation passes
+    for (const row of values.rowsmeasurement) {
+      // Assuming AddMeasurementMutation.mutate is your mutation logic
+      AddMeasurementMutation.mutate({
+        order_id: orderid,
+        length: row.length,
+        inside_diameter: row.inside_diameter,
+        outside_diameter: row.outside_diameter,
+        flat_crush: row.flat_crush,
+        h20: row.h20,
+        radial: row.radial,
+        number_control: row.number_of_control,
+        remarks: row.remarks,
+        pallete_count: row.pallete_count,
+        user_id: userID,
+      });
+ await new Promise((r) => setTimeout(r, 500));
+    alert("Submission successful!");
+    console.log(JSON.stringify(values, null, 2));
+    setLastpalleteCount(0);
+    setNumberControl(0);
+    }
+
+   
+  }}
+>
+
+
                     {({ values, setFieldValue }) => (
                    <Form>
   <div className="">
