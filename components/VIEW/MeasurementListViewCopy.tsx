@@ -135,7 +135,7 @@ console.log("orders data  ",measurementsData);
         }}
       >
         {({ values, setFieldValue }) => (
-          
+          console.log(values.rows),
           <Form>
             <div className="">
               <FieldArray
