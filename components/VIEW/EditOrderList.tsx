@@ -46,7 +46,7 @@ export default function AddOrderList(params:any) {
       const user = userData[0]; // Get the first user object
       setInitialValues((prev) => ({
         ...prev,
-        Id: user.id || "",
+        Id: user.order_fabrication_control || "",
         product_name: user.product_name || "",
         CustomerName: user.customer_id || "",
         ArticleName: user.article_id || "",

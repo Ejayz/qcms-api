@@ -21,8 +21,7 @@ export async function PUT(req: NextRequest) {
       
     } =
       await req.json();
-
-    // Initialize Supabase client
+    console.log("the ID",id)    // Initialize Supabase client
     const supabase = await createClient();
 
     // Verify user role

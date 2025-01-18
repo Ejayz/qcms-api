@@ -90,6 +90,7 @@ export default function OrderListView() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userID, setUserID] = useState<string | null>(null);
   const [orderid, setOrderid] = useState<string | null>(null);
+  const [orderformdisplay, setOrderformdisplay] = useState<string | null>(null);
   const [asssing_id, setAssign_id] = useState<string | null>(null);
   const [editableRowProd, setEditableRowProd] = useState<number | null>(null);
   const [editableRowProof, setEditableRowProof] = useState<number | null>(null);
@@ -967,10 +968,11 @@ export default function OrderListView() {
                     onClick={() => {
                       setIsModalOpen(true);
                       setOrderid(order.id);
+                      setOrderformdisplay(order.order_fabrication_control);
                       setNumberControl(order.tbl_article.number_control);
                     }}
                   >
-                    {order.id}
+                    {order.order_fabrication_control}
                   </td>
                   <td>{order.product_name}</td>
                   <td className="text-xs">{order.tbl_customer.company_name}</td>
@@ -1156,7 +1158,7 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 readOnly
-                                                value={orderid}
+                                                value={orderformdisplay}
                                                 name={`rows.${index}.production_order_form_id`}
                                                 type="number"
                                                 className="input input-bordered"
@@ -1208,7 +1210,7 @@ export default function OrderListView() {
                                             </td>
                                             <td>
                                               <button
-                                                className="btn btn-danger"
+                                                className="btn btn-error"
                                                 type="button"
                                                 onClick={() =>
                                                   arrayHelpers.remove(index)
@@ -1242,6 +1244,7 @@ export default function OrderListView() {
             <Field
               name={`rows2.${index}.production_order_form_id`}
               type="text"
+              value={orderformdisplay}
               className="input input-bordered"
               readOnly
             />
@@ -1482,7 +1485,7 @@ export default function OrderListView() {
                                             <td>
                                               <Field
                                                 readOnly
-                                                value={orderid}
+                                                value={orderformdisplay}
                                                 name={`rowsproofing.${index}.proofing_order_form_id`}
                                                 type="number"
                                                 className="input input-bordered"
@@ -1548,7 +1551,7 @@ export default function OrderListView() {
                                             </td>
                                             <td>
                                               <button
-                                                className="btn btn-danger"
+                                                className="btn btn-error"
                                                 type="button"
                                                 onClick={() =>
                                                   arrayHelpers.remove(index)
@@ -1579,6 +1582,7 @@ export default function OrderListView() {
               <Field
                 name={`rows3.${index}.proofing_order_form_id`}
                 type="text"
+                value={orderformdisplay}
                 className="input input-bordered"
                 readOnly
               />
@@ -1755,14 +1759,7 @@ export default function OrderListView() {
     const isAllEmptyOrZero = values.rowsmeasurement.every(
       (row) =>
         row.pallete_count === 0 &&
-        row.number_of_control === 0 &&
-        row.length === "" &&
-        row.inside_diameter === "" &&
-        row.outside_diameter === "" &&
-        row.flat_crush === "" &&
-        row.h20 === "" &&
-        row.radial === "" &&
-        row.remarks === ""
+        row.number_of_control === 0
     );
 
     if (isAllEmptyOrZero) {
@@ -1774,20 +1771,19 @@ export default function OrderListView() {
     for (const row of values.rowsmeasurement) {
       // Assuming AddMeasurementMutation.mutate is your mutation logic
       AddMeasurementMutation.mutate({
-        order_id: orderid,
-        length: row.length,
-        inside_diameter: row.inside_diameter,
-        outside_diameter: row.outside_diameter,
-        flat_crush: row.flat_crush,
-        h20: row.h20,
-        radial: row.radial,
-        number_control: row.number_of_control,
-        remarks: row.remarks,
-        pallete_count: row.pallete_count,
-        user_id: userID,
-      });
- await new Promise((r) => setTimeout(r, 500));
-    alert("Submission successful!");
+            order_id: orderid,
+            length: row.length,
+            inside_diameter: row.inside_diameter,
+            outside_diameter: row.outside_diameter,
+            flat_crush: row.flat_crush,
+            h20: row.h20,
+            radial: row.radial,
+            number_control: row.number_of_control,
+            remarks: row.remarks,
+            pallete_count: row.pallete_count,
+            user_id: userID,
+          });
+    // alert("Submission successful!");
     console.log(JSON.stringify(values, null, 2));
     setLastpalleteCount(0);
     setNumberControl(0);
@@ -1796,7 +1792,6 @@ export default function OrderListView() {
    
   }}
 >
-
 
                     {({ values, setFieldValue }) => (
                    <Form>
@@ -2171,13 +2166,21 @@ export default function OrderListView() {
                         onClick={async () => {
                           try {
                             await updateMeasurementMutation.mutateAsync({
-                              ...row,
+                              ...row
+                              
                             });
                             setEditableRowMes(null); // Reset editable row after saving
                             refetchMeasurentData(); // Refetch data after update
+                                 
                           } catch (error) {
                             console.error("Error in mutation:", error);
                           }
+                          setIsModalOpen(false);
+                          setTimeout(() => {
+                            setIsModalOpen(true);
+                            setSelectedTab("tab3");
+                          }, 100);
+
                         }}
                       >
                         Save
@@ -2207,7 +2210,12 @@ export default function OrderListView() {
                           <button
                             type="button"
                             className={`btn btn-primary ${editableRowMes !== null ? "hidden" : ""}`}
-                            onClick={() => setEditableRowMes(index)}
+                            onClick={() => {
+                              setEditableRowMes(index); 
+                              console.log("the id is:",row.measurement_id);
+                            }}
+                             
+                            
                           >
                             Edit
                           </button>
