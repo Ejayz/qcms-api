@@ -46,13 +46,13 @@ export async function POST(req: NextRequest) {
   .insert([
     {
       // Do not include `id` in the payload
-      order_form_id: order_id || null,
-      length: length || null,
-      inside_diameter: inside_diameter || null,
-      outside_diameter: outside_diameter || null,
-      flat_crush: flat_crush || null,
-      h20: h20 || null,
-      radial: radial || null,
+      order_form_id: order_id || 0,
+      length: length || 0,
+      inside_diameter: inside_diameter || 0,
+      outside_diameter: outside_diameter || 0,
+      flat_crush: flat_crush || 0,
+      h20: h20 || 0,
+      radial: radial || 0,
       number_control: control_number || null,
       pallete_count: pallete_count,
       remarks: remarks || null,
