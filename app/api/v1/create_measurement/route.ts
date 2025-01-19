@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
       user_id,
     } = data;
 
-   
+    console.log("Data gathered:", data[1]);
 
     // Create Supabase client
     const supabase = await createClient();

@@ -519,12 +519,13 @@ export default function OrderListView() {
   //measurement
   const AddMeasurementMutation = useMutation({
     mutationFn: async (data: any) => {
+      // alert("Data to be added: " + JSON.stringify(data, null, 2));
       const response = await fetch("/api/v1/create_measurement", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       });
       return response.json();
     },
@@ -1770,26 +1771,52 @@ export default function OrderListView() {
     const pallete_number=values.rowsmeasurement[0].pallete_count;
     const control_number=values.rowsmeasurement[0].number_of_control;
     // Proceed with submission logic if validation passes
-    for (const row of values.rowsmeasurement) {
-      // Assuming AddMeasurementMutation.mutate is your mutation logic
-      AddMeasurementMutation.mutate({
-            order_id: orderid,
-            length: row.length,
-            inside_diameter: row.inside_diameter,
-            outside_diameter: row.outside_diameter,
-            flat_crush: row.flat_crush,
-            h20: row.h20,
-            radial: row.radial,
-            number_control: control_number,
-            remarks: row.remarks,
-            pallete_count: pallete_number,
-            user_id: userID,
-          });
-    // alert("Submission successful!");
-    console.log(JSON.stringify(values, null, 2));
-    setLastpalleteCount(0);
+    // for (const row of values.rowsmeasurement) {
+    //   // Assuming AddMeasurementMutation.mutate is your mutation logic
+    //   AddMeasurementMutation.mutate({
+    //         order_id: orderid,
+    //         length: row.length,
+    //         inside_diameter: row.inside_diameter,
+    //         outside_diameter: row.outside_diameter,
+    //         flat_crush: row.flat_crush,
+    //         h20: row.h20,
+    //         radial: row.radial,
+    //         number_control: control_number,
+    //         remarks: row.remarks,
+    //         pallete_count: pallete_number,
+    //         user_id: userID,
+    //       });
+    // // alert("Submission successful!");
+    // console.log(JSON.stringify(values, null, 2));
+    // setLastpalleteCount(0);
+    // setNumberControl(0);
+    // }
+    (async () => {
+      for (const row of values.rowsmeasurement) {
+        const measurementData = {
+          order_id: orderid,
+          length: row.length,
+          inside_diameter: row.inside_diameter,
+          outside_diameter: row.outside_diameter,
+          flat_crush: row.flat_crush,
+          h20: row.h20,
+          radial: row.radial,
+          number_control: control_number,
+          remarks: row.remarks,
+          pallete_count: pallete_number,
+          user_id: userID,
+        };
+      setLastpalleteCount(0);
     setNumberControl(0);
-    }
+        // Log for debugging
+        // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
+        console.log("Inserting data:", measurementData);
+    
+        // Wait for mutation to complete before moving to the next
+        await AddMeasurementMutation.mutateAsync(measurementData);
+      }
+    })();
+    
 
    
   }}
@@ -1798,7 +1825,7 @@ export default function OrderListView() {
                     {({ values, setFieldValue }) => (
                    <Form>
   <div className="">
-    <FieldArray 
+  <FieldArray 
       name="rowsmeasurement"
       render={(arrayHelpers) => (
 
@@ -2077,15 +2104,10 @@ console.log("values:", values.rowsmeasurement.length); // Debug
 ) : (
   <FieldArray
     name="rows4"
-    render={(arrayHelpers) => {
-      // Sort rows by pallete_count
-      const groupedRows = [...values.rows4].sort(
-        (a, b) => Number(a.pallete_count) - Number(b.pallete_count)
-      );
-
-      return (
+    render={(arrayHelpers) => (
+      
         <tbody className="table relative text-center overflow-auto">
-          {groupedRows.map((row, index) => (
+          {values.rows4.map((row, index) => (
             <tr key={index}>
               <td className="border-y border-slate-500">
                 <Field
@@ -2259,8 +2281,8 @@ console.log("values:", values.rowsmeasurement.length); // Debug
             </tr>
           ))}
         </tbody>
-      );
-    }}
+      
+)}
   />
 )}
   </div>
