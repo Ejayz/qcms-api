@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     .from("tbl_production")
     .select()
     .eq("order_form_id", id)
-    .eq("is_exist", true);
+    .eq("is_exist", true).order("created_at", { ascending: false });
     
 
   if (error) {
