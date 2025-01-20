@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
     .from("tbl_order_form")
     .select("*")
     .eq("order_id", order_id)
-    .eq("is_exist", true);
+    .eq("is_exist", true).order("created_at", { ascending: false });
 
   if (error) {
     return NextResponse.json({ code: 500, error: error.message }, { status: 500 });
