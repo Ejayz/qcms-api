@@ -5,7 +5,7 @@ import { Formik, Form, FieldArray, Field, ErrorMessage } from "formik";
 import { Eye, Pencil, Search, Slice, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, use } from "react";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormSelect } from "../UI/FormInput";
@@ -101,9 +101,13 @@ export default function OrderListView() {
   const [selectedTab, setSelectedTab] = useState('tab1'); 
   const [filterPalleteCount, setFilterPalleteCount] = useState(1); 
   const [enablepallete, setEnablePallete] = useState(false);
+  const [enableplus, setenableplus] = useState(true);
   const [lastpalleteCount, setLastpalleteCount] = useState<number | 1>(1);
 
   console.log("current enablepallete: ", enablepallete);
+
+
+
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -210,6 +214,7 @@ export default function OrderListView() {
         h20: "",
         radial: "",
         remarks: "",
+        isnew: false, // Added isnew property
       },
     ],
     rows4: [
@@ -644,12 +649,13 @@ export default function OrderListView() {
       console.log("All Pallete Counts:", palleteCounts);
       console.log("Highest Pallete Count:", maxPalleteCount);
       setLastpalleteCount(maxPalleteCount);
+      setEnablePallete(true);
     }
     else{
       setLastpalleteCount(1)
+      setEnablePallete(false);
     }
   }, [fetchedMeasurementData]); // Add fetchedMeasurementData as a dependency
-
 
   const updateMeasurementMutation = useMutation({
     mutationFn: async (updatedData: any) => {
@@ -1768,30 +1774,9 @@ export default function OrderListView() {
       alert("Cannot submit: All fields are empty or have a value of 0.");
       return; // Prevent form submission
     }
-    const pallete_number=values.rowsmeasurement[0].pallete_count;
-    const control_number=values.rowsmeasurement[0].number_of_control;
-    // Proceed with submission logic if validation passes
-    // for (const row of values.rowsmeasurement) {
-    //   // Assuming AddMeasurementMutation.mutate is your mutation logic
-    //   AddMeasurementMutation.mutate({
-    //         order_id: orderid,
-    //         length: row.length,
-    //         inside_diameter: row.inside_diameter,
-    //         outside_diameter: row.outside_diameter,
-    //         flat_crush: row.flat_crush,
-    //         h20: row.h20,
-    //         radial: row.radial,
-    //         number_control: control_number,
-    //         remarks: row.remarks,
-    //         pallete_count: pallete_number,
-    //         user_id: userID,
-    //       });
-    // // alert("Submission successful!");
-    // console.log(JSON.stringify(values, null, 2));
-    // setLastpalleteCount(0);
-    // setNumberControl(0);
-    // }
-    (async () => {
+    // const pallete_number=values.rowsmeasurement[0].pallete_count;
+    // const control_number=values.rowsmeasurement[0].number_of_control;
+       (async () => {
       for (const row of values.rowsmeasurement) {
         const measurementData = {
           order_id: orderid,
@@ -1801,9 +1786,9 @@ export default function OrderListView() {
           flat_crush: row.flat_crush,
           h20: row.h20,
           radial: row.radial,
-          number_control: control_number,
+          number_control: row.number_of_control,
           remarks: row.remarks,
-          pallete_count: pallete_number,
+          pallete_count: row.pallete_count,
           user_id: userID,
         };
       setLastpalleteCount(0);
@@ -1816,7 +1801,7 @@ export default function OrderListView() {
         await AddMeasurementMutation.mutateAsync(measurementData);
       }
     })();
-    
+    // console.log("Values are: ",values.rowsmeasurement);
 
    
   }}
@@ -1872,6 +1857,7 @@ export default function OrderListView() {
         arrayHelpers.remove(index); // Trigger the "Remove" button functionality
       }
     });
+                setenableplus(true);
                   arrayHelpers.push({
                     pallete_count: currentMaxPallete + 1, // Incremented pallete_count
                     number_of_control: parseInt(newControlNumber, 10), // User input
@@ -1882,11 +1868,13 @@ export default function OrderListView() {
                     h20: "",
                     radial: "",
                     remarks: "",
+                    isNew:false,
                   });
                 } else {
                   alert("Please enter a valid number for the control number.");
                 }
                 setEnablePallete(true)
+              
               }else{
                 alert("Please finish the current pallete before adding a new one.");
               }
@@ -1945,7 +1933,9 @@ export default function OrderListView() {
                           placeholder={` ${row.number_of_control==0?"":""}`}
                           type="number"
                           readOnly
-                          className={`input bg-white input-bordered w-20 max-w-md`}
+                          className={`input input-bordered w-20 max-w-md ${
+                            values.rowsmeasurement[index]?.isnew ? "text-white" : "bg-white"
+                          }`}
                           onChange={(e: any) => {
                             const newPalleteCount = parseInt(e.target.value, 10);
                             setFieldValue(`rowsmeasurement.${index}.pallete_count`, newPalleteCount);
@@ -1959,7 +1949,9 @@ export default function OrderListView() {
                           type="number"
                           placeholder={`${row.number_of_control==0?"":""}`}
                           readOnly
-                          className={`input bg-white input-bordered w-20 max-w-md `}
+                          className={`input input-bordered w-20 max-w-md ${
+                            values.rowsmeasurement[index]?.isnew ? "text-white" : "bg-white"
+                          }`}
                           onChange={(e: any) => {
                             const newControlNumber = parseInt(e.target.value, 10);
                             setFieldValue(`rowsmeasurement.${index}.number_of_control`, newControlNumber);
@@ -2024,37 +2016,24 @@ export default function OrderListView() {
                         />
                       </td>
                       <td>
-  {/* Add Row Button */}{
+  {/* Add Row Button */}
+  {
   values.rowsmeasurement.filter(
     (r) => r.number_of_control === row.number_of_control
-  ).length+1 <= Number(row.number_of_control) ? (
+  ).length < Number(row.number_of_control) ? (
     <button
-      className={`btn btn-success mt-2 ${enablepallete?"":"hidden"} `}
+      className={`btn btn-success mt-2`}
       type="button"
       onClick={() => {
-        // Check if "Add Row" should be allowed
-        // console.log(
-        //   "rowlength:",
-        //   values.rowsmeasurement.filter(
-        //     (r) => r.number_of_control === row.number_of_control
-        //   ).length + 1 
-        // ); // Debug
+        const existingRows = values.rowsmeasurement.filter(
+          (r) => r.number_of_control === row.number_of_control
+        );
 
-console.log("row:", row.number_of_control); // Debug
-console.log("values:", values.rowsmeasurement.length); // Debug
-        if(values.rowsmeasurement.length >= row.number_of_control-1){
-          setEnablePallete(false)
-        }else{
-          setEnablePallete(true)
-       
-        }
-        console.log(row.number_of_control);
-
-      
-        if (row.number_of_control > values.rowsmeasurement.length) {
+        // Check if more rows can be added for the current control
+        if (existingRows.length < Number(row.number_of_control)) {
           arrayHelpers.push({
-            pallete_count: "",
-            number_of_control:"", // Keep the same control number
+            pallete_count: row.pallete_count,
+            number_of_control: row.number_of_control, // Use same control number
             length: "",
             inside_diameter: "",
             outside_diameter: "",
@@ -2062,21 +2041,22 @@ console.log("values:", values.rowsmeasurement.length); // Debug
             h20: "",
             radial: "",
             remarks: "",
+            isnew: true, // Mark as new row
           });
-         
-          // console.log("pallete_count:", row.pallete_count); // Debug
+          setEnablePallete(true); // Optionally handle any UI updates
         } else {
-          alert("Pallet count must be greater than 0 to add a row.");
+          alert("You have reached the maximum rows for this control.");
         }
 
-      
-        console.log("number_of_control:", row.number_of_control); // Debug
+        console.log("Current rows length:", existingRows.length); // Debugging
+        console.log("Number of control:", row.number_of_control); // Debugging
       }}
     >
       +
     </button>
-  ) :null
+  ) : null
 }
+
 
   <button
     type="button"
