@@ -57,7 +57,7 @@ console.log("artcle data",data)
               type="text"
               ref={searchInput}
               className="grow w-full"
-              placeholder="Search Customer Name"
+              placeholder="Search Product Name"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   setSearch(searchInput.current?.value || "");
