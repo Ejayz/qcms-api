@@ -13,9 +13,7 @@ export default {
         foreground: "var(--foreground)",
       },
     },
-  },
-  plugins: [require("daisyui")],
-  daisyui: {
+  },daisyui: {
     themes: [
       {
         light: {
@@ -29,4 +27,6 @@ export default {
       },
     ],
   },
+  plugins: [require("daisyui")],
+  
 } satisfies Config;
