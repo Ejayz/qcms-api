@@ -52,12 +52,14 @@ console.log("artcle data",data)
       </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
         <div className="w-full flex flex-row  justify-between items-center">
+          <div className="items-center">
+            <span className="text-lg font-semibold">Search Product Name, Customer Name, and Article Nominal</span>
           <label className="input pr-0 input-bordered flex flex-row justify-center items-center">
             <input
               type="text"
               ref={searchInput}
               className="grow w-full"
-              placeholder="Search Product Name"
+              placeholder="Search Product Name, Customer Name, and Article Nominal"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   setSearch(searchInput.current?.value || "");
@@ -68,6 +70,7 @@ console.log("artcle data",data)
 
             />
             <button
+          
               onClick={() => {
                 setSearch(searchInput.current?.value || "");
                 setPage(1);
@@ -77,7 +80,7 @@ console.log("artcle data",data)
               <Search color="#000000" /> Search
             </button>
           </label>
-
+              </div>
           <Link
             href="/dashboard/addarticle"
             className="btn btn-primary text-black"
@@ -118,7 +121,7 @@ console.log("artcle data",data)
                   {/* <th>{index + 1}</th> */}
                   {/* <td className="text-xs">{get_users.id}</td> */}
                   <td>{get_users.article_name}</td>
-                  <td>{get_users.customer_id}</td>
+                  <td>{get_users.tbl_customer.company_name}</td>
                   <td>{get_users.article_nominal}</td>
                   <td>{`${get_users.article_min}`}</td>
                   <td>{get_users.article_max}</td>
