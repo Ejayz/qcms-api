@@ -2284,7 +2284,7 @@ export default function OrderListView() {
                                     <thead className="text-black text-sm">
                                       <tr>
                                         <th>Pallete</th>
-                                        <th>Number Of Control</th>
+                                        <th className="hidden">Number Of Control</th>
                                         <th>Length</th>
                                         <th>Inside Diameter</th>
                                         <th>Outside Diameter</th>
@@ -2343,16 +2343,7 @@ export default function OrderListView() {
                                                       : row.number_of_control.toString()
                                                   } // Fixes the placeholder issue
                                                   readOnly
-                                                  className={`input input-bordered w-20 max-w-md ${
-                                                    values.rowsmeasurement[
-                                                      index
-                                                    ]?.isnew ||
-                                                    values.rowsmeasurement[
-                                                      index
-                                                    ]?.iswhiteAll
-                                                      ? "text-white hidden"
-                                                      : "bg-white"
-                                                  }`}
+                                                  className="hidden"
                                                   onChange={(e: any) => {
                                                     const newControlNumber =
                                                       parseInt(
@@ -2627,15 +2618,15 @@ export default function OrderListView() {
                                           readOnly
                                         />
                                       </td>
-                                      <td className="border-y border-slate-500">
+                                      {/* <td className="">
+                                        
                                         <Field
                                           name={`rows4.${index}.number_of_control`}
                                           type="number"
-                                          className="input input-bordered w-20 max-w-md border-white text-white bg-white"
+                                          className="input input-bordered w-20 max-w-md hidden"
                                           value={row.number_of_control}
-                                          readOnly
                                         />
-                                      </td>
+                                      </td> */}
                                       <td className="border-y border-slate-500">
                                         <Field
                                           name={`rows4.${index}.length`}
