@@ -5,7 +5,6 @@ export async function GET(req: NextRequest) {
   const page = parseInt(req.nextUrl.searchParams.get("page") || "0", 10);
   const limit = parseInt(req.nextUrl.searchParams.get("limit") || "10", 10);
   const search = req.nextUrl.searchParams.get("search");
-  
   const startDate = req.nextUrl.searchParams.get("startDate");
   const endDate = req.nextUrl.searchParams.get("endDate");
   const order = req.nextUrl.searchParams.get("order");
@@ -45,8 +44,8 @@ export async function GET(req: NextRequest) {
     const adjustedStartDate = `${startDate}T00:00:00`; // Ensure start of the day
     const adjustedEndDate = `${endDate}T23:59:59`; // Ensure end of the day
     query = query
-      .gte("created_at", adjustedStartDate)
-      .lte("created_at", adjustedEndDate);
+      .gte("entry_date_time", adjustedStartDate)
+      .lte("exit_date_time", adjustedEndDate);
   }
 
   const { data, error, count } = await query;

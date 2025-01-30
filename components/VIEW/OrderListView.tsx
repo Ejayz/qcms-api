@@ -1023,7 +1023,7 @@ export default function OrderListView() {
                     {order.order_fabrication_control}
                   </td>
                   <td>{order.product_name}</td>
-                  <td className="text-xs">{order.tbl_customer.company_name}</td>
+                  <td className="text-xs">{order.tbl_customer?.company_name}</td>
                   <td>{order.tbl_article.article_name}</td>
                   <td>{order.pallete_count}</td>
                   {/* <td>
