@@ -11,32 +11,30 @@ export default function UserListView() {
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
 
-  const { data, isFetching, isLoading, isError } = useQuery({
+  const { data, refetch, isFetching, isLoading, isError } = useQuery({
     queryKey: ["get_article", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_article?page=${page}&search=${encodeURIComponent(
-          search
-        )}&limit=${limit}`,
+        `/api/v1/get_article?page=${page}&search=${encodeURIComponent(search)}&limit=${limit}`,
         {
           method: "GET",
           headers: {
-            Accept: "*/*",
-            "User-Agent": "Thunder Client (https://www.thunderclient.com)",
+            Accept: "application/json",
           },
-          redirect: "follow",
         }
       );
+  
       const result = await response.json();
-
+  
       if (response.ok) {
         return result;
       } else {
-        throw new Error("Something went wrong while fetching site list.");
+        throw new Error(result.error || "Something went wrong while fetching.");
       }
     },
     retry: 1,
   });
+  
 console.log("artcle data",data)
   return (
     <div className="overflow-x-auto mt-4 w-11/12 mx-auto text-black">
@@ -52,23 +50,21 @@ console.log("artcle data",data)
       </div>
       <div className="w-11/12 flex flex-col mx-auto gap-y-12 h-full">
         <div className="w-full flex flex-row  justify-between items-center">
-          <div className="items-center">
-            <span className="text-lg font-semibold">Search Product Name, Customer Name, and Article Nominal</span>
+          <div className="items-center w-3/5">
           <label className="input pr-0 input-bordered flex flex-row justify-center items-center">
-            <input
-              type="text"
-              ref={searchInput}
-              className="grow w-full"
-              placeholder="Search Product Name, Customer Name, and Article Nominal"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  setSearch(searchInput.current?.value || "");
-                  setPage(1);
-                }
-              }
-              }
+          <input
+  type="text"
+  ref={searchInput}
+  className="grow w-full"
+  placeholder="Search Product Name or Customer Name"
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      setSearch(searchInput.current?.value.trim() || "");
+      setPage(1);
+    }
+  }}
+/>
 
-            />
             <button
           
               onClick={() => {
@@ -81,6 +77,16 @@ console.log("artcle data",data)
             </button>
           </label>
               </div>
+              <button className="btn btn-info"
+              onClick={() => {
+                if (searchInput.current) {
+                  searchInput.current.value = "";
+                }
+                setSearch("");
+                setPage(1);
+                refetch();
+              }}
+              >Refresh</button>
           <Link
             href="/dashboard/addarticle"
             className="btn btn-primary text-black"
@@ -114,14 +120,12 @@ console.log("artcle data",data)
                   Something went wrong while fetching site list.
                 </td>
               </tr>
-            ) : data?.data?.length > 0 ? (
+            ) : data.data?.length > 0 ? (
               data.data.map((get_users: any, index: any) => (
                 
                 <tr key={index}>
-                  {/* <th>{index + 1}</th> */}
-                  {/* <td className="text-xs">{get_users.id}</td> */}
                   <td>{get_users.article_name}</td>
-                  <td>{get_users.tbl_customer?.company_name || "No Customer"}</td>
+                  <td>{get_users.tbl_customer?.company_name || "N/A"}</td>
 
                   <td>{get_users.article_nominal}</td>
                   <td>{get_users.article_min}</td>

@@ -41,6 +41,11 @@ export async function POST(req: NextRequest) {
 
     console.log("Insert Result:", insertResult);
 
+    const { data: updateResult, error: updateError } = await supabase
+      .from("tbl_orders_form")
+      .update({ entry_date_time, exit_date_time })
+      .eq("id", order_form_id);
+
     // Return success response
     return NextResponse.json(
       { message: "Data inserted successfully", data: insertResult },

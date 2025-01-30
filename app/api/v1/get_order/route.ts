@@ -5,6 +5,7 @@ export async function GET(req: NextRequest) {
   const page = parseInt(req.nextUrl.searchParams.get("page") || "0", 10);
   const limit = parseInt(req.nextUrl.searchParams.get("limit") || "10", 10);
   const search = req.nextUrl.searchParams.get("search");
+  
   const startDate = req.nextUrl.searchParams.get("startDate");
   const endDate = req.nextUrl.searchParams.get("endDate");
   const order = req.nextUrl.searchParams.get("order");

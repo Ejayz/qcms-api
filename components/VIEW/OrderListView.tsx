@@ -24,6 +24,7 @@ export default function OrderListView() {
   const [sort_by, setSort_by] = useState("Sort By");
   const {
     data: ordersData,
+    refetch: refetchOrdersData,
     isFetching,
     isLoading,
     isError,
@@ -104,6 +105,10 @@ export default function OrderListView() {
   const [enableplus, setenableplus] = useState(true);
   const [lastpalleteCount, setLastpalleteCount] = useState<number | 1>(1);
   const [tractnumbercontrollenght, setTractnumbercontrollenght] = useState<number | 0>(0);
+  const [isbuttonhide, setisbuttonhide] = useState<boolean>(false);
+  const [isfieldhide, setisfieldhide] = useState<boolean>(false);
+  const [isfieldhideproof, setisfieldhideproof] = useState<boolean>(false);
+  
 
   console.log("current enablepallete: ", enablepallete);
 
@@ -323,6 +328,8 @@ export default function OrderListView() {
   useEffect(() => {
     if (fetchedProductionData?.length > 0) {
       const productionData = fetchedProductionData[0];
+      setisbuttonhide(false);
+      setisfieldhide(true);
       //setEditproductionID(productionData.id);
       setInitialValues((prev) => ({
         ...prev,
@@ -331,12 +338,28 @@ export default function OrderListView() {
           production_order_form_id: data.order_form_id,
           production_entry_date_time: data.entry_date_time,
           production_exit_date_time: data.exit_date_time,
+          
         })),
+      }));
+    }else{
+      setisbuttonhide(true);
+      setisfieldhide(false);
+      setInitialValues((prev) => ({
+        ...prev,
+        rows2: [
+          {
+            production_id: "",
+            production_order_form_id: "",
+            production_entry_date_time: "",
+            production_exit_date_time: "",
+            ishidefield:false,
+          },
+        ],
       }));
     }
   }, [fetchedProductionData, refetchProductionData]);
   // console.log("fetchedProductionData", fetchedProductionData?.length);
-
+  
   const updateProductionMutation = useMutation({
     mutationFn: async (updatedData: any) => {
       const response = await fetch(
@@ -440,7 +463,9 @@ export default function OrderListView() {
     if (fetchedProofingData?.length > 0) {
       const proofingData = fetchedProofingData[0];
       //setEditproductionID(proofingData.id);
+      setisfieldhideproof(true);
       setInitialValuesProofing((prev) => ({
+        
         ...prev,
         rows3: fetchedProofingData.map((data: any) => ({
           proofing_id: data.id,
@@ -452,6 +477,23 @@ export default function OrderListView() {
         })),
       }));
     }
+    else{
+      setisfieldhideproof(false);
+      setInitialValuesProofing((prev) => ({
+        ...prev,
+        rows3: [
+          {
+            proofing_id: "",
+            proofing_order_form_id: "",
+            proofing_entry_date_time: "",
+            proofing_exit_date_time: "",
+            proofing_num_pallete: "",
+            proofing_program_name: "",
+          },
+        ],
+      }));
+    }
+
   }, [fetchedProofingData]);
   // console.log("fetchedProofingData", fetchedProofingData?.length);
 
@@ -965,8 +1007,8 @@ export default function OrderListView() {
                   Something went wrong while fetching orders list.
                 </td>
               </tr>
-            ) : ordersWithCustomerNames.length > 0 ? (
-              ordersWithCustomerNames?.map((order: any, index: number) => (
+            ) : ordersWithCustomerNames?.length > 0 ? (
+              ordersWithCustomerNames.map((order: any, index: number) => (
                 <tr key={index}>
                   <td
                     className="text-xs hover:text-orange-500 hover:cursor-pointer"
@@ -990,26 +1032,15 @@ export default function OrderListView() {
                     )}
                   </td> */}
                   <td>
-  {order.tbl_production
-    .filter((production: any) => production.order_form_id === order.id)
-    .map((production:any, index:any) => (
-      <div key={index}>
-        {production.entry_date_time
-          ? DateTime.fromISO(production.entry_date_time).toFormat("dd/MM/yy hh:mm a")
-          : "No Data"}
-      </div>
-    ))}
+                  {order.entry_date_time
+  ? DateTime.fromISO(order.entry_date_time).toFormat("dd/MM/yy hh:mm a")
+  : "Don't Have Production"}
+
 </td>
 <td>
-  {order.tbl_production
-    .filter((production: any) => production.order_form_id === order.id)
-    .map((production:any, index:any) => (
-      <div key={index}>
-        {production.entry_date_time
-          ? DateTime.fromISO(production.entry_date_time).toFormat("dd/MM/yy hh:mm a")
-          : "No Data"}
-      </div>
-    ))}
+{order.exit_date_time
+  ? DateTime.fromISO(order.exit_date_time).toFormat("dd/MM/yy hh:mm a")
+  : "Don't Have Production"}
 </td>
 
 
@@ -1135,42 +1166,49 @@ export default function OrderListView() {
                               name="rows"
                               render={(arrayHelpers) => (
                                 <div>
-                                  <div className="flex place-content-end gap-3">
-                                    <button
-                                      className="btn btn-info"
-                                      type="button"
-                                      onClick={() =>
-                                        arrayHelpers.push({
-                                          production_order_form_id: "",
-                                          production_entry_date_time: "",
-                                          production_exit_date_time: "",
-                                        })
+
+                                <div className="flex place-content-end gap-3">
+                                                                       {fetchedProductionData?.length === 0 ? (
+                                                                        <>
+                                                                        {/* <button
+                                        className={`btn btn-info ${isbuttonhide===false ? "hidden" : "bg-white"}`}
+                                        type="button"
+                                        onClick={() => {
+                                          setisbuttonhide(true);
+                                          arrayHelpers.push({
+                                            production_order_form_id: "",
+                                            production_entry_date_time: "",
+                                            production_exit_date_time: "",
+                                          });
+
+                                        } 
                                       }
-                                    >
-                                      Add Production
-                                    </button>
-                                    <button
-                                      className="btn btn-primary"
-                                      type="submit"
-                                      // onClick={() => setSubmitContext('rows')}
-                                    >
-                                      Save Production
-                                    </button>
-                                    <button
-                                      className="btn btn-accent"
-                                      onClick={() => {
-                                        setTractnumbercontrollenght(0);
-                                        setEditableRowProd(null);
-                                        setIsModalOpen(false);
-                                        setOrderid(null);
-                                        refetchMeasurentData();
-                                        refetchProductionData();
-                                        refetchProofingData();
-                                      }}
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
+                                      >
+                                        Add Production
+                                      </button> */}
+                                      <button
+                                        className="btn btn-primary"
+                                        type="submit"
+                                      >
+                                          Save Production
+                                        </button></>
+                                  ):null}
+                                  <button
+                                    className="btn btn-accent"
+                                    onClick={() => {
+                                      refetchOrdersData();
+                                      setEditableRowProd(null);
+                                      setIsModalOpen(false);
+                                      setOrderid(null);
+                                      refetchMeasurentData();
+                                      refetchProductionData();
+                                      refetchProofingData();
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                    
                                   <div className="text-black overflow-auto">
                                     <table className="table relative text-center overflow-auto">
                                       <thead className="text-black text-sm">
@@ -1194,25 +1232,29 @@ export default function OrderListView() {
                                                   value={orderformdisplay}
                                                   name={`rows.${index}.production_order_form_id`}
                                                   type="number"
-                                                  className="input input-bordered"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                  isfieldhide
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
                                                 />
                                               </td>
                                               <td>
-                                                <Field
-                                                  name={`rows.${index}.production_entry_date_time`}
-                                                  type="datetime-local"
-                                                  className={`input input-bordered ${
-                                                    typeof errors.rows?.[
-                                                      index
-                                                    ] === "object" &&
-                                                    errors.rows?.[index]
-                                                      ?.production_entry_date_time &&
-                                                    touched.rows?.[index]
-                                                      ?.production_entry_date_time
-                                                      ? "border-red-500"
-                                                      : ""
-                                                  }`}
-                                                />
+                                              <Field
+  name={`rows.${index}.production_entry_date_time`}
+  type="datetime-local"
+  className={`input input-bordered 
+    ${
+      typeof errors.rows?.[index] === "object" &&
+      errors.rows?.[index]?.production_entry_date_time &&
+      touched.rows?.[index]?.production_entry_date_time
+        ? "border-red-500"
+        : ""
+    } 
+    ${isfieldhide ? "hidden" : "bg-white"}
+  `}
+/>
+
                                                 <ErrorMessage
                                                   name={`rows.${index}.production_entry_date_time`}
                                                   component="div"
@@ -1233,7 +1275,8 @@ export default function OrderListView() {
                                                       ?.production_exit_date_time
                                                       ? "border-red-500"
                                                       : ""
-                                                  }`}
+                                                  }${isfieldhide ? "hidden" : "bg-white"}
+                                                  `}
                                                 />
                                                 <ErrorMessage
                                                   name={`rows.${index}.production_exit_date_time`}
@@ -1242,15 +1285,15 @@ export default function OrderListView() {
                                                 />
                                               </td>
                                               <td>
-                                                <button
-                                                  className="btn btn-error"
+                                                {/* <button
+                                                  className= {`btn btn-error bg-red ${isfieldhide ? "hidden" : "bg-white"}`}
                                                   type="button"
                                                   onClick={() =>
                                                     arrayHelpers.remove(index)
                                                   }
                                                 >
                                                   Remove
-                                                </button>
+                                                </button> */}
                                               </td>
                                             </tr>
                                           </tbody>
@@ -1258,7 +1301,19 @@ export default function OrderListView() {
                                       ))}
 
                                       {/* second FieldArray */}
-                                      {fetchedProductionData?.length === 0 ? (
+                                      {isLoading || isFetching ? (
+              <tr>
+                <td colSpan={7}>
+                  <span className="loading loading-dots loading-md"></span>
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td className="text-error font-bold" colSpan={7}>
+                  Something went wrong while fetching orders list.
+                </td>
+              </tr>
+            ) : fetchedProductionData?.length === 0 ? (
                                         <p className="text-center text-sm text-slate-600">
                                           No Production Data Found
                                         </p>
@@ -1390,12 +1445,14 @@ export default function OrderListView() {
                                                             </button>
                                                             <button
                                                               className="btn btn-primary"
+                                                              type="button"
                                                               onClick={() => {
                                                                 // Alert first, then reset the editable row and refetch data
                                                                 if (
                                                                   window.confirm(
                                                                     "Are you sure you want to cancel?"
                                                                   )
+                                                                  
                                                                 ) {
                                                                   setTractnumbercontrollenght(0);
                                                                   setEditableRowProd(
@@ -1443,7 +1500,7 @@ export default function OrderListView() {
                                                             >
                                                               Edit
                                                             </button>
-                                                            <button
+                                                            {/* <button
                                                               type="button"
                                                               className={`btn btn-error ${
                                                                 editableRowProd !==
@@ -1479,7 +1536,7 @@ export default function OrderListView() {
                                                               }}
                                                             >
                                                               Remove
-                                                            </button>
+                                                            </button> */}
                                                           </>
                                                         )}
                                                       </div>
@@ -1548,31 +1605,32 @@ export default function OrderListView() {
                             render={(arrayHelpers) => (
                               <div>
                                 <div className="flex place-content-end gap-3">
-                                  <button
-                                    className="btn btn-info"
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.push({
+                                  {(fetchedProofingData?.length === 0 ? (
+                                  <>
+                                  {/* <button
+                                      className="btn btn-info"
+                                      type="button"
+                                      onClick={() => arrayHelpers.push({
                                         proofing_order_form_id: "",
                                         proofing_entry_date_time: "",
                                         proofing_exit_date_time: "",
                                         proofing_num_pallete: "",
                                         proofing_program_name: "",
-                                      })
-                                    }
-                                  >
-                                    Add Proofing
-                                  </button>
-                                  <button
-                                    className="btn btn-primary"
-                                    type="submit"
-                                    // onClick={() => setSubmitContext('rows')}
-                                  >
-                                    Save Proofing
-                                  </button>
+                                      })}
+                                    >
+                                      Add Proofing
+                                    </button> */}
+                                    <button
+                                      className="btn btn-primary"
+                                      type="submit"
+                                    >
+                                        Save Proofing
+                                      </button></>
+                                  ) : null)}
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      refetchOrdersData();
                                       setTractnumbercontrollenght(0);
                                       setEditableRowProof(null);
                                       setIsModalOpen(false);
@@ -1610,7 +1668,7 @@ export default function OrderListView() {
                                                 value={orderformdisplay}
                                                 name={`rowsproofing.${index}.proofing_order_form_id`}
                                                 type="number"
-                                                className="input input-bordered"
+                                                className={`input input-bordered w-20 max-w-md ${isfieldhideproof ? "hidden" : "bg-white"}`}
                                               />
                                             </td>
                                             <td>
@@ -1627,7 +1685,9 @@ export default function OrderListView() {
                                                     ?.proofing_entry_date_time
                                                     ? "border-red-500"
                                                     : ""
-                                                }`}
+                                                }
+                                                ${isfieldhideproof ? "hidden" : "bg-white"}
+                                                `}
                                               />
                                               <ErrorMessage
                                                 name={`rowsproofing.${index}.proofing_entry_date_time`}
@@ -1649,7 +1709,9 @@ export default function OrderListView() {
                                                     ?.proofing_exit_date_time
                                                     ? "border-red-500"
                                                     : ""
-                                                }`}
+                                                }
+                                                ${isfieldhideproof ? "hidden" : "bg-white"}
+                                                `}
                                               />
                                               <ErrorMessage
                                                 name={`rowsproofing.${index}.proofing_exit_date_time`}
@@ -1661,17 +1723,17 @@ export default function OrderListView() {
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_num_pallete`}
                                                 type="number"
-                                                className="input input-bordered"
+                                                className={`input input-bordered ${isfieldhideproof ? "hidden" : "bg-white"}`}
                                               />
                                             </td>
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_program_name`}
                                                 type="text"
-                                                className="input input-bordered"
+                                                className={`input input-bordered ${isfieldhideproof ? "hidden" : "bg-white"}`}
                                               />
                                             </td>
-                                            <td>
+                                            {/* <td>
                                               <button
                                                 className="btn btn-error"
                                                 type="button"
@@ -1681,14 +1743,26 @@ export default function OrderListView() {
                                               >
                                                 Remove
                                               </button>
-                                            </td>
+                                            </td> */}
                                           </tr>
                                         </tbody>
                                       </React.Fragment>
                                     ))}
 
                                     {/* second FieldArray */}
-                                    {fetchedProofingData?.length === 0 ? (
+                                    {isLoading || isFetching ? (
+              <tr>
+                <td colSpan={7}>
+                  <span className="loading loading-dots loading-md"></span>
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td className="text-error font-bold" colSpan={7}>
+                  Something went wrong while fetching orders list.
+                </td>
+              </tr>
+            ) : fetchedProofingData?.length === 0 ? (
                                       <p className="text-center text-sm text-slate-600">
                                         No Proofing Data Found
                                       </p>
@@ -1848,6 +1922,7 @@ export default function OrderListView() {
                                                           Save
                                                         </button>
                                                         <button
+                                                          type="button"
                                                           className="btn btn-primary"
                                                           onClick={() => {
                                                             if (
@@ -1896,7 +1971,7 @@ export default function OrderListView() {
                                                         >
                                                           Edit
                                                         </button>
-                                                        <button
+                                                        {/* <button
                                                           type="button"
                                                           className={`btn btn-error ${
                                                             editableRowProof !==
@@ -1930,7 +2005,7 @@ export default function OrderListView() {
                                                           }}
                                                         >
                                                           Remove
-                                                        </button>
+                                                        </button> */}
                                                       </>
                                                     )}
                                                   </div>
@@ -2191,7 +2266,7 @@ export default function OrderListView() {
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
-                                    
+                                      refetchOrdersData();
                                       setIsModalOpen(false);
                                       setOrderid(null);
                                       refetchMeasurentData();
@@ -2519,13 +2594,19 @@ export default function OrderListView() {
                                         )
                                       )}
                                     </tbody>
-                                  </table>
-                                </div>
-                              </div>
-                            )}
-                          />
-
-                          {fetchedMeasurementData?.length === 0 ? (
+                                    {isLoading || isFetching ? (
+              <tr>
+                <td colSpan={7}>
+                  <span className="loading loading-dots loading-md"></span>
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td className="text-error font-bold" colSpan={7}>
+                  Something went wrong while fetching orders list.
+                </td>
+              </tr>
+            ) : fetchedMeasurementData?.length === 0 ? (
                             <p className="text-center text-sm text-slate-600">
                               No Measurement Data Found
                             </p>
@@ -2533,9 +2614,10 @@ export default function OrderListView() {
                             <FieldArray
                               name="rows4"
                               render={(arrayHelpers) => (
-                                <tbody className="table relative text-center overflow-auto">
+                                
+                                <tbody className="border-y border-slate-500">
                                   {values.rows4.map((row, index) => (
-                                    <tr key={index}>
+                                    <tr key={index} className="border-y border-slate-500">
                                       <td className="border-y border-slate-500">
                                         <Field
                                           name={`rows4.${index}.pallete_count`}
@@ -2549,7 +2631,7 @@ export default function OrderListView() {
                                         <Field
                                           name={`rows4.${index}.number_of_control`}
                                           type="number"
-                                          className="input input-bordered w-20 max-w-md hidden"
+                                          className="input input-bordered w-20 max-w-md border-white text-white bg-white"
                                           value={row.number_of_control}
                                           readOnly
                                         />
@@ -2719,7 +2801,7 @@ export default function OrderListView() {
                                                       }
                                                     }}
                                                   >
-                                                    <Trash /> Remove
+                                                    Remove
                                                   </button>
                                                 </>
                                               )}
@@ -2733,6 +2815,13 @@ export default function OrderListView() {
                               )}
                             />
                           )}
+                                  </table>
+                                </div>
+                              </div>
+                            )}
+                          />
+
+                         
                         </div>
                       </Form>
                     )}

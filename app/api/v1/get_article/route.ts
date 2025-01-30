@@ -2,41 +2,48 @@ import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const page = parseInt(req.nextUrl.searchParams.get("page") || "0", 10);
+  const page = parseInt(req.nextUrl.searchParams.get("page") || "1", 10) - 1; // Convert to zero-based index
   const limit = parseInt(req.nextUrl.searchParams.get("limit") || "10", 10);
   const search = req.nextUrl.searchParams.get("search") || "";
 
-  console.log("Search:", search);
-  console.log("Page:", page);
+  console.log("Page:", page + 1); // Convert back to 1-based for logging
   console.log("Limit:", limit);
+  console.log("Search Company:", search);
 
   const supabase = await createClient();
 
-  let query = supabase
-  .from("tbl_article")
-  .select("*, tbl_customer(id, company_name)", { count: "exact" }) // ⬅️ LEFT JOIN
-  .eq("is_exist", true)
-  .order("created_at", { ascending: false })
-  .range((page - 1) * limit, page * limit - 1);
+  // Query to get articles matching search
+  let articleQuery = supabase
+    .from("tbl_article")
+    .select("*, tbl_customer!inner(id, company_name)", { count: "exact" }) // Ensure inner join
+    // .not("customer_id", "is", null)
+    .order("created_at", { ascending: false })
+    .range(page * limit, (page + 1) * limit - 1);
 
-// Apply search for both article_name & company_name
-if (search) {
-  query = query
-    .or(`article_name.ilike.%${search}%`)
-    .ilike("tbl_customer.company_name", `%${search}%`); // 🔥 Fix search for customer name
-}
+  // Query to get customers matching search
+  let customerQuery = supabase
+    .from("tbl_article")
+    .select("*, tbl_customer!inner(id, company_name)", { count: "exact" })
+    .filter("tbl_customer.company_name", "ilike", `%${search}%`)
+    .order("created_at", { ascending: false })
+    .range(page * limit, (page + 1) * limit - 1);
 
-const { data, error, count } = await query;
-
-
-  console.log("Returned Data:", data);
-
-  // Handle error
-  if (error) {
-    console.error("Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  // Apply search to articles
+  if (search) {
+    articleQuery = articleQuery.filter("article_name", "ilike", `%${search}%`);
   }
 
-  // Return response
-  return NextResponse.json({ data, total_count: count || 0 }, { status: 200 });
+  // Execute both queries
+  const [{ data: articleResults, error: articleError, count: articleCount }, { data: customerResults, error: customerError, count: customerCount }] =
+    await Promise.all([articleQuery, customerQuery]);
+
+  if (articleError || customerError) {
+    console.error("Error:", articleError || customerError);
+    return NextResponse.json({ error: (articleError || customerError)?.message }, { status: 500 });
+  }
+
+  // Merge results while avoiding duplicates
+  const mergedResults = [...new Map([...articleResults, ...customerResults].map(item => [item.id, item])).values()];
+
+  return NextResponse.json({ data: mergedResults, total_count: (articleCount || 0) + (customerCount || 0) }, { status: 200 });
 }
