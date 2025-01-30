@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     .range(page * limit, (page + 1) * limit - 1);
 
   // Query to get customers matching search
-  let customerQuery = supabase
+  const customerQuery = supabase
     .from("tbl_article")
     .select("*, tbl_customer!inner(id, company_name)", { count: "exact" })
     .filter("tbl_customer.company_name", "ilike", `%${search}%`)
