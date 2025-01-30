@@ -77,6 +77,7 @@ console.log("artcle data",data)
             </button>
           </label>
               </div>
+              <div className="w-2/5 flex justify-end items-center gap-4">
               <button className="btn btn-info"
               onClick={() => {
                 if (searchInput.current) {
@@ -93,6 +94,7 @@ console.log("artcle data",data)
           >
             Add Article
           </Link>
+          </div>
         </div>
 
         <table className="table text-center">
