@@ -19,10 +19,10 @@ export async function GET(req: NextRequest) {
   // Base query
   let query = supabase
     .from("tbl_orders_form")
-    .select("* ,tbl_customer(*),tbl_article(*)", { count: "exact" })
+    .select("* ,tbl_customer(*),tbl_article(*),tbl_production(*)", { count: "exact" })
     .eq("is_exist", true)
     .or(`order_fabrication_control.ilike.%${search}%`)
-
+  
     .range((page - 1) * limit, page * limit - 1);
 
   // Add search filter

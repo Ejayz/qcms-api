@@ -103,6 +103,7 @@ export default function OrderListView() {
   const [enablepallete, setEnablePallete] = useState(false);
   const [enableplus, setenableplus] = useState(true);
   const [lastpalleteCount, setLastpalleteCount] = useState<number | 1>(1);
+  const [tractnumbercontrollenght, setTractnumbercontrollenght] = useState<number | 0>(0);
 
   console.log("current enablepallete: ", enablepallete);
 
@@ -988,6 +989,30 @@ export default function OrderListView() {
                       "dd/MM/yy hh:mm a"
                     )}
                   </td> */}
+                  <td>
+  {order.tbl_production
+    .filter((production: any) => production.order_form_id === order.id)
+    .map((production:any, index:any) => (
+      <div key={index}>
+        {production.entry_date_time
+          ? DateTime.fromISO(production.entry_date_time).toFormat("dd/MM/yy hh:mm a")
+          : "No Data"}
+      </div>
+    ))}
+</td>
+<td>
+  {order.tbl_production
+    .filter((production: any) => production.order_form_id === order.id)
+    .map((production:any, index:any) => (
+      <div key={index}>
+        {production.entry_date_time
+          ? DateTime.fromISO(production.entry_date_time).toFormat("dd/MM/yy hh:mm a")
+          : "No Data"}
+      </div>
+    ))}
+</td>
+
+
 
                   <td className="justify-center items-center flex gap-4">
                     {userRole === "Super Admin" && (
@@ -1134,6 +1159,7 @@ export default function OrderListView() {
                                     <button
                                       className="btn btn-accent"
                                       onClick={() => {
+                                        setTractnumbercontrollenght(0);
                                         setEditableRowProd(null);
                                         setIsModalOpen(false);
                                         setOrderid(null);
@@ -1371,6 +1397,7 @@ export default function OrderListView() {
                                                                     "Are you sure you want to cancel?"
                                                                   )
                                                                 ) {
+                                                                  setTractnumbercontrollenght(0);
                                                                   setEditableRowProd(
                                                                     null
                                                                   ); // Reset the editable state
@@ -1546,6 +1573,7 @@ export default function OrderListView() {
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      setTractnumbercontrollenght(0);
                                       setEditableRowProof(null);
                                       setIsModalOpen(false);
                                       setOrderid(null);
@@ -1827,6 +1855,7 @@ export default function OrderListView() {
                                                                 "Are you sure you want to cancel?"
                                                               )
                                                             ) {
+                                                              setTractnumbercontrollenght(0);
                                                               setEditableRowProof(
                                                                 null
                                                               ); // Reset the editable state
@@ -1942,11 +1971,12 @@ export default function OrderListView() {
                     enableReinitialize={true}
                     onSubmit={async (values) => {
                       // Check if all rows have 0 or empty values
+                    
                       const isAllEmptyOrZero = values.rowsmeasurement.every(
                         (row) =>
                           row.pallete_count === 0 && row.number_of_control === 0
                       );
-
+                      console.log("current row lenght",tractnumbercontrollenght+1)
                       if (isAllEmptyOrZero) {
                         alert(
                           "Cannot submit: All fields are empty or have a value of 0."
@@ -1955,10 +1985,49 @@ export default function OrderListView() {
                       }else{
                       // const pallete_number=values.rowsmeasurement[0].pallete_count;
                       // const control_number=values.rowsmeasurement[0].number_of_control;
+                      // if(numberControl===tractnumbercontrollenght){
+                      // const userConfirmed = window.confirm("The number of controls is not yet complete. Are you sure you want to submit it?");
+                      // if (!userConfirmed) {
+                      //   return;
+                      // }
+                      // }
+                    if(numberControl!==tractnumbercontrollenght+1){
                       const userConfirmed = window.confirm("The number of controls is not yet complete. Are you sure you want to submit it?");
-                      if(userConfirmed){
+                      if (userConfirmed) {
+                        (async () => {
+                          for (const row of values.rowsmeasurement) {
+                            
+                            const measurementData = {
+                              order_id: orderid,
+                              length: row.length,
+                              inside_diameter: row.inside_diameter,
+                              outside_diameter: row.outside_diameter,
+                              flat_crush: row.flat_crush,
+                              h20: row.h20,
+                              radial: row.radial,
+                              number_control: row.number_of_control,
+                              remarks: row.remarks,
+                              pallete_count: row.pallete_count,
+                              user_id: userID,
+                            };
+                            setLastpalleteCount(0);
+                            // setNumberControl(0);
+                            // Log for debugging
+                            // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
+                            console.log("Inserting data:", measurementData);
+  
+                            // Wait for mutation to complete before moving to the next
+                            await AddMeasurementMutation.mutateAsync(
+                              measurementData
+                            );
+                          }
+                        })();
+                      }
+                    }else{
+                      
                       (async () => {
                         for (const row of values.rowsmeasurement) {
+                          
                           const measurementData = {
                             order_id: orderid,
                             length: row.length,
@@ -1973,7 +2042,7 @@ export default function OrderListView() {
                             user_id: userID,
                           };
                           setLastpalleteCount(0);
-                          setNumberControl(0);
+                          // setNumberControl(0);
                           // Log for debugging
                           // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
                           console.log("Inserting data:", measurementData);
@@ -1984,7 +2053,7 @@ export default function OrderListView() {
                           );
                         }
                       })();
-                      }
+                    }
                     }
                      
                       // console.log("Values are: ",values.rowsmeasurement);
@@ -2032,6 +2101,7 @@ export default function OrderListView() {
                                         "Values are: ",
                                         values.rowsmeasurement
                                       );
+                                      console.log("numbr of control:",numberControl)
 
                                       // Remove rows where pallete_count and number_of_control are 0
 
@@ -2043,8 +2113,9 @@ export default function OrderListView() {
                                         );
 
                                       if(filterPalleteCount===currentMaxPallete){
-                                        alert("The number of controls is complete. You can no longer add a new control number.");
-                                      }else{
+                                        alert("The pallete count is complete. You can no longer add a new pallete.");
+                                      }
+                                      else{
 
                                       
                                       if (
@@ -2052,8 +2123,12 @@ export default function OrderListView() {
                                         hasInvalidRow
                                       ) {
                                         const newControlNumber = prompt(
-                                          "Enter a new control number:"
+                                          `The new control number must be equal to the current control number: ${numberControl}.\n\nPlease enter a new control number:`
                                         );
+                                        if (newControlNumber !== null && parseInt(newControlNumber, 10) !== numberControl) {
+                                          alert("Please enter a valid number for the control number.");
+                                          return;
+                                        }
 
                                         if (
                                           newControlNumber &&
@@ -2076,11 +2151,9 @@ export default function OrderListView() {
                                           setenableplus(true);
                                           arrayHelpers.push({
                                             pallete_count:
-                                              currentMaxPallete + 1, // Incremented pallete_count
-                                            number_of_control: parseInt(
-                                              newControlNumber,
-                                              10
-                                            ), // User input
+                                              currentMaxPallete+1, // Incremented pallete_count
+                                            number_of_control: numberControl,
+                                             // User input
                                             length: "",
                                             inside_diameter: "",
                                             outside_diameter: "",
@@ -2118,11 +2191,13 @@ export default function OrderListView() {
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                    
                                       setIsModalOpen(false);
                                       setOrderid(null);
                                       refetchMeasurentData();
                                       refetchProductionData();
                                       refetchProofingData();
+                                      setTractnumbercontrollenght(0);
                                     }}
                                   >
                                     Cancel
@@ -2410,6 +2485,8 @@ export default function OrderListView() {
                                                         "Current rows length:",
                                                         existingRows.length
                                                       ); // Debugging
+
+                                                      setTractnumbercontrollenght(existingRows.length);
                                                       console.log(
                                                         "Number of control:",
                                                         row.number_of_control
@@ -2429,9 +2506,10 @@ export default function OrderListView() {
                                                       ? "hidden"
                                                       : ""
                                                   }`}
-                                                  onClick={() =>
-                                                    arrayHelpers.remove(index)
-                                                  }
+                                                  onClick={() => {
+                                                    arrayHelpers.remove(index);
+                                                    tractnumbercontrollenght-1
+                                                  }}
                                                 >
                                                   Remove
                                                 </button>
@@ -2471,7 +2549,7 @@ export default function OrderListView() {
                                         <Field
                                           name={`rows4.${index}.number_of_control`}
                                           type="number"
-                                          className="input input-bordered w-20 max-w-md"
+                                          className="input input-bordered w-20 max-w-md hidden"
                                           value={row.number_of_control}
                                           readOnly
                                         />
@@ -2579,6 +2657,7 @@ export default function OrderListView() {
                                                       "Are you sure you want to cancel?"
                                                     )
                                                   ) {
+                                                    setTractnumbercontrollenght(0);
                                                     setEditableRowMes(null); // Reset the editable state
                                                     refetchMeasurentData(); // Refetch measurement data
                                                     setIsModalOpen(false);

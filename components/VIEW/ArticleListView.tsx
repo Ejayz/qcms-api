@@ -98,7 +98,7 @@ console.log("artcle data",data)
               <th>Article Min</th>
               <th>Article Max</th>
               <th>Number Control</th>
-              <th>OPTIONS</th>
+              <th>OPTIONS</th>  
             </tr>
           </thead>
           <tbody>
@@ -121,10 +121,11 @@ console.log("artcle data",data)
                   {/* <th>{index + 1}</th> */}
                   {/* <td className="text-xs">{get_users.id}</td> */}
                   <td>{get_users.article_name}</td>
-                  <td>{get_users.tbl_customer.company_name}</td>
+                  <td>{get_users.tbl_customer?.company_name || "No Customer"}</td>
+
                   <td>{get_users.article_nominal}</td>
-                  <td>{`${get_users.article_min}`}</td>
-                  <td>{get_users.article_max}</td>
+                  <td>{get_users.article_min}</td>
+                  <td>{get_users.article_max}</td>  
                   <td>{get_users.number_control}</td>
                   <td className="justify-center items-center flex gap-4">
                   <Link href={`/dashboard/edit_article/${get_users.id}`} className="link flex">

@@ -13,19 +13,21 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient();
 
   let query = supabase
-    .from("tbl_article")
-    .select("*, tbl_customer!inner(company_name)", { count: "exact" })
-    .eq("is_exist", true)
-    .order("created_at", { ascending: false })
-    .range((page - 1) * limit, page * limit - 1);
+  .from("tbl_article")
+  .select("*, tbl_customer(id, company_name)", { count: "exact" }) // ⬅️ LEFT JOIN
+  .eq("is_exist", true)
+  .order("created_at", { ascending: false })
+  .range((page - 1) * limit, page * limit - 1);
 
-  // 🔥 Apply search filter only if a search term is provided
-  if (search) {
-    query = query.or(`article_name.ilike.%${search}%`);
-    query = query.filter("tbl_customer.company_name", "ilike", `%${search}%`); // Separate filter for customer
-  }
+// Apply search for both article_name & company_name
+if (search) {
+  query = query
+    .or(`article_name.ilike.%${search}%`)
+    .ilike("tbl_customer.company_name", `%${search}%`); // 🔥 Fix search for customer name
+}
 
-  const { data, error, count } = await query;
+const { data, error, count } = await query;
+
 
   console.log("Returned Data:", data);
 
