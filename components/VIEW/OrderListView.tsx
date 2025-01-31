@@ -2574,7 +2574,8 @@ export default function OrderListView() {
                                                   }`}
                                                   onClick={() => {
                                                     arrayHelpers.remove(index);
-                                                    tractnumbercontrollenght-1
+                                                    setTractnumbercontrollenght((prev) => prev - 1);
+
                                                   }}
                                                 >
                                                   Remove
