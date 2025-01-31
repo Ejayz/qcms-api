@@ -431,7 +431,7 @@ export default function EditArticleListCopy(params:any) {
                   
                       {/* <button>Remove</button> */}
                       <button className="btn btn-primary" type="submit">
-                        Edit Article
+                        Save Article
                       </button>
                       <Link
                         href="/dashboard/article_management"
