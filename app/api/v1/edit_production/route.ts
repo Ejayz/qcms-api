@@ -24,23 +24,20 @@ export async function PUT(req: NextRequest) {
     // }
 
     // Update user details in the database
-    const { data: userUpdateData, error: userUpdateError } = await supabase
-      .from("tbl_production")
-      .update({
-        entry_date_time,
-        exit_date_time,
-        updated_at: new Date(),
-      })
-      .eq("id", id);
+    const { data: updateResult, error: updateError } = await supabase
+    .from("tbl_orders_form")
+    .update({ entry_date_time, exit_date_time })
+    .eq("id", id);
 
-    if (userUpdateError) {
-      console.error("Supabase Update Error:", userUpdateError);
+
+    if (updateError) {
+      console.error("Supabase Update Error:", updateError);
       return NextResponse.json(
-        { error: `Database update failed: ${userUpdateError.message}` },
+        { error: `Database update failed: ${updateError.message}` },
         { status: 500 }
       );
     }
-    console.log("recieved data are:",userUpdateData)
+    console.log("recieved data are:",updateResult)
 
     // Optional: Update Auth if password is provided
     // if (password) {
@@ -60,7 +57,7 @@ export async function PUT(req: NextRequest) {
 
     // Return success response
     return NextResponse.json(
-      { message: "User updated successfully", data: userUpdateData },
+      { message: "User updated successfully", data: updateResult },
       { status: 200 }
     );
   } catch (err: any) {

@@ -113,6 +113,9 @@ export default function OrderListView() {
   const [isContinueAdd, setisContinueAdd] = useState<boolean>(false);
   const [editableGroupKey, setEditableGroupKey] = useState<string | null>(null);
   const [updatedGroupData, setUpdatedGroupData] = useState<{ [key: string]: any }>({});
+  const [retrievedentryDateTime, setRetrievedentryDateTime] = useState<string | null>(null);
+  const [retrievedexitDateTime, setRetrievedexitDateTime] = useState<string | null>(null);
+
 
   console.log("current enablepallete: ", enablepallete);
 
@@ -320,7 +323,7 @@ export default function OrderListView() {
     useQuery({
       queryKey: ["production", orderid],
       queryFn: async () => {
-        const response = await fetch(`/api/v1/getoneproduction/?id=${orderid}`);
+        const response = await fetch(`/api/v1/getoneorder/?id=${orderid}`);
         if (!response.ok) {
           throw new Error(
             `Failed to fetch production data: ${response.status}`
@@ -335,7 +338,14 @@ export default function OrderListView() {
     if (fetchedProductionData?.length > 0) {
       const productionData = fetchedProductionData[0];
       setisbuttonhide(false);
-      setisfieldhide(true);
+      // setisfieldhide(true);
+      setRetrievedentryDateTime(productionData.entry_date_time);
+      setRetrievedexitDateTime(productionData.exit_date_time);
+      if(productionData.entry_date_time ===null && productionData.exit_date_time ===null){
+        setisfieldhide(false);
+      }else{
+        setisfieldhide(true);
+      }
       //setEditproductionID(productionData.id);
       setInitialValues((prev) => ({
         ...prev,
@@ -345,10 +355,12 @@ export default function OrderListView() {
           production_entry_date_time: data.entry_date_time,
           production_exit_date_time: data.exit_date_time,
         })),
+        
       }));
+      
     } else {
       setisbuttonhide(true);
-      setisfieldhide(false);
+      // setisfieldhide(false);
       setInitialValues((prev) => ({
         ...prev,
         rows2: [
@@ -363,12 +375,14 @@ export default function OrderListView() {
       }));
     }
   }, [fetchedProductionData, refetchProductionData]);
-  // console.log("fetchedProductionData", fetchedProductionData?.length);
+  console.log("fetchedProductionData", fetchedProductionData?.length);
+  
+        console.log("updated entry",retrievedentryDateTime);
 
   const updateProductionMutation = useMutation({
     mutationFn: async (updatedData: any) => {
       const response = await fetch(
-        `/api/v1/edit_production?id=${updatedData.production_id}`,
+        `/api/v1/edit_production?id=${orderid}`,
         {
           method: "PUT",
           headers: {
@@ -1144,12 +1158,12 @@ export default function OrderListView() {
                     onSubmit={async (values) => {
                       try {
                         for (const row of values.rows) {
-                          await AddOrderMutation.mutateAsync({
-                            order_form_id: orderid,
-                            entry_date_time: row.production_entry_date_time,
-                            exit_date_time: row.production_exit_date_time,
-                            user_id: userID,
-                          });
+                          if (orderid) {
+                            await updateProductionMutation.mutateAsync({
+                              production_entry_date_time: row.production_entry_date_time,
+                              production_exit_date_time: row.production_exit_date_time,
+                            });
+                          }
                         }
                       } catch (error) {
                         toast.error("Failed to complete operation");
@@ -1167,31 +1181,14 @@ export default function OrderListView() {
                               render={(arrayHelpers) => (
                                 <div>
                                   <div className="flex place-content-end gap-3">
-                                    {fetchedProductionData?.length === 0 ? (
-                                      <>
-                                        {/* <button
-                                        className={`btn btn-info ${isbuttonhide===false ? "hidden" : "bg-white"}`}
-                                        type="button"
-                                        onClick={() => {
-                                          setisbuttonhide(true);
-                                          arrayHelpers.push({
-                                            production_order_form_id: "",
-                                            production_entry_date_time: "",
-                                            production_exit_date_time: "",
-                                          });
-
-                                        } 
-                                      }
+                                    {retrievedentryDateTime === null && retrievedexitDateTime=== null ? (
+                      
+                                      <button
+                                        className="btn btn-primary"
+                                        type="submit"
                                       >
-                                        Add Production
-                                      </button> */}
-                                        <button
-                                          className="btn btn-primary"
-                                          type="submit"
-                                        >
-                                          Save Production
-                                        </button>
-                                      </>
+                                        Save Production
+                                      </button>
                                     ) : null}
                                     <button
                                       className="btn btn-accent"
@@ -1232,11 +1229,13 @@ export default function OrderListView() {
                                                   value={orderformdisplay}
                                                   name={`rows.${index}.production_order_form_id`}
                                                   type="number"
-                                                  className={`input input-bordered w-20 max-w-md ${
+                                                  className={`input input-bordered w-20 max-w-md 
+                                                    ${
                                                     isfieldhide
                                                       ? "hidden"
                                                       : "bg-white"
-                                                  }`}
+                                                  }
+                                                  `}
                                                 />
                                               </td>
                                               <td>
@@ -1321,8 +1320,7 @@ export default function OrderListView() {
                                             orders list.
                                           </td>
                                         </tr>
-                                      ) : fetchedProductionData?.length ===
-                                        0 ? (
+                                      ) : retrievedentryDateTime === null && retrievedexitDateTime === null ? (
                                         <p className="text-center text-sm text-slate-600">
                                           No Production Data Found
                                         </p>
