@@ -328,7 +328,7 @@ const removeCustomerMutation = useMutation({
                   </>
                 ) : (
                   <>
-                    <Pencil /> Edit Order
+                    <Pencil /> Save
                   </>
                 )}
               </button>
