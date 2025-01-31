@@ -1024,7 +1024,7 @@ export default function OrderListView() {
                   </td>
                   <td>{order.product_name}</td>
                   <td className="text-xs">{order.tbl_customer?.company_name}</td>
-                  <td>{order.tbl_article.article_name}</td>
+                  <td>{order.tbl_article?.article_name}</td>
                   <td>{order.pallete_count}</td>
                   {/* <td>
                     {DateTime.fromISO(order.created_at).toFormat(
@@ -2822,55 +2822,58 @@ export default function OrderListView() {
             </div>
           </div>
         )}
-        {isAssignModalOpen && (
-          <div className="modal modal-open">
-            <div className="modal-box w-11/12 max-w-1xl">
-              <div className="flex flex-col gap-y-4">
-                <div className="flex flex-col gap-y-4">
-                  <label className="label">Assign Order</label>
-                  <select
-                    className="select select-bordered"
-                    onChange={(e) => {
-                      setAssign_id(e.target.value);
-                    }}
-                  >
-                    <option value="" disabled selected>
-                      Select Customer
-                    </option>
-                    {customerOptions.map((option: any) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex gap-4 place-content-end">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                      AssignOrderMutation.mutate({
-                        order_form_id: orderid,
-                        user_id: asssing_id,
-                      });
-                    }}
-                  >
-                    Assign
-                  </button>
-                  <button
-                    className="btn btn-accent"
-                    onClick={() => {
-                      setAssignModal(false);
-                      setOrderid(null);
-                      window.location.reload();
-                    }}
-                  >
-                    Cancel
-                  </button>
-                </div>
+       {isAssignModalOpen && (
+  <div className="modal modal-open">
+    <div className="modal-box w-11/12 max-w-1xl">
+      <div className="flex flex-col gap-y-4">
+        <Formik
+          initialValues={{ assign_id: "" }}
+          onSubmit={(values) => {
+            AssignOrderMutation.mutate({
+              order_form_id: orderid,
+              user_id: values.assign_id,
+            });
+          }}
+        >
+          {({ setFieldValue, errors,touched }) => (
+            <Form className="flex flex-col gap-y-4">
+              <label className="label">Assign Order</label>
+              <FormSelect
+                        tooltip="Select the customer's name from the dropdown"
+                        name="CustomerName"
+                        placeholder="Choose a customer"
+                        label="Customer Name"
+                        options={customerOptions
+                        }
+                        errors={errors.assign_id ? errors.assign_id : ""}
+                        touched={touched.assign_id ? "true" :"" }// Adjust as needed
+                      />
+                      {isLoading && <p>Loading customers...</p>}
+                      {error && <p className="text-red-500">{error}</p>}
+              <div className="flex gap-4 place-content-end">
+                <button className="btn btn-primary" type="submit">
+                  Assign
+                </button>
+                <button
+                  className="btn btn-accent"
+                  type="button"
+                  onClick={() => {
+                    setAssignModal(false);
+                    setOrderid(null);
+                    window.location.reload();
+                  }}
+                >
+                  Cancel
+                </button>
               </div>
-            </div>
-          </div>
-        )}
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </div>
+  </div>
+)}
+
       </div>
     </div>
   );

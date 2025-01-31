@@ -195,8 +195,8 @@ export default function AddOrderList() {
                       name="Id"
                       placeholder="Order ID"
                       label="Order ID"
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
+                      errors={errors.Id ? errors.Id : ""}
+                      touched={touched.Id ? "true":"" }// Adjust as needed
                     />
                   </div>
                   <div>
@@ -205,8 +205,8 @@ export default function AddOrderList() {
                       name="product_name"
                       placeholder="Product Name"
                       label="Product Name"
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
+                      errors={errors.product_name ? errors.product_name : ""}
+                      touched={touched.product_name ? "true" :""} // Adjust as needed
                     />
                   </div>
                   <div>
@@ -218,8 +218,8 @@ export default function AddOrderList() {
                         label="Customer Name"
                         options={customerOptions
                         }
-                        errors={error ? error : ""}
-                        touched="true" // Adjust as needed
+                        errors={errors.CustomerName ? errors.CustomerName : ""}
+                        touched={touched.CustomerName ? "true" :"" }// Adjust as needed
                       />
                       {isLoading && <p>Loading customers...</p>}
                       {error && <p className="text-red-500">{error}</p>}
@@ -233,8 +233,8 @@ export default function AddOrderList() {
                         placeholder="Choose a Article"
                         label="Article Name"
                         options={articleOptions}
-                        errors={error ? error : ""}
-                        touched="true" // Adjust as needed
+                        errors={errors.ArticleName ? errors.ArticleName : ""}
+                        touched={touched.ArticleName? "true":""} // Adjust as needed
                       />
                       {isLoading && <p>Loading article...</p>}
                       {error && <p className="text-red-500">{error}</p>}
