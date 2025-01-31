@@ -109,7 +109,7 @@ export default function OrderListView() {
   const [isfieldhide, setisfieldhide] = useState<boolean>(false);
   const [isfieldhideproof, setisfieldhideproof] = useState<boolean>(false);
   
-
+  console.log("display form id",orderformdisplay);
   console.log("current enablepallete: ", enablepallete);
 
   useEffect(() => {
@@ -1018,6 +1018,7 @@ export default function OrderListView() {
                       setOrderformdisplay(order.order_fabrication_control);
                       setNumberControl(order.tbl_article.number_control);
                       setFilterPalleteCount(order.pallete_count);
+                      console.log("orderform id",orderformdisplay)
                     }}
                   >
                     {order.order_fabrication_control}
@@ -1231,8 +1232,8 @@ export default function OrderListView() {
                                                   readOnly
                                                   value={orderformdisplay}
                                                   name={`rows.${index}.production_order_form_id`}
-                                                  type="number"
-                                                  className={`input input-bordered w-20 max-w-md ${
+                                                  type="text"
+                                                  className={`input input-bordered w-32 max-w-md ${
                                                   isfieldhide
                                                       ? "hidden"
                                                       : "bg-white"
@@ -1333,7 +1334,7 @@ export default function OrderListView() {
                                                         name={`rows2.${index}.production_order_form_id`}
                                                         type="text"
                                                         value={orderformdisplay}
-                                                        className="input input-bordered"
+                                                        className="input input-bordered w-32 max-w-md"
                                                         readOnly
                                                       />
                                                     </td>
@@ -1667,7 +1668,7 @@ export default function OrderListView() {
                                                 readOnly
                                                 value={orderformdisplay}
                                                 name={`rowsproofing.${index}.proofing_order_form_id`}
-                                                type="number"
+                                                type="text"
                                                 className={`input input-bordered w-20 max-w-md ${isfieldhideproof ? "hidden" : "bg-white"}`}
                                               />
                                             </td>
