@@ -88,7 +88,7 @@ export default function AddArticleListCopy() {
     },
     onSuccess: (data) => {
       toast.success("Article Added Successfully");
-      navigator.push("/dashboard/article_management");
+      // navigator.push("/dashboard/article_management");
       console.log("article on success data", data.id);
     },
     onMutate: (data) => {
@@ -115,7 +115,7 @@ export default function AddArticleListCopy() {
       if (data?.id) {
         setNominalId(data.id);
         toast.success("Article Nominal Added Successfully");
-        navigator.push("/dashboard/article_management");
+        // navigator.push("/dashboard/article_management");
         console.log("Nominal ID on success:", data.id);
       } else {
         console.warn("No ID returned in the response:", data);
@@ -142,7 +142,7 @@ export default function AddArticleListCopy() {
     },
     onSuccess: (data) => {
       toast.success("Article Min Added Successfully");
-      navigator.push("/dashboard/article_management");
+      // navigator.push("/dashboard/article_management");
       setMinId(data.id);
       console.log("min on success data", data.id);
     },
@@ -167,7 +167,7 @@ export default function AddArticleListCopy() {
     },
     onSuccess: (data) => {
       toast.success("Article Max Added Successfully");
-      navigator.push("/dashboard/article_management");
+      // navigator.push("/dashboard/article_management");
       setMaxId(data.id);
       console.log("max on success data", data.id);
     },
@@ -231,57 +231,49 @@ export default function AddArticleListCopy() {
         onSubmit={async (values) => {
           for (const row of values.rows) {
             try {
-              const nominalResponse = await AddNominalMutation.mutateAsync({
-                length: row.LengthNominal,
-                inside_diameter: row.InsideDiameterNominal,
-                outside_diameter: row.OutsideDiameterNominal,
-                flat_crush: row.FlatCrushNominal,
-                h20: row.H20Nominal,
-                user_id: userID,
-              });
-              
-              const minResponse = await AddMinMutation.mutateAsync({
-                length: row.LengthMin,
-                inside_diameter: row.InsideDiameterMin,
-                outside_diameter: row.OutsideDiameterMin,
-                flat_crush: row.FlatCrushMin,
-                h20: row.H20Min,
-                user_id: userID,
-              });
-              
-              const maxResponse = await AddMaxMutation.mutateAsync({
-                length: row.LengthMax,
-                inside_diameter: row.InsideDiameterMax,
-                outside_diameter: row.OutsideDiameterMax,
-                flat_crush: row.FlatCrushMax,
-                h20: row.H20Max,
-                user_id: userID,
-              });
-              
-              // Extract IDs
-              const nominalId = nominalResponse?.id;
-              const minId = minResponse?.id;
-              const maxId = maxResponse?.id;
-              
-              if (!nominalId || !minId || !maxId) {
-                throw new Error("One or more required IDs are missing");
+              const [nominal, min, max] = await Promise.all([
+                AddNominalMutation.mutateAsync({
+                  length: row.LengthNominal,
+                  inside_diameter: row.InsideDiameterNominal,
+                  outside_diameter: row.OutsideDiameterNominal,
+                  flat_crush: row.FlatCrushNominal,
+                  h20: row.H20Nominal,
+                }),
+                AddMinMutation.mutateAsync({
+                  length: row.LengthMin,
+                  inside_diameter: row.InsideDiameterMin,
+                  outside_diameter: row.OutsideDiameterMin,
+                  flat_crush: row.FlatCrushMin,
+                  h20: row.H20Min,
+                }),
+                AddMaxMutation.mutateAsync({
+                  length: row.LengthMax,
+                  inside_diameter: row.InsideDiameterMax,
+                  outside_diameter: row.OutsideDiameterMax,
+                  flat_crush: row.FlatCrushMax,
+                  h20: row.H20Max,
+                }),
+              ]);
+      
+              if (!nominal.id || !min.id || !max.id) {
+                throw new Error("Missing required IDs");
               }
-              
+      
               await AddArticleMutation.mutateAsync({
                 article_name: row.article_name,
                 customer_id: row.customer_id,
-                article_nominal: nominalId,
-                article_min: minId,
-                article_max: maxId,
+                article_nominal: nominal.id,
+                article_min: min.id,
+                article_max: max.id,
                 number_control: row.NumberControl,
-                user_id: userID,
               });
-              
             } catch (error) {
               toast.error("Failed to add article");
-              console.error("Error in mutation chain:", error);
+              console.error(error);
             }
-          }
+          
+          
+          }navigator.push("/dashboard/article_management");
         }}
       >
         {({ values, setFieldValue, errors, touched }) => (
