@@ -88,7 +88,7 @@ export default function AddArticleListCopy() {
     },
     onSuccess: (data) => {
       toast.success("Article Added Successfully");
-      // navigator.push("/dashboard/article_management");
+      navigator.push("/dashboard/article_management");
       console.log("article on success data", data.id);
     },
     onMutate: (data) => {
@@ -257,6 +257,7 @@ export default function AddArticleListCopy() {
       
               if (!nominal.id || !min.id || !max.id) {
                 throw new Error("Missing required IDs");
+                
               }
       
               await AddArticleMutation.mutateAsync({
@@ -267,13 +268,14 @@ export default function AddArticleListCopy() {
                 article_max: max.id,
                 number_control: row.NumberControl,
               });
+              // navigator.push("/dashboard/article_management");
             } catch (error) {
               toast.error("Failed to add article");
               console.error(error);
             }
           
           
-          }navigator.push("/dashboard/article_management");
+          }
         }}
       >
         {({ values, setFieldValue, errors, touched }) => (
