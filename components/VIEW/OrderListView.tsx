@@ -2335,7 +2335,7 @@ export default function OrderListView() {
                                     <thead className="text-black text-sm">
                                       <tr>
                                         <th>Pallete</th>
-                                        <th>Number Of Control</th>
+                                        {/* <th>Number Of Control</th> */}
                                         <th>Length</th>
                                         <th>Inside Diameter</th>
                                         <th>Outside Diameter</th>
