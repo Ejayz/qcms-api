@@ -208,7 +208,7 @@ export default function EditArticleListCopy(params:any) {
       toast.error("Failed to update article");
     },
     onSuccess: (data) => {
-      toast.success("Article updated Successfully");
+      // toast.success("Article updated Successfully");
       router.push("/dashboard/article_management");
     },
     onMutate: (data) => {
@@ -231,7 +231,7 @@ export default function EditArticleListCopy(params:any) {
       toast.error("Failed to update article");
     },
     onSuccess: (data) => {
-      toast.success("Article updated Successfully");
+      // toast.success("Article updated Successfully");
       router.push("/dashboard/article_management");
     },
     onMutate: (data) => {
@@ -254,7 +254,7 @@ export default function EditArticleListCopy(params:any) {
       toast.error("Failed to update article");
     },
     onSuccess: (data) => {
-      toast.success("Article updated Successfully");
+      // toast.success("Article updated Successfully");
       router.push("/dashboard/article_management");
     },
     onMutate: (data) => {
