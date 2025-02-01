@@ -37,8 +37,6 @@ export default function AddArticleListCopy() {
 
   console.log("the user id is:", userID);
 
-
- 
   const initialValues = {
     rows: [
       {
@@ -180,13 +178,13 @@ export default function AddArticleListCopy() {
 
   // console.log("orders data  ",measurementsData);
   console.log("max id", maxId + "min id", minId + "nominal id", nominalId);
-const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
 
   const [asssing_id, setAssign_id] = useState<string | null>(null);
- const { data: customerData } = useQuery({
+  const { data: customerData } = useQuery({
     queryKey: ["get_customer", page, search, limit],
     queryFn: async () => {
       console.log("Fetching Data with:", { page, search, limit }); // Debug
@@ -209,7 +207,7 @@ const [page, setPage] = useState(1);
     },
     retry: 1,
   });
-  
+
   console.log("Customer Data:", customerData);
 
   const customerOptions =
@@ -217,7 +215,6 @@ const [page, setPage] = useState(1);
       value: customer.id,
       label: `${customer.company_name}`,
     })) || [];
-
 
   return (
     <div className="flex flex-col w-full p-12 mx-auto text-black">
@@ -234,75 +231,52 @@ const [page, setPage] = useState(1);
         onSubmit={async (values) => {
           for (const row of values.rows) {
             try {
-              // Run Nominal, Min, and Max Mutations in parallel
-              const [nominalResponse, minResponse, maxResponse] =
-                await Promise.all([
-                  new Promise((resolve, reject) => {
-                    AddNominalMutation.mutate(
-                      {
-                        length: row.LengthNominal,
-                        inside_diameter: row.InsideDiameterNominal,
-                        outside_diameter: row.OutsideDiameterNominal,
-                        flat_crush: row.FlatCrushNominal,
-                        h20: row.H20Nominal,
-                        user_id: userID,
-                      },
-                      { onSuccess: resolve, onError: reject }
-                    );
-                  }),
-                  new Promise((resolve, reject) => {
-                    AddMinMutation.mutate(
-                      {
-                        length: row.LengthMin,
-                        inside_diameter: row.InsideDiameterMin,
-                        outside_diameter: row.OutsideDiameterMin,
-                        flat_crush: row.FlatCrushMin,
-                        h20: row.H20Min,
-                        user_id: userID,
-                      },
-                      { onSuccess: resolve, onError: reject }
-                    );
-                  }),
-                  new Promise((resolve, reject) => {
-                    AddMaxMutation.mutate(
-                      {
-                        length: row.LengthMax,
-                        inside_diameter: row.InsideDiameterMax,
-                        outside_diameter: row.OutsideDiameterMax,
-                        flat_crush: row.FlatCrushMax,
-                        h20: row.H20Max,
-                        user_id: userID,
-                      },
-                      { onSuccess: resolve, onError: reject }
-                    );
-                  }),
-                ]);
-
+              const nominalResponse = await AddNominalMutation.mutateAsync({
+                length: row.LengthNominal,
+                inside_diameter: row.InsideDiameterNominal,
+                outside_diameter: row.OutsideDiameterNominal,
+                flat_crush: row.FlatCrushNominal,
+                h20: row.H20Nominal,
+                user_id: userID,
+              });
+              
+              const minResponse = await AddMinMutation.mutateAsync({
+                length: row.LengthMin,
+                inside_diameter: row.InsideDiameterMin,
+                outside_diameter: row.OutsideDiameterMin,
+                flat_crush: row.FlatCrushMin,
+                h20: row.H20Min,
+                user_id: userID,
+              });
+              
+              const maxResponse = await AddMaxMutation.mutateAsync({
+                length: row.LengthMax,
+                inside_diameter: row.InsideDiameterMax,
+                outside_diameter: row.OutsideDiameterMax,
+                flat_crush: row.FlatCrushMax,
+                h20: row.H20Max,
+                user_id: userID,
+              });
+              
               // Extract IDs
-              const nominalId = (nominalResponse as { id: string })?.id;
-              const minId = (minResponse as { id: string })?.id;
-              const maxId = (maxResponse as { id: string })?.id;
-
-              // Ensure all IDs are valid before proceeding
+              const nominalId = nominalResponse?.id;
+              const minId = minResponse?.id;
+              const maxId = maxResponse?.id;
+              
               if (!nominalId || !minId || !maxId) {
                 throw new Error("One or more required IDs are missing");
               }
-
-              // Add Article Mutation
-              await new Promise((resolve, reject) => {
-                AddArticleMutation.mutate(
-                  {
-                    article_name: row.article_name,
-                    customer_id: row.customer_id,
-                    article_nominal: nominalId,
-                    article_min: minId,
-                    article_max: maxId,
-                    number_control: row.NumberControl,
-                    user_id: userID,
-                  },
-                  { onSuccess: resolve, onError: reject }
-                );
+              
+              await AddArticleMutation.mutateAsync({
+                article_name: row.article_name,
+                customer_id: row.customer_id,
+                article_nominal: nominalId,
+                article_min: minId,
+                article_max: maxId,
+                number_control: row.NumberControl,
+                user_id: userID,
               });
+              
             } catch (error) {
               toast.error("Failed to add article");
               console.error("Error in mutation chain:", error);
@@ -310,7 +284,7 @@ const [page, setPage] = useState(1);
           }
         }}
       >
-        {({ values, setFieldValue,errors,touched }) => (
+        {({ values, setFieldValue, errors, touched }) => (
           <Form>
             <div className="">
               <FieldArray
@@ -321,91 +295,90 @@ const [page, setPage] = useState(1);
                       {values.rows.map((row, index) => (
                         <div key={index} className="flex gap-4">
                           <div className="inline gap-2">
-                          <label className="label">Product Name</label>
-                          <Field
-                            name={`rows.${index}.article_name`}
-                            type="text"
-                            placeholder="Enter Product Name"
-                          className={`input input-bordered
+                            <label className="label">Product Name</label>
+                            <Field
+                              name={`rows.${index}.article_name`}
+                              type="text"
+                              placeholder="Enter Product Name"
+                              className={`input input-bordered
                              ${
-      typeof errors.rows?.[index] === "object" &&
-      errors.rows?.[index]?.article_name &&
-      touched.rows?.[index]?.article_name
-        ? "border-red-500"
-        : ""
-    } 
+                               typeof errors.rows?.[index] === "object" &&
+                               errors.rows?.[index]?.article_name &&
+                               touched.rows?.[index]?.article_name
+                                 ? "border-red-500"
+                                 : ""
+                             } 
                             `}
-                          /> <ErrorMessage
-                                                                            name={`rows.${index}.article_name`}
-                                                                            component="div"
-                                                                            className="text-red-500 text-sm"
-                                                                          />
+                            />{" "}
+                            <ErrorMessage
+                              name={`rows.${index}.article_name`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
                           </div>
                           <div className="inline gap-2">
-  <label className="label">Customer Name</label>
-  <Field
-    as="select"
-    name={`rows.${index}.customer_id`}
-    className={`select select-bordered
+                            <label className="label">Customer Name</label>
+                            <Field
+                              as="select"
+                              name={`rows.${index}.customer_id`}
+                              className={`select select-bordered
                                    ${
-      typeof errors.rows?.[index] === "object" &&
-      errors.rows?.[index]?.customer_id &&
-      touched.rows?.[index]?.customer_id
-        ? "border-red-500"
-        : ""
-    } `}
-    defaultValue=""
-    onChange={(e:any) => {
-      // Update Formik state directly
-      setFieldValue(`rows.${index}.customer_id`, e.target.value);
-    }}
-  >
-    
-    <option value="" disabled>
-      Select Customer
-    </option>
-    {customerOptions?.map((option: any) => (
-      <option key={option.value} value={option.value}>
-        {option.label}
-      </option>
-    ))}
-  </Field>
-  <ErrorMessage
-                                                                            name={`rows.${index}.customer_id`}
-                                                                            component="div"
-                                                                            className="text-red-500 text-sm"
-                                                                          />
-</div>
-
+                                     typeof errors.rows?.[index] === "object" &&
+                                     errors.rows?.[index]?.customer_id &&
+                                     touched.rows?.[index]?.customer_id
+                                       ? "border-red-500"
+                                       : ""
+                                   } `}
+                              defaultValue=""
+                              onChange={(e: any) => {
+                                // Update Formik state directly
+                                setFieldValue(
+                                  `rows.${index}.customer_id`,
+                                  e.target.value
+                                );
+                              }}
+                            >
+                              <option value="" disabled>
+                                Select Customer
+                              </option>
+                              {customerOptions?.map((option: any) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </Field>
+                            <ErrorMessage
+                              name={`rows.${index}.customer_id`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
+                          </div>
 
                           <div className="inline gap-2">
-                          <label className="label">Number of Control</label>
-                          <Field
-                            name={`rows.${index}.NumberControl`}
-                            type="number"
-                            placeholder="Enter Number Of Control"
-                            className={`input input-bordered    ${
-      typeof errors.rows?.[index] === "object" &&
-      errors.rows?.[index]?.NumberControl &&
-      touched.rows?.[index]?.NumberControl
-        ? "border-red-500"
-        : ""
-    }`}
-                          />
-                          <ErrorMessage
-                                                                            name={`rows.${index}.NumberControl`}
-                                                                            component="div"
-                                                                            className="text-red-500 text-sm"
-                                                                          />
-
+                            <label className="label">Number of Control</label>
+                            <Field
+                              name={`rows.${index}.NumberControl`}
+                              type="number"
+                              placeholder="Enter Number Of Control"
+                              className={`input input-bordered    ${
+                                typeof errors.rows?.[index] === "object" &&
+                                errors.rows?.[index]?.NumberControl &&
+                                touched.rows?.[index]?.NumberControl
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
+                            />
+                            <ErrorMessage
+                              name={`rows.${index}.NumberControl`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
                           </div>
-                          
                         </div>
                       ))}
                     </div>
 
                     <div className="flex place-content-end gap-3">
-
                       <button className="btn btn-primary" type="submit">
                         Add Article
                       </button>
