@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Field, FieldArray, Form, Formik } from "formik";
+import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { Pencil } from "lucide-react";
+import * as Yup from "yup";
 
 export default function AddArticleListCopy() {
   const queryClient = new QueryClient();
@@ -36,6 +37,8 @@ export default function AddArticleListCopy() {
 
   console.log("the user id is:", userID);
 
+
+ 
   const initialValues = {
     rows: [
       {
@@ -61,7 +64,15 @@ export default function AddArticleListCopy() {
       },
     ],
   };
-
+  const validationSchema = Yup.object({
+    rows: Yup.array().of(
+      Yup.object().shape({
+        article_name: Yup.string().required("Product Name is required"),
+        customer_id: Yup.string().required("Customer Name is required"),
+        NumberControl: Yup.number().required("Number of Control is required"),
+      })
+    ),
+  });
   const AddArticleMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/v1/create_article", {
@@ -207,6 +218,7 @@ const [page, setPage] = useState(1);
       label: `${customer.company_name}`,
     })) || [];
 
+
   return (
     <div className="flex flex-col w-full p-12 mx-auto text-black">
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
@@ -218,6 +230,7 @@ const [page, setPage] = useState(1);
       </div>
       <Formik
         initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={async (values) => {
           for (const row of values.rows) {
             try {
@@ -297,7 +310,7 @@ const [page, setPage] = useState(1);
           }
         }}
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue,errors,touched }) => (
           <Form>
             <div className="">
               <FieldArray
@@ -313,21 +326,41 @@ const [page, setPage] = useState(1);
                             name={`rows.${index}.article_name`}
                             type="text"
                             placeholder="Enter Product Name"
-                            className="input input-bordered"
-                          />
+                          className={`input input-bordered
+                             ${
+      typeof errors.rows?.[index] === "object" &&
+      errors.rows?.[index]?.article_name &&
+      touched.rows?.[index]?.article_name
+        ? "border-red-500"
+        : ""
+    } 
+                            `}
+                          /> <ErrorMessage
+                                                                            name={`rows.${index}.article_name`}
+                                                                            component="div"
+                                                                            className="text-red-500 text-sm"
+                                                                          />
                           </div>
                           <div className="inline gap-2">
   <label className="label">Customer Name</label>
   <Field
     as="select"
     name={`rows.${index}.customer_id`}
-    className="select select-bordered"
+    className={`select select-bordered
+                                   ${
+      typeof errors.rows?.[index] === "object" &&
+      errors.rows?.[index]?.customer_id &&
+      touched.rows?.[index]?.customer_id
+        ? "border-red-500"
+        : ""
+    } `}
     defaultValue=""
     onChange={(e:any) => {
       // Update Formik state directly
       setFieldValue(`rows.${index}.customer_id`, e.target.value);
     }}
   >
+    
     <option value="" disabled>
       Select Customer
     </option>
@@ -337,7 +370,13 @@ const [page, setPage] = useState(1);
       </option>
     ))}
   </Field>
+  <ErrorMessage
+                                                                            name={`rows.${index}.customer_id`}
+                                                                            component="div"
+                                                                            className="text-red-500 text-sm"
+                                                                          />
 </div>
+
 
                           <div className="inline gap-2">
                           <label className="label">Number of Control</label>
@@ -345,8 +384,20 @@ const [page, setPage] = useState(1);
                             name={`rows.${index}.NumberControl`}
                             type="number"
                             placeholder="Enter Number Of Control"
-                            className="input input-bordered"
+                            className={`input input-bordered    ${
+      typeof errors.rows?.[index] === "object" &&
+      errors.rows?.[index]?.NumberControl &&
+      touched.rows?.[index]?.NumberControl
+        ? "border-red-500"
+        : ""
+    }`}
                           />
+                          <ErrorMessage
+                                                                            name={`rows.${index}.NumberControl`}
+                                                                            component="div"
+                                                                            className="text-red-500 text-sm"
+                                                                          />
+
                           </div>
                           
                         </div>

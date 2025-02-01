@@ -372,7 +372,7 @@ export default function EditArticleListCopy(params:any) {
         
          
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue, errors,touched }) => (
           <Form>
             <div className="">
               <FieldArray
@@ -388,7 +388,15 @@ export default function EditArticleListCopy(params:any) {
                                                 name={`rows.${index}.article_name`}
                                                 type="text"
                                                 placeholder="Enter Product Name"
-                                                className="input input-bordered"
+                                                className={`input input-bordered 
+                                                    ${
+      typeof errors.rows?.[index] === "object" &&
+      errors.rows?.[index]?.article_name &&
+      touched.rows?.[index]?.article_name
+        ? "border-red-500"
+        : ""
+    } 
+                                                  `}
                                               />
                                               </div>
                                               <div className="inline gap-2">

@@ -45,5 +45,5 @@ export async function GET(req: NextRequest) {
   // Merge results while avoiding duplicates
   const mergedResults = [...new Map([...articleResults, ...customerResults].map(item => [item.id, item])).values()];
 
-  return NextResponse.json({ data: mergedResults, total_count: (articleCount || 0) + (customerCount || 0) }, { status: 200 });
+  return NextResponse.json({ data: mergedResults, total_count: (articleCount || 0) || (customerCount || 0) }, { status: 200 });
 }
