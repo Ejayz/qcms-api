@@ -2648,345 +2648,226 @@ export default function OrderListView() {
                                       )}
                                     </tbody>
                                     {isLoading || isFetching ? (
-                                      <tr>
-                                        <td colSpan={7}>
-                                          <span className="loading loading-dots loading-md"></span>
-                                        </td>
-                                      </tr>
-                                    ) : isError ? (
-                                      <tr>
-                                        <td
-                                          className="text-error font-bold"
-                                          colSpan={7}
-                                        >
-                                          Something went wrong while fetching
-                                          orders list.
-                                        </td>
-                                      </tr>
-                                    ) : fetchedMeasurementData?.length === 0 ? (
-                                      <p className="text-center text-sm text-slate-600">
-                                        No Measurement Data Found
-                                      </p>
-                                    ) : (
-                                      <FieldArray
-                                        name="rows4"
-                                        render={(arrayHelpers) => {
-                                          // Step 1: Group rows based on countMatchingPalettes
-                                          const groupedRows =
-                                            values.rows4.reduce(
-                                              (groups: any, row: any) => {
-                                                const countMatchingPalettes =
-                                                  values.rows4.filter(
-                                                    (r) =>
-                                                      r.pallete_count ===
-                                                        row.pallete_count &&
-                                                      Number(
-                                                        r.number_of_control
-                                                      ) ===
-                                                        Number(
-                                                          row.number_of_control
-                                                        )
-                                                  ).length;
-                                                // Create the group key based on countMatchingPalettes
-                                                const groupKey = `${row.pallete_count}|${countMatchingPalettes}`;
-
-                                                if (!groups[groupKey]) {
-                                                  groups[groupKey] = [];
-                                                }
-                                                groups[groupKey].push(row);
-
-                                                return groups;
-                                              },
-                                              {}
-                                            );
-
-                                          // Step 2: Render the grouped rows
-                                          return (
-                                            <tbody className="border-y border-slate-500">
-                                              {Object.keys(groupedRows).map(
-                                                (groupKey) => {
-                                                  const group =
-                                                    groupedRows[groupKey]; // Group of rows with the same countMatchingPalettes
-
-                                                  return (
-                                                    <React.Fragment
-                                                      key={groupKey}
-                                                    >
-                                                      <tr className="font-bold text-center">
-                                                        <td
-                                                          colSpan={10}
-                                                        >{`Group: ${groupKey}`}</td>
-                                                      </tr>
-                                                      {group.map((row:any, index:any) => {
-  const isLastRow = index === group.length - 1; // Check if last row of group
-
-  return (
-    <tr key={index} className="border-y border-slate-500">
-      <td className="border-y border-slate-500">
-        <Field
-          name={`rows4.${index}.pallete_count`}
-          type="number"
-          className="input input-bordered w-20 max-w-md"
-          value={row.pallete_count}
-          readOnly
-        />
-      </td>
-      <td className="border-y border-slate-500">
-        <Field
-          name={`rows4.${index}.number_of_control`}
-          type="number"
-          className="input input-bordered w-20 max-w-md"
-          value={row.number_of_control}
-          readOnly
-        />
-      </td>
-      {/* Other table fields here... */}
-      <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.length`}
-                                                                  type="number"
-                                                                  className="input input-bordered w-20 max-w-md"
-                                                                  value={
-                                                                    row.length
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-                                                              <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.inside_diameter`}
-                                                                  type="number"
-                                                                  className="input input-bordered w-20 max-w-md"
-                                                                  value={
-                                                                    row.inside_diameter
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-                                                              <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.outside_diameter`}
-                                                                  type="number"
-                                                                  className="input input-bordered w-20 max-w-md"
-                                                                  value={
-                                                                    row.outside_diameter
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-                                                              <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.flat_crush`}
-                                                                  type="number"
-                                                                  className="input input-bordered w-20 max-w-md"
-                                                                  value={
-                                                                    row.flat_crush
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-                                                              <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.h20`}
-                                                                  type="number"
-                                                                  className="input input-bordered w-20 max-w-md"
-                                                                  value={
-                                                                    row.h20
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-                                                              <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.radial`}
-                                                                  type="number"
-                                                                  className="input input-bordered w-20 max-w-md"
-                                                                  value={
-                                                                    row.radial
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-                                                              <td className="border-y border-slate-500">
-                                                                <Field
-                                                                  name={`rows4.${values.rows4.findIndex((r) => r.measurement_id === row.measurement_id)}.remarks`}
-                                                                  type="text"
-                                                                  className="input input-bordered"
-                                                                  value={
-                                                                    row.remarks
-                                                                  }
-                                                                  readOnly={
-                                                                    editableGroupKey !==
-                                                                    groupKey
-                                                                  }
-                                                                />
-                                                              </td>
-
-      <td className="border-y border-slate-500">
-        <div className="flex gap-2">
-          {/* Edit button appears only in the last row of every group */}
-          {isLastRow && editableGroupKey !== groupKey && (
-
-            
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => {
-                setEditableGroupKey(groupKey);
-                
-                // Store current group data before editing
-                setUpdatedGroupData((prev) => ({
-                  ...prev,
-                  [groupKey]: groupedRows[groupKey], // Store all rows of the group
-                }));
-
-                console.log("Group data:", groupedRows[groupKey].length); // Debugging
-                console.log("Group Key:", groupKey); // Debugging
-                console.log("Group Rows Data:", groupedRows); // Debugging
-                console.log("numbercontrol",numberControl);
-              }}
-              
-            >
-              Edit
-            </button>
-          )}
-
-          {/* Save/Cancel buttons appear only in the last row of the selected group */}
-           {/* Save/Cancel buttons appear only in the last row of the selected group */}
-      {isLastRow && editableGroupKey === groupKey && (
-        <>
-          {groupedRows[groupKey].length !== Number(numberControl) ? (
-            <button
-            className={`btn btn-success mt-2`}
-            type="button"
-            onClick={() => {
-              const existingRows = values.rowsmeasurement.filter(
-                (r) => r.number_of_control === row.number_of_control
-              );
-          
-              // Check if more rows can be added
-              if (existingRows.length < Number(row.number_of_control)) {
-                arrayHelpers.push({
-                  pallete_count: row.pallete_count,
-                  number_of_control: row.number_of_control,
-                  length: "",
-                  inside_diameter: "",
-                  outside_diameter: "",
-                  flat_crush: "",
-                  h20: "",
-                  radial: "",
-                  remarks: "",
-                  isnew: true,
-                });
-          
-                // Re-trigger edit mode
-                setTimeout(() => setEditableGroupKey(groupKey), 0);
-              } else {
-                alert("You have reached the maximum rows for this control.");
-              }
-          
-              console.log("Current rows length:", existingRows.length);
-            }}
-          >
-            +
-          </button>
-          
-          ) : null}
-
-          <button
-            type="button"
-            className="btn btn-success"
-            onClick={async () => {
-              try {
-                console.log("Updating Group:", groupKey);
-                console.log("Group Data Before Update:", group);
-
-                // Ensure each row in the group has its `measurement_id`
-                const updatedData = group.map((row: any) => ({
-                  id: row.measurement_id, // Ensure this field exists
-                  length: row.length,
-                  inside_diameter: row.inside_diameter,
-                  outside_diameter: row.outside_diameter,
-                  flat_crush: row.flat_crush,
-                  h20: row.h20,
-                  radial: row.radial,
-                  number_control: row.number_of_control,
-                  remarks: row.remarks,
-                }));
-
-                console.log("Final Payload Sent to API:", updatedData);
-
-                // Send each row to API one by one
-                await Promise.all(
-                  updatedData.map(async (row: any) => {
-                    await fetch(`/api/v1/edit_measurement?id=${row.id}`, {
-                      method: "PUT",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify(row),
-                    });
-                  })
-                );
-
-                setEditableGroupKey(null); // Reset after saving
-                refetchMeasurentData();
-              } catch (error) {
-                console.error("Error in mutation:", error);
-              }
-            }}
-          >
-            Save
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => {
-              if (window.confirm("Are you sure you want to cancel?")) {
-                setEditableGroupKey(null);
-                refetchMeasurentData();
-
-              }
-            }}
-          >
-            Cancel
-          </button>
-        </>
-      )}
-        </div>
-      </td>
-    </tr>
-  );
-})}
-
-                                                    </React.Fragment>
-                                                  );
-                                                }
+              <tr>
+                <td colSpan={7}>
+                  <span className="loading loading-dots loading-md"></span>
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td className="text-error font-bold" colSpan={7}>
+                  Something went wrong while fetching orders list.
+                </td>
+              </tr>
+            ) : fetchedMeasurementData?.length === 0 ? (
+                            <p className="text-center text-sm text-slate-600">
+                              No Measurement Data Found
+                            </p>
+                          ) : (
+                            <FieldArray
+                              name="rows4"
+                              render={(arrayHelpers) => (
+                                
+                                <tbody className="border-y border-slate-500">
+                                  {values.rows4.map((row, index) => (
+                                    <tr key={index} className="border-y border-slate-500">
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.pallete_count`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.pallete_count}
+                                          readOnly
+                                        />
+                                      </td>
+                                      {/* <td className="">
+                                        
+                                        <Field
+                                          name={`rows4.${index}.number_of_control`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md hidden"
+                                          value={row.number_of_control}
+                                        />
+                                      </td> */}
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.length`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.length}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.inside_diameter`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.inside_diameter}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.outside_diameter`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.outside_diameter}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.flat_crush`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.flat_crush}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.h20`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.h20}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.radial`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.radial}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.remarks`}
+                                          type="text"
+                                          className="input input-bordered"
+                                          value={row.remarks}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <div className="flex gap-2">
+                                          {editableRowMes === index ? (
+                                            <>
+                                              <button
+                                                type="button"
+                                                className="btn btn-success"
+                                                onClick={async () => {
+                                                  try {
+                                                    await updateMeasurementMutation.mutateAsync(
+                                                      {
+                                                        ...row,
+                                                      }
+                                                    );
+                                                    setEditableRowMes(null); // Reset editable row after saving
+                                                    refetchMeasurentData(); // Refetch data after update
+                                                  } catch (error) {
+                                                    console.error(
+                                                      "Error in mutation:",
+                                                      error
+                                                    );
+                                                  }
+                                                  setIsModalOpen(false);
+                                                  setTimeout(() => {
+                                                    setIsModalOpen(true);
+                                                    setSelectedTab("tab3");
+                                                  }, 100);
+                                                }}
+                                              >
+                                                Save
+                                              </button>
+                                              <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={() => {
+                                                  if (
+                                                    window.confirm(
+                                                      "Are you sure you want to cancel?"
+                                                    )
+                                                  ) {
+                                                    setTractnumbercontrollenght(0);
+                                                    setEditableRowMes(null); // Reset the editable state
+                                                    refetchMeasurentData(); // Refetch measurement data
+                                                    setIsModalOpen(false);
+                                                    setTimeout(() => {
+                                                      setIsModalOpen(true);
+                                                      setSelectedTab("tab3");
+                                                    }, 100);
+                                                  }
+                                                }}
+                                              >
+                                                Cancel
+                                              </button>
+                                            </>
+                                          ) : (
+                                            <>
+                                              {!editableRowMes && (
+                                                <>
+                                                  <button
+                                                    type="button"
+                                                    className={`btn btn-primary ${
+                                                      editableRowMes !== null
+                                                        ? "hidden"
+                                                        : ""
+                                                    }`}
+                                                    onClick={() => {
+                                                      setEditableRowMes(index);
+                                                      console.log(
+                                                        "the id is:",
+                                                        row.measurement_id
+                                                      );
+                                                    }}
+                                                  >
+                                                    Edit
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    className={`btn btn-error ${
+                                                      editableRowMes !== null
+                                                        ? "hidden"
+                                                        : ""
+                                                    } ${
+                                                      removeMeasurementMutation.isPending
+                                                        ? "loading"
+                                                        : ""
+                                                    }`}
+                                                    onClick={() => {
+                                                      const isConfirmed =
+                                                        window.confirm(
+                                                          "Are you sure you want to remove this measurement?"
+                                                        );
+                                                      if (isConfirmed) {
+                                                        removeMeasurementMutation.mutate(
+                                                          {
+                                                            measurement_id:
+                                                              row.measurement_id,
+                                                            is_exist: false,
+                                                          }
+                                                        );
+                                                      }
+                                                    }}
+                                                  >
+                                                    Remove
+                                                  </button>
+                                                </>
                                               )}
-                                            </tbody>
-                                          );
-                                        }}
-                                      />
-                                    )}
+                                            </>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              )}
+                            />
+                          )}
                                   </table>
                                 </div>
                               </div>
