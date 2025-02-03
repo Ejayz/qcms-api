@@ -13,6 +13,7 @@ export async function PUT(req: NextRequest) {
       outside_diameter,
       flat_crush,
       h20,
+      radial,
     } =
       await req.json();
 
@@ -37,6 +38,7 @@ export async function PUT(req: NextRequest) {
         outside_diameter,
         flat_crush,
         h20,
+        radial,
         updated_at: new Date(),
       })
       .eq("id", id);

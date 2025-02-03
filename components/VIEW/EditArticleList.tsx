@@ -19,25 +19,25 @@ export default function EditArticleListCopy(params:any) {
       {
         article_name: "",
         customer_id: "",
-        LengthNominal: "",
-        LengthMin: "",
-        LengthMax: "",
-        InsideDiameterNominal: "",
-        InsideDiameterMin: "",
-        InsideDiameterMax: "",
-        OutsideDiameterNominal: "",
-        OutsideDiameterMin: "",
-        OutsideDiameterMax: "",
-        FlatCrushNominal: "",
-        FlatCrushMin: "",
-        FlatCrushMax: "",
-        H20Nominal: "",
-        H20Min: "",
-        H20Max: "",
-        RadialNominal:"",
-        RadialMin:"",
-        RadialMax:"",
-        NumberControl: "",
+        LengthNominal: 0,
+        LengthMin: 0,
+        LengthMax: 0,
+        InsideDiameterNominal: 0,
+        InsideDiameterMin: 0,
+        InsideDiameterMax: 0,
+        OutsideDiameterNominal: 0,
+        OutsideDiameterMin: 0,
+        OutsideDiameterMax: 0,
+        FlatCrushNominal: 0,
+        FlatCrushMin: 0,
+        FlatCrushMax: 0,
+        H20Nominal: 0,
+        H20Min: 0,
+        H20Max: 0,
+        RadialNominal:0,
+        RadialMin:0,
+        RadialMax:0,
+        NumberControl: 0,
       },
     ],
   });
@@ -354,7 +354,7 @@ export default function EditArticleListCopy(params:any) {
         outside_diameter: row.OutsideDiameterNominal,
         flat_crush: row.FlatCrushNominal,
         h20: row.H20Nominal,
-        radial:row.RadialNominal
+        radial:row.RadialNominal,
       }),
       UpdateMinMutation.mutateAsync({
         length: row.LengthMin,
@@ -362,7 +362,7 @@ export default function EditArticleListCopy(params:any) {
         outside_diameter: row.OutsideDiameterMin,
         flat_crush: row.FlatCrushMin,
         h20: row.H20Min,
-        radial:row.RadialMin
+        radial:row.RadialMin,
       }),
       UpdateMaxMutation.mutateAsync({
         length: row.LengthMax,
@@ -370,7 +370,7 @@ export default function EditArticleListCopy(params:any) {
         outside_diameter: row.OutsideDiameterMax,
         flat_crush: row.FlatCrushMax,
         h20: row.H20Max,
-        radial:row.RadialMax
+        radial:row.RadialMax,
       }),
       UpdateArticleMutation.mutateAsync({
         article_name: row.article_name,
@@ -514,21 +514,21 @@ export default function EditArticleListCopy(params:any) {
                                 <td>
                                   <Field
                                     name={`rows.${index}.LengthNominal`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.LengthMin`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.LengthMax`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
@@ -545,21 +545,21 @@ export default function EditArticleListCopy(params:any) {
                                 <td>
                                   <Field
                                     name={`rows.${index}.InsideDiameterNominal`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.InsideDiameterMin`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.InsideDiameterMax`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
@@ -576,21 +576,21 @@ export default function EditArticleListCopy(params:any) {
                                 <td>
                                   <Field
                                     name={`rows.${index}.OutsideDiameterNominal`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.OutsideDiameterMin`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.OutsideDiameterMax`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
@@ -601,35 +601,33 @@ export default function EditArticleListCopy(params:any) {
                         </tbody>
                         {/* tbody for flat crush */}
                         <tbody>
-                          {values.rows.map((row, index) => (
-                            <React.Fragment key={index}>
+                       
                               <tr>
                                 <td>Flat Crush</td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.FlatCrushNominal`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.FlatCrushMin`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.FlatCrushMax`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
 
                               </tr>
-                            </React.Fragment>
-                          ))}
+                          
                         </tbody>
                         {/* tbody for h20 */}
                         <tbody>
@@ -639,21 +637,21 @@ export default function EditArticleListCopy(params:any) {
                                 <td>
                                   <Field
                                     name={`rows.${index}.H20Nominal`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.H20Min`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
                                 <td>
                                   <Field
                                     name={`rows.${index}.H20Max`}
-                                    type="text"
+                                    type="number"
                                     className="input input-bordered"
                                   />
                                 </td>
