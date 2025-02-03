@@ -1002,7 +1002,7 @@ export default function OrderListView() {
           <thead>
             <tr>
               <th>OF ID</th>
-              <th>Product Name</th>
+              {/* <th>Product Name</th> */}
               <th>Customer Name</th>
               <th>Article Name</th>
               <th>Pallete Count</th>
@@ -1040,7 +1040,7 @@ export default function OrderListView() {
                   >
                     {order.order_fabrication_control}
                   </td>
-                  <td>{order.product_name ? order.product_name: " "}</td>
+                  {/* <td>{order.product_name ? order.product_name: " "}</td> */}
                   <td>{order.tbl_customer?.company_name ? order.tbl_customer?.company_name: " "}</td>
                   <td>{order.tbl_article?.article_name ? order.tbl_article?.article_name: " "}</td>
                   <td>{order.pallete_count ? order.pallete_count : " "}</td>

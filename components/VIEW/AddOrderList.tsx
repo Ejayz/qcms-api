@@ -14,7 +14,7 @@ export default function AddOrderList() {
 
   const Add_Order_Validator = Yup.object().shape({
     Id: Yup.string().required("Id is required"),
-    product_name: Yup.string().required("Product Name is required"),
+    // product_name: Yup.string().required("Product Name is required"),
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
@@ -199,7 +199,7 @@ export default function AddOrderList() {
                       touched={touched.Id ? "true":"" }// Adjust as needed
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <FormInput
                       tooltip="Enter the product name"
                       name="product_name"
@@ -208,7 +208,7 @@ export default function AddOrderList() {
                       errors={errors.product_name ? errors.product_name : ""}
                       touched={touched.product_name ? "true" :""} // Adjust as needed
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormSelect
