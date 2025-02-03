@@ -20,8 +20,8 @@ export default function OrderListView() {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [order, setOrder] = useState("Order");
-  const [sort_by, setSort_by] = useState("Sort By");
+  // const [order, setOrder] = useState("Order");
+  // const [sort_by, setSort_by] = useState("Sort By");
   const {
     data: ordersData,
     refetch: refetchOrdersData,
@@ -36,15 +36,15 @@ export default function OrderListView() {
       limit,
       startDate,
       endDate,
-      sort_by,
-      order,
+      // sort_by,
+      // order,
     ],
     queryFn: async () => {
       if (startDate && endDate) {
         const response = await fetch(
           `/api/v1/get_order?page=${page}&search=${encodeURIComponent(
             search
-          )}&limit=${limit}&startDate=${startDate}&endDate=${endDate}&sort_by=${sort_by}&order=${order}`,
+          )}&limit=${limit}&startDate=${startDate}&endDate=${endDate}`,
           {
             method: "GET",
             headers: {
@@ -64,7 +64,7 @@ export default function OrderListView() {
         const response = await fetch(
           `/api/v1/get_order?page=${page}&search=${encodeURIComponent(
             search
-          )}&limit=${limit}&sort_by=${sort_by}&order=${order}`,
+          )}&limit=${limit}`,
           {
             method: "GET",
             headers: {
@@ -973,8 +973,8 @@ export default function OrderListView() {
                 onClick={() => {
                   setStartDate("");
                   setEndDate("");
-                  setOrder("Order");
-                  setSort_by("Sort By");
+                  // setOrder("Order");
+                  // setSort_by("Sort By");
                   setSearch("");
                   setPage(1);
                   if (searchInput.current) {
@@ -1025,8 +1025,8 @@ export default function OrderListView() {
                   Something went wrong while fetching orders list.
                 </td>
               </tr>
-            ) : ordersWithCustomerNames?.length > 0 ? (
-              ordersWithCustomerNames.map((order: any, index: number) => (
+            ) : ordersData?.data?.length > 0 ? (
+              ordersData.data.map((order: any, index: number) => (
                 <tr key={index}>
                   <td
                     className="text-xs hover:text-orange-500 hover:cursor-pointer"
