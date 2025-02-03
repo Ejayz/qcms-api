@@ -1613,9 +1613,9 @@ export default function OrderListView() {
                             render={(arrayHelpers) => (
                               <div>
                                 <div className="flex place-content-end gap-3">
-                                  {fetchedProofingData?.length === 0 ? (
-                                    <>
-                                      {/* <button
+                                  {/* {fetchedProofingData?.length === 0 ? ( */}
+                                    {/* <> */}
+                                      <button
                                       className="btn btn-info"
                                       type="button"
                                       onClick={() => arrayHelpers.push({
@@ -1627,15 +1627,15 @@ export default function OrderListView() {
                                       })}
                                     >
                                       Add Proofing
-                                    </button> */}
+                                    </button>
                                       <button
                                         className="btn btn-primary"
                                         type="submit"
                                       >
                                         Save Proofing
                                       </button>
-                                    </>
-                                  ) : null}
+                                    {/* </> */}
+                                  {/* // ) : null} */}
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
@@ -1677,11 +1677,13 @@ export default function OrderListView() {
                                                 value={orderformdisplay}
                                                 name={`rowsproofing.${index}.proofing_order_form_id`}
                                                 type="number"
-                                                className={`input input-bordered w-20 max-w-md ${
-                                                  isfieldhideproof
-                                                    ? "hidden"
-                                                    : "bg-white"
-                                                }`}
+                                                className="input input-bordered w-20 max-w-md"
+                                                // className={`input input-bordered w-20 max-w-md 
+                                                //   ${isfieldhideproof
+                                                //     ? "hidden"
+                                                //     : "bg-white"
+                                                // }
+                                                // `}
                                               />
                                             </td>
                                             <td>
@@ -1699,11 +1701,7 @@ export default function OrderListView() {
                                                     ? "border-red-500"
                                                     : ""
                                                 }
-                                                ${
-                                                  isfieldhideproof
-                                                    ? "hidden"
-                                                    : "bg-white"
-                                                }
+                                            
                                                 `}
                                               />
                                               <ErrorMessage
@@ -1727,11 +1725,7 @@ export default function OrderListView() {
                                                     ? "border-red-500"
                                                     : ""
                                                 }
-                                                ${
-                                                  isfieldhideproof
-                                                    ? "hidden"
-                                                    : "bg-white"
-                                                }
+                                              
                                                 `}
                                               />
                                               <ErrorMessage
@@ -1744,25 +1738,27 @@ export default function OrderListView() {
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_num_pallete`}
                                                 type="number"
-                                                className={`input input-bordered ${
-                                                  isfieldhideproof
-                                                    ? "hidden"
-                                                    : "bg-white"
-                                                }`}
+                                                className="input input-bordered max-w-md"
+                                                // className={`input input-bordered ${
+                                                //   isfieldhideproof
+                                                //     ? "hidden"
+                                                //     : "bg-white"
+                                                // }`}
                                               />
                                             </td>
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_program_name`}
                                                 type="text"
-                                                className={`input input-bordered ${
-                                                  isfieldhideproof
-                                                    ? "hidden"
-                                                    : "bg-white"
-                                                }`}
+                                                className="input input-bordered max-w-md"
+                                                // className={`input input-bordered ${
+                                                //   isfieldhideproof
+                                                //     ? "hidden"
+                                                //     : "bg-white"
+                                                // }`}
                                               />
                                             </td>
-                                            {/* <td>
+                                            <td>
                                               <button
                                                 className="btn btn-error"
                                                 type="button"
@@ -1772,7 +1768,7 @@ export default function OrderListView() {
                                               >
                                                 Remove
                                               </button>
-                                            </td> */}
+                                            </td>
                                           </tr>
                                         </tbody>
                                       </React.Fragment>

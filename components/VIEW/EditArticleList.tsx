@@ -667,7 +667,7 @@ export default function EditArticleListCopy(params:any) {
                                                         <td>Radial</td>
                                                         <td>
                                                           <Field
-                                                            name={`rows.${index},RadialNominal`}
+                                                            name={`rows.${index}.RadialNominal`}
                                                             type="number"
                                                             className="input input-bordered"
                                                           />
