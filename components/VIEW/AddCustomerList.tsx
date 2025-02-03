@@ -181,7 +181,7 @@ export default function AddCustomerList() {
                   </>
                 ) : (
                   <>
-                    <Plus /> ADD CUSTOMER
+                    ADD CUSTOMER
                   </>
                 )}
               </button>

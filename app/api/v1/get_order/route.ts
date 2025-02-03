@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     .select("* ,tbl_customer(*),tbl_article(*),tbl_production(*)", { count: "exact" })
     .eq("is_exist", true)
     .or(`order_fabrication_control.ilike.%${search}%`)
-  
+    .order("created_at", { ascending: false })
     .range((page - 1) * limit, page * limit - 1);
 
   // Add search filter
