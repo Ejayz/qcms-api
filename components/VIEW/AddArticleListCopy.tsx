@@ -101,6 +101,7 @@ export default function AddArticleListCopy() {
 
   const AddNominalMutation = useMutation({
     mutationFn: async (data: any) => {
+      console.log("nominal data",data);
       const response = await fetch("/api/v1/create_article_nominal", {
         method: "POST",
         headers: {
@@ -243,6 +244,7 @@ export default function AddArticleListCopy() {
                   h20: row.H20Nominal,
                   radial:row.RadialNominal,
                 }),
+                
                 AddMinMutation.mutateAsync({
                   length: row.LengthMin,
                   inside_diameter: row.InsideDiameterMin,
@@ -596,7 +598,7 @@ export default function AddArticleListCopy() {
                                 <td>Radial</td>
                                 <td>
                                   <Field
-                                    name={`rows.${index},RadialNominal`}
+                                    name={`rows.${index}.RadialNominal`}
                                     type="number"
                                     className="input input-bordered"
                                   />
