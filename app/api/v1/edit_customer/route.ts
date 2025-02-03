@@ -7,8 +7,8 @@ export async function PUT(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id");
 
     // Parse request body
-    const { email, first_name, middle_name, last_name, company_name, user_id } = await req.json();
-    console.log("Received Data:", email, first_name, middle_name, last_name, company_name, user_id);
+    const { email, first_name, middle_name, last_name, company_name, user_id,customer_id } = await req.json();
+    console.log("Received Data:", email, first_name, middle_name, last_name, company_name, user_id,customer_id);
     // Initialize Supabase client
     const supabase = await createClient();
 
@@ -62,6 +62,7 @@ export async function PUT(req: NextRequest) {
         // middle_name,
         // last_name,
         company_name,
+        customer_id,
         user_id,
         updated_at: new Date(),
       })

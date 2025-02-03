@@ -34,6 +34,9 @@ export default function EditArticleListCopy(params:any) {
         H20Nominal: "",
         H20Min: "",
         H20Max: "",
+        RadialNominal:"",
+        RadialMin:"",
+        RadialMax:"",
         NumberControl: "",
       },
     ],
@@ -119,6 +122,7 @@ export default function EditArticleListCopy(params:any) {
           OutsideDiameterNominal: nominalData[0].outside_diameter,
           FlatCrushNominal: nominalData[0].flat_crush,
           H20Nominal: nominalData[0].h20,
+          RadialNominal:nominalData[0].radial,
         })),
       }));
     }
@@ -154,6 +158,7 @@ export default function EditArticleListCopy(params:any) {
           OutsideDiameterMin: minData[0].outside_diameter,
           FlatCrushMin: minData[0].flat_crush,
           H20Min: minData[0].h20,
+          RadialMin:minData[0].radial,
         })),
       }));
     }
@@ -188,6 +193,7 @@ export default function EditArticleListCopy(params:any) {
           OutsideDiameterMax: maxData[0].outside_diameter,
           FlatCrushMax: maxData[0].flat_crush,
           H20Max: maxData[0].h20,
+          RadialMax:maxData[0].radial,
         })),
       }));
     }
@@ -329,7 +335,7 @@ export default function EditArticleListCopy(params:any) {
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashboard/measurement_management">
+            <Link href="/dashboard/article_management">
               Article Management
             </Link>
           </li>
@@ -348,6 +354,7 @@ export default function EditArticleListCopy(params:any) {
         outside_diameter: row.OutsideDiameterNominal,
         flat_crush: row.FlatCrushNominal,
         h20: row.H20Nominal,
+        radial:row.RadialNominal
       }),
       UpdateMinMutation.mutateAsync({
         length: row.LengthMin,
@@ -355,6 +362,7 @@ export default function EditArticleListCopy(params:any) {
         outside_diameter: row.OutsideDiameterMin,
         flat_crush: row.FlatCrushMin,
         h20: row.H20Min,
+        radial:row.RadialMin
       }),
       UpdateMaxMutation.mutateAsync({
         length: row.LengthMax,
@@ -362,6 +370,7 @@ export default function EditArticleListCopy(params:any) {
         outside_diameter: row.OutsideDiameterMax,
         flat_crush: row.FlatCrushMax,
         h20: row.H20Max,
+        radial:row.RadialMax
       }),
       UpdateArticleMutation.mutateAsync({
         article_name: row.article_name,
@@ -378,9 +387,7 @@ export default function EditArticleListCopy(params:any) {
   // Redirect after all mutations succeed
   router.push("/dashboard/article_management");
 }}
-
         
-         
       >
         {({ values, setFieldValue, errors,touched }) => (
           <Form>
@@ -654,7 +661,44 @@ export default function EditArticleListCopy(params:any) {
                           
                               </tr>
                           
-                        </tbody>  </React.Fragment>
+                        </tbody>  
+                            <tbody>
+                                                      <tr>
+                                                        <td>Radial</td>
+                                                        <td>
+                                                          <Field
+                                                            name={`rows.${index},RadialNominal`}
+                                                            type="number"
+                                                            className="input input-bordered"
+                                                          />
+                                                        </td>
+                                                        <td>
+                                                          <Field
+                                                            name={`rows.${index}.RadialMin`}
+                                                            type="number"
+                                                            className="input input-bordered"
+                                                          />
+                                                        </td>
+                                                        <td>
+                                                          <Field
+                                                            name={`rows.${index}.RadialMax`}
+                                                            type="number"
+                                                            className="input input-bordered"
+                                                          />
+                                                        </td>
+                        
+                                                        {/* <td>
+                                                          <button
+                                                            className="btn btn-danger"
+                                                            type="button"
+                                                            onClick={() => arrayHelpers.remove(index)}
+                                                          >
+                                                            Remove
+                                                          </button>
+                                                        </td> */}
+                                                      </tr>
+                                                    </tbody>
+                        </React.Fragment>
                           ))}
                       </table>
                     </div>

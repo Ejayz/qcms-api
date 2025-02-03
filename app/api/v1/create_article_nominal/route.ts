@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
       flat_crush,
       h20,
       user_id,
+      radial,
     } = data;
 
  
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
           outside_diameter: outside_diameter || null,
           flat_crush: flat_crush || null,
           h20: h20 || null,
+          radial:radial||null,
           user_id: user_id,
           is_exist: true, // Always true
         },

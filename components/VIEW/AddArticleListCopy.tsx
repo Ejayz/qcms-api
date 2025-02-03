@@ -7,7 +7,7 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Pencil } from "lucide-react";
+import { Pencil, Radical } from "lucide-react";
 import * as Yup from "yup";
 
 export default function AddArticleListCopy() {
@@ -58,6 +58,9 @@ export default function AddArticleListCopy() {
         H20Nominal: "",
         H20Min: "",
         H20Max: "",
+        RadialNominal:"",
+        RadialMin:"",
+        RadialMax:"",
         NumberControl: "",
       },
     ],
@@ -238,6 +241,7 @@ export default function AddArticleListCopy() {
                   outside_diameter: row.OutsideDiameterNominal,
                   flat_crush: row.FlatCrushNominal,
                   h20: row.H20Nominal,
+                  radial:row.RadialNominal,
                 }),
                 AddMinMutation.mutateAsync({
                   length: row.LengthMin,
@@ -245,6 +249,7 @@ export default function AddArticleListCopy() {
                   outside_diameter: row.OutsideDiameterMin,
                   flat_crush: row.FlatCrushMin,
                   h20: row.H20Min,
+                  radial:row.RadialMin,
                 }),
                 AddMaxMutation.mutateAsync({
                   length: row.LengthMax,
@@ -252,6 +257,7 @@ export default function AddArticleListCopy() {
                   outside_diameter: row.OutsideDiameterMax,
                   flat_crush: row.FlatCrushMax,
                   h20: row.H20Max,
+                  radial:row.RadialMax,
                 }),
               ]);
       
@@ -510,8 +516,7 @@ export default function AddArticleListCopy() {
                             </tbody>
                             {/* tbody for flat crush */}
                             <tbody>
-                              {values.rows.map((row, index) => (
-                                <React.Fragment key={index}>
+                          
                                   <tr>
                                     <td>Flat Crush</td>
                                     <td>
@@ -546,8 +551,7 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                                   </tr>
-                                </React.Fragment>
-                              ))}
+                               
                             </tbody>
                             {/* tbody for h20 */}
                             <tbody>
@@ -585,7 +589,45 @@ export default function AddArticleListCopy() {
                                   </button>
                                 </td> */}
                               </tr>
-                            </tbody>{" "}
+                            </tbody>
+                            
+                            <tbody>
+                              <tr>
+                                <td>Radial</td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index},RadialNominal`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.RadialMin`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.RadialMax`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                                {/* <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                            </tbody>
+
                           </React.Fragment>
                         ))}
                       </table>
