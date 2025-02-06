@@ -64,7 +64,7 @@ export default function AddOrderList(params:any) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Id: data.Id,
+          order_fabrication_control: data.Id,
           // product_name: data.product_name,
           customer_id: data.CustomerName,
           article_id: data.ArticleName,
@@ -236,7 +236,7 @@ const removeCustomerMutation = useMutation({
                       label="Order ID"
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
-                      readonly={true}
+                      // readonly={true}
                     />
                   </div>
                   {/* <div>
