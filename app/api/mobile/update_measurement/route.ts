@@ -5,6 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     // Parse incoming request data
     const data = await req.json();
+    console.log(data)
     const {
       order_id,
       length,
@@ -30,16 +31,7 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-//GET PALLET COUNT
-    const {data:PalleteData, error:PalleteError} = await supabase.from("tbl_measurement").select("pallete_count").eq("order_form_id", order_id).eq("is_exist", true).eq("pallete_count",pallete_count);
-    if(PalleteError){
-      return NextResponse.json(
-        { error: PalleteError.message },
-        { status: 500 }
-      );
-    }
 
-    const control_number= PalleteData.length + 1;
 
     // Update data into tbl_orders_form
     const { data: insertResult, error } = await supabase
