@@ -45,7 +45,7 @@ export default function UserListView() {
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/">Home</Link>
+            {/* <Link href="#">Home</Link> */}
           </li>
           <li>
             <span>Customer Management</span>
@@ -118,7 +118,7 @@ export default function UserListView() {
             ) : data?.data?.length > 0 ? (
               data.data.map((customer: any) => (
                 <tr key={customer.id}>
-                  <td>{customer.id}</td>
+                  <td>{customer.customer_id}</td>
                   <td>{customer.company_name}</td>
                   <td className="flex gap-4 justify-center">
                     <Link

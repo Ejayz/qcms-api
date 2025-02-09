@@ -13,8 +13,8 @@ export async function GET(req: NextRequest) {
   let query = supabase
     .from("tbl_orders_form")
     .select("* ,tbl_customer(company_name),tbl_article(id,user_id,is_exist,article_max,article_min,article_name,number_control,article_nominal)", { count: "exact" })
+    .eq("order_fabrication_control",search)
     .eq("is_exist", true)
-    .or(`order_fabrication_control.ilike.%${search}%`)
 
 
   // Add date filters
@@ -23,16 +23,15 @@ export async function GET(req: NextRequest) {
   if(startDate ){
     const adjustedStartDate = `${startDate}T00:00:00`; // Ensure start of the day
     query = query
-      .gte("created_at", adjustedStartDate)
+      .gte("entry_date_time", adjustedStartDate)
   }
 
 
   if ( endDate) {
     const adjustedEndDate = `${endDate}T23:59:59`; // Ensure end of the day
     query = query
-      .lte("created_at", adjustedEndDate);
+      .lte("exit_date_time", adjustedEndDate);
   }
-
   const { data, error, count } = await query;
 
   if (error) {

@@ -5,36 +5,52 @@ export async function POST(req: NextRequest) {
   try {
     // Parse incoming request data
     const data = await req.json();
+    console.log(data)
     const {
+      order_id,
       length,
       inside_diameter,
       outside_diameter,
       flat_crush,
       h20,
-      user_id,
       radial,
+      number_control,
+      pallete_count,
+      remarks,
+      user_id,
+      measurement_id
     } = data;
 
- 
+   
+
     // Create Supabase client
     const supabase = await createClient();
+    if(pallete_count === 0 || pallete_count === null || pallete_count === undefined){
+      return NextResponse.json(
+        { error: "Pallete count cannot be 0" },
+        { status: 400 }
+      );
+    }
 
-    // Insert data into tbl_orders_form
+
+    // Update data into tbl_orders_form
     const { data: insertResult, error } = await supabase
-      .from("tbl_article_nominal")
-      .insert([
-        {
-          length: length || null,
-          inside_diameter: inside_diameter || null,
-          outside_diameter: outside_diameter || null,
-          flat_crush: flat_crush || null,
-          h20: h20 || null,
-          radial:radial||null,
-          user_id: user_id,
-          is_exist: true, // Always true
-        },
-      ])
-      .select(); // Ensure we return the inserted row, including its ID
+  .from("tbl_measurement")
+  .update([
+    {
+      length: length || 0,
+      inside_diameter: inside_diameter || 0,
+      outside_diameter: outside_diameter || 0,
+      flat_crush: flat_crush || 0,
+      h20: h20 || 0,
+      radial: radial || 0,
+      remarks: remarks || null,
+      user_id: user_id || null,
+      is_exist: true,
+    },
+  ]).eq("id",measurement_id)
+  .eq("is_exist",true);
+
 
     // Handle errors
     if (error) {
@@ -45,14 +61,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-
-    const insertedId = insertResult[0]?.id;
     // Return success response
     return NextResponse.json(
-      { message: "Data inserted successfully", id: insertedId, data: insertResult },
+      { message: "Data inserted successfully", data: insertResult },
       { status: 200 }
     );
-    
   } catch (err) {
     console.error("Unexpected Error:", err);
     return NextResponse.json(

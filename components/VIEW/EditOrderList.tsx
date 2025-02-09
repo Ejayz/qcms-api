@@ -16,7 +16,7 @@ export default function AddOrderList(params:any) {
 
   const [initialValues, setInitialValues] = useState({
     Id: "",
-    product_name: "",
+    // product_name: "",
     CustomerName: "",
     ArticleName: "",
     PalleteCount: "",
@@ -47,7 +47,7 @@ export default function AddOrderList(params:any) {
       setInitialValues((prev) => ({
         ...prev,
         Id: user.order_fabrication_control || "",
-        product_name: user.product_name || "",
+        // product_name: user.product_name || "",
         CustomerName: user.customer_id || "",
         ArticleName: user.article_id || "",
         PalleteCount: user.pallete_count ||"0",
@@ -64,8 +64,8 @@ export default function AddOrderList(params:any) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          Id: data.Id,
-          product_name: data.product_name,
+          order_fabrication_control: data.Id,
+          // product_name: data.product_name,
           customer_id: data.CustomerName,
           article_id: data.ArticleName,
           pallete_count: data.PalleteCount,
@@ -88,7 +88,7 @@ export default function AddOrderList(params:any) {
 
   const Add_Order_Validator = Yup.object().shape({
     Id: Yup.string().required("Id is required"),
-    product_name: Yup.string().required("Product Id is required"),
+    // product_name: Yup.string().required("Product Id is required"),
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
@@ -236,11 +236,12 @@ const removeCustomerMutation = useMutation({
                       label="Order ID"
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
-                      readonly={true}
+                      // readonly={true}
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <FormInput
+                    
                       tooltip="Enter the product name"
                       name="product_name"
                       placeholder="Product Name"
@@ -248,7 +249,7 @@ const removeCustomerMutation = useMutation({
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="form-control w-96 max-w-lg">
                     <FormSelect
@@ -328,7 +329,7 @@ const removeCustomerMutation = useMutation({
                   </>
                 ) : (
                   <>
-                    <Pencil /> Edit Order
+                   Save
                   </>
                 )}
               </button>

@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     // Parse incoming request data
     const data = await req.json();
-    const { first_name, last_name, email, middle_name,company_name, user_id } = data;
+    const { first_name, last_name, email, middle_name,company_name, user_id,customer_id } = data;
 
 
 
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
           last_name: last_name || null,
           email: email || null,
           middle_name: middle_name || null,
+          customer_id:customer_id || null,
           company_name: company_name || null,
           user_id: user_id,
           is_exist: true, // Always true

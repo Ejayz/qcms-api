@@ -26,6 +26,7 @@ export default function EditCustomerList(params: any) {
     // lastname: "",
     // email: "",
     company_name: "",
+    customer_id:"",
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,6 +58,7 @@ export default function EditCustomerList(params: any) {
         // lastname: user.last_name || "",
         // email: user.email || "",
         company_name: user.company_name || "",
+        customer_id:user.customer_id ||"",
       }));
     }
   }, [isSuccess, userData]);
@@ -74,6 +76,7 @@ export default function EditCustomerList(params: any) {
           // middle_name: data.middlename,
           // last_name: data.lastname,
           company_name: data.company_name,
+          customer_id:data.customer_id,
         }),
       });
      const result = await response.json();
@@ -164,6 +167,20 @@ export default function EditCustomerList(params: any) {
               <div className="border p-12 rounded-md bg-white">
                 <h1 className="text-xl font-bold py-4">Customer Details</h1>
                 <div className="grid lg:grid-cols-2 gap-6 w-full place-content-center grid-cols-1">
+                <div>
+                    <label className="form-control w-96 max-w-lg">
+                      <FormInput
+                        tooltip="Input of Customer ID. This is required."
+                        name="customer_id"
+                        placeholder="Enter Customer ID"
+                        label="Customer ID"
+                        errors={errors.customer_id ? errors.customer_id : ""}
+                        touched={touched.customer_id ? "true" : ""}
+                        type="number"
+                        // readonly={true}
+                      />
+                    </label>
+                  </div>
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormInput
@@ -193,7 +210,7 @@ export default function EditCustomerList(params: any) {
                   </>
                 ) : (
                   <>
-                    <Pencil /> EDIT CUSTOMER
+                  Save Customer
                   </>
                 )}
               </button>

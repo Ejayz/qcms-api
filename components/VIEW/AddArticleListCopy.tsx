@@ -1,13 +1,14 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { Field, FieldArray, Form, Formik } from "formik";
+import { ErrorMessage, Field, FieldArray, Form, Formik } from "formik";
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/client";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Pencil } from "lucide-react";
+import { Pencil, Radical } from "lucide-react";
+import * as Yup from "yup";
 
 export default function AddArticleListCopy() {
   const queryClient = new QueryClient();
@@ -57,11 +58,22 @@ export default function AddArticleListCopy() {
         H20Nominal: "",
         H20Min: "",
         H20Max: "",
+        RadialNominal:"",
+        RadialMin:"",
+        RadialMax:"",
         NumberControl: "",
       },
     ],
   };
-
+  const validationSchema = Yup.object({
+    rows: Yup.array().of(
+      Yup.object().shape({
+        article_name: Yup.string().required("Product Name is required"),
+        customer_id: Yup.string().required("Customer Name is required"),
+        NumberControl: Yup.number().required("Number of Control is required"),
+      })
+    ),
+  });
   const AddArticleMutation = useMutation({
     mutationFn: async (data: any) => {
       const response = await fetch("/api/v1/create_article", {
@@ -89,6 +101,7 @@ export default function AddArticleListCopy() {
 
   const AddNominalMutation = useMutation({
     mutationFn: async (data: any) => {
+      console.log("nominal data",data);
       const response = await fetch("/api/v1/create_article_nominal", {
         method: "POST",
         headers: {
@@ -106,7 +119,7 @@ export default function AddArticleListCopy() {
       if (data?.id) {
         setNominalId(data.id);
         toast.success("Article Nominal Added Successfully");
-        navigator.push("/dashboard/article_management");
+        // navigator.push("/dashboard/article_management");
         console.log("Nominal ID on success:", data.id);
       } else {
         console.warn("No ID returned in the response:", data);
@@ -133,7 +146,7 @@ export default function AddArticleListCopy() {
     },
     onSuccess: (data) => {
       toast.success("Article Min Added Successfully");
-      navigator.push("/dashboard/article_management");
+      // navigator.push("/dashboard/article_management");
       setMinId(data.id);
       console.log("min on success data", data.id);
     },
@@ -158,7 +171,7 @@ export default function AddArticleListCopy() {
     },
     onSuccess: (data) => {
       toast.success("Article Max Added Successfully");
-      navigator.push("/dashboard/article_management");
+      // navigator.push("/dashboard/article_management");
       setMaxId(data.id);
       console.log("max on success data", data.id);
     },
@@ -169,13 +182,13 @@ export default function AddArticleListCopy() {
 
   // console.log("orders data  ",measurementsData);
   console.log("max id", maxId + "min id", minId + "nominal id", nominalId);
-const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const searchInput = useRef<HTMLInputElement>(null);
   const [limit] = useState(10);
   const [search, setSearch] = useState("");
 
   const [asssing_id, setAssign_id] = useState<string | null>(null);
- const { data: customerData } = useQuery({
+  const { data: customerData } = useQuery({
     queryKey: ["get_customer", page, search, limit],
     queryFn: async () => {
       console.log("Fetching Data with:", { page, search, limit }); // Debug
@@ -198,7 +211,7 @@ const [page, setPage] = useState(1);
     },
     retry: 1,
   });
-  
+
   console.log("Customer Data:", customerData);
 
   const customerOptions =
@@ -218,86 +231,62 @@ const [page, setPage] = useState(1);
       </div>
       <Formik
         initialValues={initialValues}
+        validationSchema={validationSchema}
         onSubmit={async (values) => {
           for (const row of values.rows) {
             try {
-              // Run Nominal, Min, and Max Mutations in parallel
-              const [nominalResponse, minResponse, maxResponse] =
-                await Promise.all([
-                  new Promise((resolve, reject) => {
-                    AddNominalMutation.mutate(
-                      {
-                        length: row.LengthNominal,
-                        inside_diameter: row.InsideDiameterNominal,
-                        outside_diameter: row.OutsideDiameterNominal,
-                        flat_crush: row.FlatCrushNominal,
-                        h20: row.H20Nominal,
-                        user_id: userID,
-                      },
-                      { onSuccess: resolve, onError: reject }
-                    );
-                  }),
-                  new Promise((resolve, reject) => {
-                    AddMinMutation.mutate(
-                      {
-                        length: row.LengthMin,
-                        inside_diameter: row.InsideDiameterMin,
-                        outside_diameter: row.OutsideDiameterMin,
-                        flat_crush: row.FlatCrushMin,
-                        h20: row.H20Min,
-                        user_id: userID,
-                      },
-                      { onSuccess: resolve, onError: reject }
-                    );
-                  }),
-                  new Promise((resolve, reject) => {
-                    AddMaxMutation.mutate(
-                      {
-                        length: row.LengthMax,
-                        inside_diameter: row.InsideDiameterMax,
-                        outside_diameter: row.OutsideDiameterMax,
-                        flat_crush: row.FlatCrushMax,
-                        h20: row.H20Max,
-                        user_id: userID,
-                      },
-                      { onSuccess: resolve, onError: reject }
-                    );
-                  }),
-                ]);
-
-              // Extract IDs
-              const nominalId = (nominalResponse as { id: string })?.id;
-              const minId = (minResponse as { id: string })?.id;
-              const maxId = (maxResponse as { id: string })?.id;
-
-              // Ensure all IDs are valid before proceeding
-              if (!nominalId || !minId || !maxId) {
-                throw new Error("One or more required IDs are missing");
+              const [nominal, min, max] = await Promise.all([
+                AddNominalMutation.mutateAsync({
+                  length: row.LengthNominal,
+                  inside_diameter: row.InsideDiameterNominal,
+                  outside_diameter: row.OutsideDiameterNominal,
+                  flat_crush: row.FlatCrushNominal,
+                  h20: row.H20Nominal,
+                  radial:row.RadialNominal,
+                }),
+                
+                AddMinMutation.mutateAsync({
+                  length: row.LengthMin,
+                  inside_diameter: row.InsideDiameterMin,
+                  outside_diameter: row.OutsideDiameterMin,
+                  flat_crush: row.FlatCrushMin,
+                  h20: row.H20Min,
+                  radial:row.RadialMin,
+                }),
+                AddMaxMutation.mutateAsync({
+                  length: row.LengthMax,
+                  inside_diameter: row.InsideDiameterMax,
+                  outside_diameter: row.OutsideDiameterMax,
+                  flat_crush: row.FlatCrushMax,
+                  h20: row.H20Max,
+                  radial:row.RadialMax,
+                }),
+              ]);
+      
+              if (!nominal.id || !min.id || !max.id) {
+                throw new Error("Missing required IDs");
+                
               }
-
-              // Add Article Mutation
-              await new Promise((resolve, reject) => {
-                AddArticleMutation.mutate(
-                  {
-                    article_name: row.article_name,
-                    customer_id: row.customer_id,
-                    article_nominal: nominalId,
-                    article_min: minId,
-                    article_max: maxId,
-                    number_control: row.NumberControl,
-                    user_id: userID,
-                  },
-                  { onSuccess: resolve, onError: reject }
-                );
+      
+              await AddArticleMutation.mutateAsync({
+                article_name: row.article_name,
+                customer_id: row.customer_id,
+                article_nominal: nominal.id,
+                article_min: min.id,
+                article_max: max.id,
+                number_control: row.NumberControl,
               });
+              // navigator.push("/dashboard/article_management");
             } catch (error) {
               toast.error("Failed to add article");
-              console.error("Error in mutation chain:", error);
+              console.error(error);
             }
+          
+          
           }
         }}
       >
-        {({ values, setFieldValue }) => (
+        {({ values, setFieldValue, errors, touched }) => (
           <Form>
             <div className="">
               <FieldArray
@@ -308,53 +297,90 @@ const [page, setPage] = useState(1);
                       {values.rows.map((row, index) => (
                         <div key={index} className="flex gap-4">
                           <div className="inline gap-2">
-                          <label className="label">Product Name</label>
-                          <Field
-                            name={`rows.${index}.article_name`}
-                            type="text"
-                            placeholder="Enter Product Name"
-                            className="input input-bordered"
-                          />
+                            <label className="label">Product Name</label>
+                            <Field
+                              name={`rows.${index}.article_name`}
+                              type="text"
+                              placeholder="Enter Product Name"
+                              className={`input input-bordered
+                             ${
+                               typeof errors.rows?.[index] === "object" &&
+                               errors.rows?.[index]?.article_name &&
+                               touched.rows?.[index]?.article_name
+                                 ? "border-red-500"
+                                 : ""
+                             } 
+                            `}
+                            />{" "}
+                            <ErrorMessage
+                              name={`rows.${index}.article_name`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
                           </div>
                           <div className="inline gap-2">
-  <label className="label">Customer Name</label>
-  <Field
-    as="select"
-    name={`rows.${index}.customer_id`}
-    className="select select-bordered"
-    defaultValue=""
-    onChange={(e:any) => {
-      // Update Formik state directly
-      setFieldValue(`rows.${index}.customer_id`, e.target.value);
-    }}
-  >
-    <option value="" disabled>
-      Select Customer
-    </option>
-    {customerOptions?.map((option: any) => (
-      <option key={option.value} value={option.value}>
-        {option.label}
-      </option>
-    ))}
-  </Field>
-</div>
+                            <label className="label">Customer Name</label>
+                            <Field
+                              as="select"
+                              name={`rows.${index}.customer_id`}
+                              className={`select select-bordered
+                                   ${
+                                     typeof errors.rows?.[index] === "object" &&
+                                     errors.rows?.[index]?.customer_id &&
+                                     touched.rows?.[index]?.customer_id
+                                       ? "border-red-500"
+                                       : ""
+                                   } `}
+                              defaultValue=""
+                              onChange={(e: any) => {
+                                // Update Formik state directly
+                                setFieldValue(
+                                  `rows.${index}.customer_id`,
+                                  e.target.value
+                                );
+                              }}
+                            >
+                              <option value="" disabled>
+                                Select Customer
+                              </option>
+                              {customerOptions?.map((option: any) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </Field>
+                            <ErrorMessage
+                              name={`rows.${index}.customer_id`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
+                          </div>
 
                           <div className="inline gap-2">
-                          <label className="label">Number of Control</label>
-                          <Field
-                            name={`rows.${index}.NumberControl`}
-                            type="number"
-                            placeholder="Enter Number Of Control"
-                            className="input input-bordered"
-                          />
+                            <label className="label">Number of Control</label>
+                            <Field
+                              name={`rows.${index}.NumberControl`}
+                              type="number"
+                              placeholder="Enter Number Of Control"
+                              className={`input input-bordered    ${
+                                typeof errors.rows?.[index] === "object" &&
+                                errors.rows?.[index]?.NumberControl &&
+                                touched.rows?.[index]?.NumberControl
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
+                            />
+                            <ErrorMessage
+                              name={`rows.${index}.NumberControl`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
                           </div>
-                          
                         </div>
                       ))}
                     </div>
 
                     <div className="flex place-content-end gap-3">
-
                       <button className="btn btn-primary" type="submit">
                         Add Article
                       </button>
@@ -492,8 +518,7 @@ const [page, setPage] = useState(1);
                             </tbody>
                             {/* tbody for flat crush */}
                             <tbody>
-                              {values.rows.map((row, index) => (
-                                <React.Fragment key={index}>
+                          
                                   <tr>
                                     <td>Flat Crush</td>
                                     <td>
@@ -528,8 +553,7 @@ const [page, setPage] = useState(1);
                                   </button>
                                 </td> */}
                                   </tr>
-                                </React.Fragment>
-                              ))}
+                               
                             </tbody>
                             {/* tbody for h20 */}
                             <tbody>
@@ -567,7 +591,45 @@ const [page, setPage] = useState(1);
                                   </button>
                                 </td> */}
                               </tr>
-                            </tbody>{" "}
+                            </tbody>
+                            
+                            <tbody>
+                              <tr>
+                                <td>Radial</td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.RadialNominal`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.RadialMin`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+                                <td>
+                                  <Field
+                                    name={`rows.${index}.RadialMax`}
+                                    type="number"
+                                    className="input input-bordered"
+                                  />
+                                </td>
+
+                                {/* <td>
+                                  <button
+                                    className="btn btn-danger"
+                                    type="button"
+                                    onClick={() => arrayHelpers.remove(index)}
+                                  >
+                                    Remove
+                                  </button>
+                                </td> */}
+                              </tr>
+                            </tbody>
+
                           </React.Fragment>
                         ))}
                       </table>

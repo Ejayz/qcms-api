@@ -20,10 +20,11 @@ export default function OrderListView() {
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [order, setOrder] = useState("Order");
-  const [sort_by, setSort_by] = useState("Sort By");
+  // const [order, setOrder] = useState("Order");
+  // const [sort_by, setSort_by] = useState("Sort By");
   const {
     data: ordersData,
+    refetch: refetchOrdersData,
     isFetching,
     isLoading,
     isError,
@@ -35,15 +36,15 @@ export default function OrderListView() {
       limit,
       startDate,
       endDate,
-      sort_by,
-      order,
+      // sort_by,
+      // order,
     ],
     queryFn: async () => {
       if (startDate && endDate) {
         const response = await fetch(
           `/api/v1/get_order?page=${page}&search=${encodeURIComponent(
             search
-          )}&limit=${limit}&startDate=${startDate}&endDate=${endDate}&sort_by=${sort_by}&order=${order}`,
+          )}&limit=${limit}&startDate=${startDate}&endDate=${endDate}`,
           {
             method: "GET",
             headers: {
@@ -63,7 +64,7 @@ export default function OrderListView() {
         const response = await fetch(
           `/api/v1/get_order?page=${page}&search=${encodeURIComponent(
             search
-          )}&limit=${limit}&sort_by=${sort_by}&order=${order}`,
+          )}&limit=${limit}`,
           {
             method: "GET",
             headers: {
@@ -98,16 +99,25 @@ export default function OrderListView() {
   const [editproductionID, setEditproductionID] = useState<string | null>(null);
   const [countNumberControl, setCountNumberControl] = useState<number>(0);
   const [numberControl, setNumberControl] = useState<number>(0);
-  const [selectedTab, setSelectedTab] = useState('tab1'); 
-  const [filterPalleteCount, setFilterPalleteCount] = useState(1); 
+  const [selectedTab, setSelectedTab] = useState("tab1");
+  const [filterPalleteCount, setFilterPalleteCount] = useState(1);
   const [enablepallete, setEnablePallete] = useState(false);
   const [enableplus, setenableplus] = useState(true);
   const [lastpalleteCount, setLastpalleteCount] = useState<number | 1>(1);
+  const [tractnumbercontrollenght, setTractnumbercontrollenght] = useState<
+    number | 0
+  >(0);
+  const [isbuttonhide, setisbuttonhide] = useState<boolean>(false);
+  const [isfieldhide, setisfieldhide] = useState<boolean>(false);
+  const [isfieldhideproof, setisfieldhideproof] = useState<boolean>(false);
+  const [isContinueAdd, setisContinueAdd] = useState<boolean>(false);
+  const [editableGroupKey, setEditableGroupKey] = useState<string | null>(null);
+  const [updatedGroupData, setUpdatedGroupData] = useState<{ [key: string]: any }>({});
+  const [retrievedentryDateTime, setRetrievedentryDateTime] = useState<string | null>(null);
+  const [retrievedexitDateTime, setRetrievedexitDateTime] = useState<string | null>(null);
+
 
   console.log("current enablepallete: ", enablepallete);
-
-
-
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -204,6 +214,7 @@ export default function OrderListView() {
   const [initialValuesMeasurement, setInitialValuesMeasurement] = useState({
     rowsmeasurement: [
       {
+
         measurement_id: "",
         pallete_count: lastpalleteCount,
         number_of_control: 0,
@@ -215,10 +226,12 @@ export default function OrderListView() {
         radial: "",
         remarks: "",
         isnew: false, // Added isnew property
+        iswhiteAll: false,
       },
     ],
     rows4: [
       {
+        id: "",
         measurement_id: "",
         pallete_count: "",
         number_of_control: "",
@@ -234,18 +247,18 @@ export default function OrderListView() {
     ],
   });
 
-// useEffect(() => {
-//   setInitialValuesMeasurement((prev) => ({
-//     ...prev,
-//     rowsmeasurement: prev.rowsmeasurement.map((row) => ({
-//       ...row,
-//       pallete_count: lastpalleteCount,
-//     })),
-//   }));
-// }, [lastpalleteCount]);
+  // useEffect(() => {
+  //   setInitialValuesMeasurement((prev) => ({
+  //     ...prev,
+  //     rowsmeasurement: prev.rowsmeasurement.map((row) => ({
+  //       ...row,
+  //       pallete_count: lastpalleteCount,
+  //     })),
+  //   }));
+  // }, [lastpalleteCount]);
 
-// console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
-//   console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
+  // console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
+  //   console.log("controlnumber:  ", initialValuesMeasurement.rowsmeasurement[0].number_of_control);
   const initialValuesAssign = {
     user_id: "",
   };
@@ -310,7 +323,7 @@ export default function OrderListView() {
     useQuery({
       queryKey: ["production", orderid],
       queryFn: async () => {
-        const response = await fetch(`/api/v1/getoneproduction/?id=${orderid}`);
+        const response = await fetch(`/api/v1/getoneorder/?id=${orderid}`);
         if (!response.ok) {
           throw new Error(
             `Failed to fetch production data: ${response.status}`
@@ -324,6 +337,15 @@ export default function OrderListView() {
   useEffect(() => {
     if (fetchedProductionData?.length > 0) {
       const productionData = fetchedProductionData[0];
+      setisbuttonhide(false);
+      // setisfieldhide(true);
+      setRetrievedentryDateTime(productionData.entry_date_time);
+      setRetrievedexitDateTime(productionData.exit_date_time);
+      if(productionData.entry_date_time ===null && productionData.exit_date_time ===null){
+        setisfieldhide(false);
+      }else{
+        setisfieldhide(true);
+      }
       //setEditproductionID(productionData.id);
       setInitialValues((prev) => ({
         ...prev,
@@ -333,15 +355,34 @@ export default function OrderListView() {
           production_entry_date_time: data.entry_date_time,
           production_exit_date_time: data.exit_date_time,
         })),
+        
+      }));
+      
+    } else {
+      setisbuttonhide(true);
+      // setisfieldhide(false);
+      setInitialValues((prev) => ({
+        ...prev,
+        rows2: [
+          {
+            production_id: "",
+            production_order_form_id: "",
+            production_entry_date_time: "",
+            production_exit_date_time: "",
+            ishidefield: false,
+          },
+        ],
       }));
     }
-  }, [fetchedProductionData,refetchProductionData]);
-  // console.log("fetchedProductionData", fetchedProductionData?.length);
+  }, [fetchedProductionData, refetchProductionData]);
+  console.log("fetchedProductionData", fetchedProductionData?.length);
+  
+        console.log("updated entry",retrievedentryDateTime);
 
   const updateProductionMutation = useMutation({
     mutationFn: async (updatedData: any) => {
       const response = await fetch(
-        `/api/v1/edit_production?id=${updatedData.production_id}`,
+        `/api/v1/edit_production?id=${orderid}`,
         {
           method: "PUT",
           headers: {
@@ -401,7 +442,6 @@ export default function OrderListView() {
       refetchProductionData();
     },
   });
-  
 
   // proofing
   const AddProofingMutation = useMutation({
@@ -442,6 +482,7 @@ export default function OrderListView() {
     if (fetchedProofingData?.length > 0) {
       const proofingData = fetchedProofingData[0];
       //setEditproductionID(proofingData.id);
+      setisfieldhideproof(true);
       setInitialValuesProofing((prev) => ({
         ...prev,
         rows3: fetchedProofingData.map((data: any) => ({
@@ -452,6 +493,21 @@ export default function OrderListView() {
           proofing_num_pallete: data.num_pallets,
           proofing_program_name: data.program_name,
         })),
+      }));
+    } else {
+      setisfieldhideproof(false);
+      setInitialValuesProofing((prev) => ({
+        ...prev,
+        rows3: [
+          {
+            proofing_id: "",
+            proofing_order_form_id: "",
+            proofing_entry_date_time: "",
+            proofing_exit_date_time: "",
+            proofing_num_pallete: "",
+            proofing_program_name: "",
+          },
+        ],
       }));
     }
   }, [fetchedProofingData]);
@@ -530,7 +586,7 @@ export default function OrderListView() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
       return response.json();
     },
@@ -583,18 +639,17 @@ export default function OrderListView() {
       }));
     }
   }, [fetchedMeasurementData]);
-  
+
   useEffect(() => {
     if (fetchedMeasurementData?.length > 0) {
       // If fetchedMeasurementData has data, update rowsmeasurement with numberControl
       setInitialValuesMeasurement((prev) => ({
         ...prev,
         rowsmeasurement: prev.rowsmeasurement.map((row) => ({
-          
           ...row,
           number_of_control: 0, // Set to the provided numberControl
-          pallete_count:0
-          
+          pallete_count: 0,
+          iswhiteAll: true,
         })),
       }));
     } else {
@@ -603,23 +658,22 @@ export default function OrderListView() {
         ...prev,
         rowsmeasurement: prev.rowsmeasurement.map((row) => ({
           ...row,
-          number_of_control: numberControl, 
-          pallete_count:lastpalleteCount,
+          number_of_control: numberControl,
+          pallete_count: lastpalleteCount,
+          iswhiteAll: false,
         })),
       }));
     }
   }, [numberControl, lastpalleteCount, fetchedMeasurementData]);
-  
+
   useEffect(() => {
     if (fetchedMeasurementData?.length > 0) {
       // If fetchedMeasurementData has data, update rowsmeasurement with numberControl
       setInitialValuesMeasurement((prev) => ({
         ...prev,
         rowsmeasurement: prev.rowsmeasurement.map((row) => ({
-          
           ...row,
           number_of_control: 0, // Set to the provided numberControl
-          
         })),
       }));
     } else {
@@ -634,11 +688,12 @@ export default function OrderListView() {
     }
   }, [numberControl, fetchedMeasurementData]);
 
-
   useEffect(() => {
     if (fetchedMeasurementData?.length > 0) {
       // Extract pallete_count values
-      const palleteCounts = fetchedMeasurementData.map((item: any) => item.pallete_count || 0);
+      const palleteCounts = fetchedMeasurementData.map(
+        (item: any) => item.pallete_count || 0
+      );
 
       // Find the highest pallete_count
       const maxPalleteCount = Math.max(...palleteCounts);
@@ -650,15 +705,16 @@ export default function OrderListView() {
       console.log("Highest Pallete Count:", maxPalleteCount);
       setLastpalleteCount(maxPalleteCount);
       setEnablePallete(true);
-    }
-    else{
-      setLastpalleteCount(1)
+    } else {
+      setLastpalleteCount(1);
       setEnablePallete(false);
     }
   }, [fetchedMeasurementData]); // Add fetchedMeasurementData as a dependency
 
   const updateMeasurementMutation = useMutation({
     mutationFn: async (updatedData: any) => {
+      alert("Data to be updated: " + JSON.stringify(updatedData, null, 2));
+      console.log("Data to be updated: ", updatedData);
       const response = await fetch(
         `/api/v1/edit_measurement?id=${updatedData.measurement_id}`,
         {
@@ -668,14 +724,14 @@ export default function OrderListView() {
           },
           body: JSON.stringify({
             // pallete_count: updatedData.pallete_count,
-            number_control: updatedData.number_of_control,
-            length: updatedData.length,
-            inside_diameter: updatedData.inside_diameter,
-            outside_diameter: updatedData.outside_diameter,
-            flat_crush: updatedData.flat_crush,
-            h20: updatedData.h20,
-            radial: updatedData.radial,
-            remarks: updatedData.remarks,
+            // number_control: updatedData.number_of_control,
+            // length: updatedData.length,
+            // inside_diameter: updatedData.inside_diameter,
+            // outside_diameter: updatedData.outside_diameter,
+            // flat_crush: updatedData.flat_crush,
+            // h20: updatedData.h20,
+            // radial: updatedData.radial,
+            // remarks: updatedData.remarks,
           }),
         }
       );
@@ -853,7 +909,7 @@ export default function OrderListView() {
                 <Search color="#000000" /> Search
               </button>
             </label>
-            <div className="flex flex-col">
+            {/* <div className="flex flex-col">
               <label className="text-black">Order By: </label>
               <select
                 className="select select-bordered w-full max-w-xs"
@@ -864,8 +920,8 @@ export default function OrderListView() {
                 <option value="Ascending">Ascending</option>
                 <option value="Descending">Descending</option>
               </select>
-            </div>
-            <div className="flex flex-col">
+            </div> */}
+            {/* <div className="flex flex-col">
               <label className="text-black">Sort By: </label>
               <select
                 className="select select-bordered w-full max-w-xs"
@@ -880,7 +936,7 @@ export default function OrderListView() {
                 <option value="created_at">Created Date</option>
                 <option value="pallete_count"></option>
               </select>
-            </div>
+            </div> */}
             <div className="flex flex-col">
               <label className="text-black">Start Date: </label>
               <input
@@ -917,8 +973,8 @@ export default function OrderListView() {
                 onClick={() => {
                   setStartDate("");
                   setEndDate("");
-                  setOrder("Order");
-                  setSort_by("Sort By");
+                  // setOrder("Order");
+                  // setSort_by("Sort By");
                   setSearch("");
                   setPage(1);
                   if (searchInput.current) {
@@ -946,11 +1002,13 @@ export default function OrderListView() {
           <thead>
             <tr>
               <th>OF ID</th>
-              <th>Product Name</th>
+              {/* <th>Product Name</th> */}
               <th>Customer Name</th>
               <th>Article Name</th>
               <th>Pallete Count</th>
-              <th>Created Date</th>
+              {/* <th>Created Date</th> */}
+              <th>Production Entry Date</th>
+              <th>Production Exit Date</th>
               <th>OPTIONS</th>
             </tr>
           </thead>
@@ -967,8 +1025,8 @@ export default function OrderListView() {
                   Something went wrong while fetching orders list.
                 </td>
               </tr>
-            ) : ordersWithCustomerNames.length > 0 ? (
-              ordersWithCustomerNames?.map((order: any, index: number) => (
+            ) : ordersData?.data?.length > 0 ? (
+              ordersData.data.map((order: any, index: number) => (
                 <tr key={index}>
                   <td
                     className="text-xs hover:text-orange-500 hover:cursor-pointer"
@@ -977,18 +1035,28 @@ export default function OrderListView() {
                       setOrderid(order.id);
                       setOrderformdisplay(order.order_fabrication_control);
                       setNumberControl(order.tbl_article.number_control);
+                      setFilterPalleteCount(order.pallete_count);
                     }}
                   >
                     {order.order_fabrication_control}
                   </td>
-                  <td>{order.product_name}</td>
-                  <td className="text-xs">{order.tbl_customer.company_name}</td>
-                  <td>{order.tbl_article.article_name}</td>
-                  <td>{order.pallete_count}</td>
+                  {/* <td>{order.product_name ? order.product_name: " "}</td> */}
+                  <td>{order.tbl_customer?.company_name ? order.tbl_customer?.company_name: " "}</td>
+                  <td>{order.tbl_article?.article_name ? order.tbl_article?.article_name: " "}</td>
+                  <td>{order.pallete_count ? order.pallete_count : " "}</td>
                   <td>
-                    {DateTime.fromISO(order.created_at).toFormat(
-                      "dd/MM/yy hh:mm a"
-                    )}
+                    {order.entry_date_time
+                      ? DateTime.fromISO(order.entry_date_time).toFormat(
+                          "dd/MM/yy hh:mm a"
+                        )
+                      : " "}
+                  </td>
+                  <td>
+                    {order.exit_date_time
+                      ? DateTime.fromISO(order.exit_date_time).toFormat(
+                          "dd/MM/yy hh:mm a"
+                        )
+                      : " "}
                   </td>
 
                   <td className="justify-center items-center flex gap-4">
@@ -1076,8 +1144,8 @@ export default function OrderListView() {
                   className="tab"
                   aria-label="Production"
                   id="tab1"
-                  checked={selectedTab === 'tab1'}
-                  onChange={() => setSelectedTab('tab1')}
+                  checked={selectedTab === "tab1"}
+                  onChange={() => setSelectedTab("tab1")}
                 />
                 <div
                   role="tabpanel"
@@ -1090,12 +1158,12 @@ export default function OrderListView() {
                     onSubmit={async (values) => {
                       try {
                         for (const row of values.rows) {
-                          await AddOrderMutation.mutateAsync({
-                            order_form_id: orderid,
-                            entry_date_time: row.production_entry_date_time,
-                            exit_date_time: row.production_exit_date_time,
-                            user_id: userID,
-                          });
+                          if (orderid) {
+                            await updateProductionMutation.mutateAsync({
+                              production_entry_date_time: row.production_entry_date_time,
+                              production_exit_date_time: row.production_exit_date_time,
+                            });
+                          }
                         }
                       } catch (error) {
                         toast.error("Failed to complete operation");
@@ -1105,288 +1173,397 @@ export default function OrderListView() {
                   >
                     {({ values, setFieldValue, errors, touched }) => (
                       console.log(values),
-                      <Form>
-                        <div className="">
-                          <FieldArray
-                            name="rows"
-                            render={(arrayHelpers) => (
-                              <div>
-                                <div className="flex place-content-end gap-3">
-                                  <button
-                                    className="btn btn-info"
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.push({
-                                        production_order_form_id: "",
-                                        production_entry_date_time: "",
-                                        production_exit_date_time: "",
-                                      })
-                                    }
-                                  >
-                                    Add Production
-                                  </button>
-                                  <button
-                                    className="btn btn-primary"
-                                    type="submit"
-                                    // onClick={() => setSubmitContext('rows')}
-                                  >
-                                    Save Production
-                                  </button>
-                                  <button
-                                    className="btn btn-accent"
-                                    onClick={() => {
-                                      setEditableRowProd(null);
-                                      setIsModalOpen(false);
-                                      setOrderid(null);
-                                      refetchMeasurentData();
-                                      refetchProductionData();
-                                      refetchProofingData();
-                                    }}
-                                  >
-                                    Cancel
-                                  </button>
+                      (
+                        <Form>
+                          <div className="">
+                            <FieldArray
+                              name="rows"
+                              render={(arrayHelpers) => (
+                                <div>
+                                  <div className="flex place-content-end gap-3">
+                                    {retrievedentryDateTime === null && retrievedexitDateTime=== null ? (
+                      
+                                      <button
+                                        className="btn btn-primary"
+                                        type="submit"
+                                      >
+                                        Save Production
+                                      </button>
+                                    ) : null}
+                                    <button
+                                      className="btn btn-accent"
+                                      onClick={() => {
+                                        refetchOrdersData();
+                                        setEditableRowProd(null);
+                                        setIsModalOpen(false);
+                                        setOrderid(null);
+                                        refetchMeasurentData();
+                                        refetchProductionData();
+                                        refetchProofingData();
+                                      }}
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+
+                                  <div className="text-black overflow-auto">
+                                    <table className="table relative text-center overflow-auto">
+                                      <thead className="text-black text-sm">
+                                        <tr>
+                                          {/* <th>Article Name</th> */}
+                                          {/* <td></td> */}
+                                          <th>OF_ID</th>
+                                          <th>Entry Date & Time</th>
+                                          <th>Exit Date & Time</th>
+                                          <th>Action</th>
+                                        </tr>
+                                      </thead>
+                                      {/* tbody for length */}
+                                      {values.rows.map((row, index) => (
+                                        <React.Fragment key={index}>
+                                          <tbody>
+                                            <tr>
+                                              <td>
+                                                <Field
+                                                  readOnly
+                                                  value={orderformdisplay}
+                                                  name={`rows.${index}.production_order_form_id`}
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md 
+                                                    ${
+                                                    isfieldhide
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }
+                                                  `}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rows.${index}.production_entry_date_time`}
+                                                  type="datetime-local"
+                                                  className={`input input-bordered 
+    ${
+      typeof errors.rows?.[index] === "object" &&
+      errors.rows?.[index]?.production_entry_date_time &&
+      touched.rows?.[index]?.production_entry_date_time
+        ? "border-red-500"
+        : ""
+    } 
+    ${isfieldhide ? "hidden" : "bg-white"}
+  `}
+                                                />
+
+                                                <ErrorMessage
+                                                  name={`rows.${index}.production_entry_date_time`}
+                                                  component="div"
+                                                  className="text-red-500 text-sm"
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rows.${index}.production_exit_date_time`}
+                                                  type="datetime-local"
+                                                  className={`input input-bordered ${
+                                                    typeof errors.rows?.[
+                                                      index
+                                                    ] === "object" &&
+                                                    errors.rows?.[index]
+                                                      ?.production_exit_date_time &&
+                                                    touched.rows?.[index]
+                                                      ?.production_exit_date_time
+                                                      ? "border-red-500"
+                                                      : ""
+                                                  }${
+                                                    isfieldhide
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }
+                                                  `}
+                                                />
+                                                <ErrorMessage
+                                                  name={`rows.${index}.production_exit_date_time`}
+                                                  component="div"
+                                                  className="text-red-500 text-sm"
+                                                />
+                                              </td>
+                                              <td>
+                                                {/* <button
+                                                  className= {`btn btn-error bg-red ${isfieldhide ? "hidden" : "bg-white"}`}
+                                                  type="button"
+                                                  onClick={() =>
+                                                    arrayHelpers.remove(index)
+                                                  }
+                                                >
+                                                  Remove
+                                                </button> */}
+                                              </td>
+                                            </tr>
+                                          </tbody>
+                                        </React.Fragment>
+                                      ))}
+
+                                      {/* second FieldArray */}
+                                      {isLoading || isFetching ? (
+                                        <tr>
+                                          <td colSpan={7}>
+                                            <span className="loading loading-dots loading-md"></span>
+                                          </td>
+                                        </tr>
+                                      ) : isError ? (
+                                        <tr>
+                                          <td
+                                            className="text-error font-bold"
+                                            colSpan={7}
+                                          >
+                                            Something went wrong while fetching
+                                            orders list.
+                                          </td>
+                                        </tr>
+                                      ) : retrievedentryDateTime === null && retrievedexitDateTime === null ? (
+                                        <p className="text-center text-sm text-slate-600">
+                                          No Production Data Found
+                                        </p>
+                                      ) : (
+                                        <FieldArray
+                                          name="rows2"
+                                          render={(arrayHelpers) => (
+                                            <tbody>
+                                              <tr>
+                                                <td></td>
+                                              </tr>
+                                              {values.rows2.map(
+                                                (row, index) => (
+                                                  <tr key={index}>
+                                                    <td className="border-y border-slate-500">
+                                                      <Field
+                                                        name={`rows2.${index}.production_order_form_id`}
+                                                        type="text"
+                                                        value={orderformdisplay}
+                                                        className="input input-bordered"
+                                                        readOnly
+                                                      />
+                                                    </td>
+                                                    <td className="border-y border-slate-500">
+                                                      <Field
+                                                        name={`rows2.${index}.production_entry_date_time`}
+                                                        type="datetime-local"
+                                                        className="input input-bordered"
+                                                        value={
+                                                          values.rows2[index]
+                                                            .production_entry_date_time
+                                                            ? values.rows2[
+                                                                index
+                                                              ].production_entry_date_time.slice(
+                                                                0,
+                                                                16
+                                                              )
+                                                            : ""
+                                                        }
+                                                        onChange={(e: any) => {
+                                                          const newValue =
+                                                            e.target.value;
+                                                          setFieldValue(
+                                                            `rows2.${index}.production_entry_date_time`,
+                                                            newValue
+                                                          );
+                                                        }}
+                                                        readOnly={
+                                                          editableRowProd !==
+                                                          index
+                                                        }
+                                                      />
+                                                    </td>
+                                                    <td className="border-y border-slate-500">
+                                                      <Field
+                                                        name={`rows2.${index}.production_exit_date_time`}
+                                                        type="datetime-local"
+                                                        className="input input-bordered"
+                                                        value={
+                                                          values.rows2[index]
+                                                            .production_exit_date_time
+                                                            ? values.rows2[
+                                                                index
+                                                              ].production_exit_date_time.slice(
+                                                                0,
+                                                                16
+                                                              )
+                                                            : ""
+                                                        }
+                                                        onChange={(e: any) => {
+                                                          const newValue =
+                                                            e.target.value;
+                                                          setFieldValue(
+                                                            `rows2.${index}.production_exit_date_time`,
+                                                            newValue
+                                                          );
+                                                        }}
+                                                        readOnly={
+                                                          editableRowProd !==
+                                                          index
+                                                        }
+                                                      />
+                                                    </td>
+
+                                                    <td className="border-y border-slate-500">
+                                                      <div className="flex gap-2">
+                                                        {editableRowProd ===
+                                                        index ? (
+                                                          <>
+                                                            <button
+                                                              type="button"
+                                                              className="btn btn-success"
+                                                              onClick={async () => {
+                                                                try {
+                                                                  await updateProductionMutation.mutateAsync(
+                                                                    {
+                                                                      production_id:
+                                                                        values
+                                                                          .rows2[
+                                                                          index
+                                                                        ]
+                                                                          .production_id,
+                                                                      production_entry_date_time:
+                                                                        values
+                                                                          .rows2[
+                                                                          index
+                                                                        ]
+                                                                          .production_entry_date_time,
+                                                                      production_exit_date_time:
+                                                                        values
+                                                                          .rows2[
+                                                                          index
+                                                                        ]
+                                                                          .production_exit_date_time,
+                                                                    }
+                                                                  );
+                                                                  setEditableRowProd(
+                                                                    null
+                                                                  ); // Reset editable row after saving
+                                                                } catch (error) {
+                                                                  console.error(
+                                                                    "Error in mutation:",
+                                                                    error
+                                                                  );
+                                                                }
+                                                              }}
+                                                            >
+                                                              Save
+                                                            </button>
+                                                            <button
+                                                              className="btn btn-primary"
+                                                              type="button"
+                                                              onClick={() => {
+                                                                // Alert first, then reset the editable row and refetch data
+                                                                if (
+                                                                  window.confirm(
+                                                                    "Are you sure you want to cancel?"
+                                                                  )
+                                                                ) {
+                                                                  setTractnumbercontrollenght(
+                                                                    0
+                                                                  );
+                                                                  setEditableRowProd(
+                                                                    null
+                                                                  ); // Reset the editable state
+                                                                  refetchProductionData(); // Trigger the refetch
+                                                                  // Close the modal first
+                                                                  setIsModalOpen(
+                                                                    false
+                                                                  );
+
+                                                                  // Reopen it after a small delay
+                                                                  setTimeout(
+                                                                    () => {
+                                                                      setIsModalOpen(
+                                                                        true
+                                                                      );
+                                                                      setSelectedTab(
+                                                                        "tab1"
+                                                                      );
+                                                                    },
+                                                                    100
+                                                                  ); // Delay of 100ms to ensure the close transition happens
+                                                                }
+                                                              }}
+                                                            >
+                                                              Cancel
+                                                            </button>
+                                                          </>
+                                                        ) : (
+                                                          <>
+                                                            <button
+                                                              type="button"
+                                                              className={`btn btn-primary ${
+                                                                editableRowProd !==
+                                                                null
+                                                                  ? "hidden"
+                                                                  : ""
+                                                              }`}
+                                                              onClick={() =>
+                                                                setEditableRowProd(
+                                                                  index
+                                                                )
+                                                              }
+                                                            >
+                                                              Edit
+                                                            </button>
+                                                            {/* <button
+                                                              type="button"
+                                                              className={`btn btn-error ${
+                                                                editableRowProd !==
+                                                                null
+                                                                  ? "hidden"
+                                                                  : ""
+                                                              } ${
+                                                                removeProductionMutation.isPending
+                                                                  ? "loading"
+                                                                  : ""
+                                                              }`}
+                                                              onClick={() => {
+                                                                const isConfirmed =
+                                                                  window.confirm(
+                                                                    "Are you sure you want to remove this production?"
+                                                                  );
+                                                                if (
+                                                                  isConfirmed
+                                                                ) {
+                                                                  removeProductionMutation.mutate(
+                                                                    {
+                                                                      production_id:
+                                                                        values
+                                                                          .rows2[
+                                                                          index
+                                                                        ]
+                                                                          .production_id,
+                                                                      is_exist:
+                                                                        false,
+                                                                    }
+                                                                  );
+                                                                }
+                                                              }}
+                                                            >
+                                                              Remove
+                                                            </button> */}
+                                                          </>
+                                                        )}
+                                                      </div>
+                                                    </td>
+                                                  </tr>
+                                                )
+                                              )}
+                                            </tbody>
+                                          )}
+                                        />
+                                      )}
+                                    </table>
+                                  </div>
                                 </div>
-                                <div className="text-black overflow-auto">
-                                  <table className="table relative text-center overflow-auto">
-                                    <thead className="text-black text-sm">
-                                      <tr>
-                                        {/* <th>Article Name</th> */}
-                                        {/* <td></td> */}
-                                        <th>OF_ID</th>
-                                        <th>Entry Date & Time</th>
-                                        <th>Exit Date & Time</th>
-                                        <th>Action</th>
-                                      </tr>
-                                    </thead>
-                                    {/* tbody for length */}
-                                    {values.rows.map((row, index) => (
-                                      <React.Fragment key={index}>
-                                        <tbody>
-                                          <tr>
-                                            <td>
-                                              <Field
-                                                readOnly
-                                                value={orderformdisplay}
-                                                name={`rows.${index}.production_order_form_id`}
-                                                type="number"
-                                                className="input input-bordered"
-                                              />
-                                            </td>
-                                            <td>
-                                              <Field
-                                                name={`rows.${index}.production_entry_date_time`}
-                                                type="datetime-local"
-                                                className={`input input-bordered ${
-                                                  typeof errors.rows?.[
-                                                    index
-                                                  ] === "object" &&
-                                                  errors.rows?.[index]
-                                                    ?.production_entry_date_time &&
-                                                  touched.rows?.[index]
-                                                    ?.production_entry_date_time
-                                                    ? "border-red-500"
-                                                    : ""
-                                                }`}
-                                              />
-                                              <ErrorMessage
-                                                name={`rows.${index}.production_entry_date_time`}
-                                                component="div"
-                                                className="text-red-500 text-sm"
-                                              />
-                                            </td>
-                                            <td>
-                                              <Field
-                                                name={`rows.${index}.production_exit_date_time`}
-                                                type="datetime-local"
-                                                className={`input input-bordered ${
-                                                  typeof errors.rows?.[
-                                                    index
-                                                  ] === "object" &&
-                                                  errors.rows?.[index]
-                                                    ?.production_exit_date_time &&
-                                                  touched.rows?.[index]
-                                                    ?.production_exit_date_time
-                                                    ? "border-red-500"
-                                                    : ""
-                                                }`}
-                                              />
-                                              <ErrorMessage
-                                                name={`rows.${index}.production_exit_date_time`}
-                                                component="div"
-                                                className="text-red-500 text-sm"
-                                              />
-                                            </td>
-                                            <td>
-                                              <button
-                                                className="btn btn-error"
-                                                type="button"
-                                                onClick={() =>
-                                                  arrayHelpers.remove(index)
-                                                }
-                                              >
-                                                Remove
-                                              </button>
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </React.Fragment>
-                                    ))}
-
-                                    {/* second FieldArray */}
-                                    {
-                                    fetchedProductionData?.length === 0 ? (
-                                      <p className="text-center text-sm text-slate-600">
-                                        No Production Data Found
-                                      </p>
-                                    ) : (
-                                      <FieldArray
-  name="rows2"
-  render={(arrayHelpers) => (
-    <tbody>
-      <tr>
-        <td></td>
-      </tr>
-      {values.rows2.map((row, index) => (
-        <tr key={index}>
-          <td className="border-y border-slate-500">
-            <Field
-              name={`rows2.${index}.production_order_form_id`}
-              type="text"
-              value={orderformdisplay}
-              className="input input-bordered"
-              readOnly
-            />
-          </td>
-          <td className="border-y border-slate-500">
-            <Field
-              name={`rows2.${index}.production_entry_date_time`}
-              type="datetime-local"
-              className="input input-bordered"
-              value={
-                values.rows2[index].production_entry_date_time
-                  ? values.rows2[index].production_entry_date_time.slice(0, 16)
-                  : ""
-              }
-              onChange={(e:any) => {
-                const newValue = e.target.value;
-                setFieldValue(`rows2.${index}.production_entry_date_time`, newValue);
-              }}
-              readOnly={editableRowProd !== index}
-            />
-          </td>
-          <td className="border-y border-slate-500">
-            <Field
-              name={`rows2.${index}.production_exit_date_time`}
-              type="datetime-local"
-              className="input input-bordered"
-              value={
-                values.rows2[index].production_exit_date_time
-                  ? values.rows2[index].production_exit_date_time.slice(0, 16)
-                  : ""
-              }
-              onChange={(e:any) => {
-                const newValue = e.target.value;
-                setFieldValue(`rows2.${index}.production_exit_date_time`, newValue);
-              }}
-              readOnly={editableRowProd !== index}
-            />
-          </td>
-
-          <td className="border-y border-slate-500">
-            <div className="flex gap-2">
-              {editableRowProd === index ? (
-                <>
-                  <button
-                    type="button"
-                    className="btn btn-success"
-                    onClick={async () => {
-                      try {
-                        await updateProductionMutation.mutateAsync({
-                          production_id: values.rows2[index].production_id,
-                          production_entry_date_time:
-                            values.rows2[index].production_entry_date_time,
-                          production_exit_date_time:
-                            values.rows2[index].production_exit_date_time,
-                        });
-                        setEditableRowProd(null); // Reset editable row after saving
-                      } catch (error) {
-                        console.error("Error in mutation:", error);
-                      }
-                    }}
-                  >
-                    Save
-                  </button>
-                  <button
-  
-  className="btn btn-primary"
-  onClick={() => {
-    // Alert first, then reset the editable row and refetch data
-    if (window.confirm("Are you sure you want to cancel?")) {
-      setEditableRowProd(null);  // Reset the editable state
-      refetchProductionData();  // Trigger the refetch
-       // Close the modal first
-    setIsModalOpen(false);
-
-    // Reopen it after a small delay
-    setTimeout(() => {
-      setIsModalOpen(true);
-      setSelectedTab('tab1');
-    }, 100); // Delay of 100ms to ensure the close transition happens
-      
-    }
-  }}
->
-  Cancel
-</button>
-
-
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className={`btn btn-primary ${editableRowProd !== null ? "hidden" : ""}`}
-                    onClick={() => setEditableRowProd(index)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className={`btn btn-error ${editableRowProd !== null ? "hidden" : ""} ${
-                      removeProductionMutation.isPending ? "loading" : ""
-                    }`}
-                    onClick={() => {
-                      const isConfirmed = window.confirm(
-                        "Are you sure you want to remove this production?"
-                      );
-                      if (isConfirmed) {
-                        removeProductionMutation.mutate({
-                          production_id: values.rows2[index].production_id,
-                          is_exist: false,
-                        });
-                      }
-                    }}
-                  >
-                    Remove
-                  </button>
-                </>
-              )}
-            </div>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  )}
-/>
-
-                                    )}
-                                  </table>
-                                </div>
-                              </div>
-                            )}
-                          />
-                        </div>
-                      </Form>
+                              )}
+                            />
+                          </div>
+                        </Form>
+                      )
                     )}
                   </Formik>
                 </div>
@@ -1397,9 +1574,10 @@ export default function OrderListView() {
                   role="tab"
                   className="tab"
                   aria-label="Proofing"
-                  defaultChecked id="tab2"
-                  checked={selectedTab === 'tab2'}
-                  onChange={() => setSelectedTab('tab2')}
+                  defaultChecked
+                  id="tab2"
+                  checked={selectedTab === "tab2"}
+                  onChange={() => setSelectedTab("tab2")}
                 />
                 <div
                   role="tabpanel"
@@ -1435,31 +1613,34 @@ export default function OrderListView() {
                             render={(arrayHelpers) => (
                               <div>
                                 <div className="flex place-content-end gap-3">
-                                  <button
-                                    className="btn btn-info"
-                                    type="button"
-                                    onClick={() =>
-                                      arrayHelpers.push({
+                                  {/* {fetchedProofingData?.length === 0 ? ( */}
+                                    {/* <> */}
+                                      <button
+                                      className="btn btn-info"
+                                      type="button"
+                                      onClick={() => arrayHelpers.push({
                                         proofing_order_form_id: "",
                                         proofing_entry_date_time: "",
                                         proofing_exit_date_time: "",
                                         proofing_num_pallete: "",
                                         proofing_program_name: "",
-                                      })
-                                    }
-                                  >
-                                    Add Proofing
-                                  </button>
-                                  <button
-                                    className="btn btn-primary"
-                                    type="submit"
-                                    // onClick={() => setSubmitContext('rows')}
-                                  >
-                                    Save Proofing
-                                  </button>
+                                      })}
+                                    >
+                                      Add Proofing
+                                    </button>
+                                      <button
+                                        className="btn btn-primary"
+                                        type="submit"
+                                      >
+                                        Save Proofing
+                                      </button>
+                                    {/* </> */}
+                                  {/* // ) : null} */}
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
+                                      refetchOrdersData();
+                                      setTractnumbercontrollenght(0);
                                       setEditableRowProof(null);
                                       setIsModalOpen(false);
                                       setOrderid(null);
@@ -1496,7 +1677,13 @@ export default function OrderListView() {
                                                 value={orderformdisplay}
                                                 name={`rowsproofing.${index}.proofing_order_form_id`}
                                                 type="number"
-                                                className="input input-bordered"
+                                                className="input input-bordered w-20 max-w-md"
+                                                // className={`input input-bordered w-20 max-w-md 
+                                                //   ${isfieldhideproof
+                                                //     ? "hidden"
+                                                //     : "bg-white"
+                                                // }
+                                                // `}
                                               />
                                             </td>
                                             <td>
@@ -1513,7 +1700,9 @@ export default function OrderListView() {
                                                     ?.proofing_entry_date_time
                                                     ? "border-red-500"
                                                     : ""
-                                                }`}
+                                                }
+                                            
+                                                `}
                                               />
                                               <ErrorMessage
                                                 name={`rowsproofing.${index}.proofing_entry_date_time`}
@@ -1535,7 +1724,9 @@ export default function OrderListView() {
                                                     ?.proofing_exit_date_time
                                                     ? "border-red-500"
                                                     : ""
-                                                }`}
+                                                }
+                                              
+                                                `}
                                               />
                                               <ErrorMessage
                                                 name={`rowsproofing.${index}.proofing_exit_date_time`}
@@ -1547,14 +1738,24 @@ export default function OrderListView() {
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_num_pallete`}
                                                 type="number"
-                                                className="input input-bordered"
+                                                className="input input-bordered max-w-md"
+                                                // className={`input input-bordered ${
+                                                //   isfieldhideproof
+                                                //     ? "hidden"
+                                                //     : "bg-white"
+                                                // }`}
                                               />
                                             </td>
                                             <td>
                                               <Field
                                                 name={`rowsproofing.${index}.proofing_program_name`}
                                                 type="text"
-                                                className="input input-bordered"
+                                                className="input input-bordered max-w-md"
+                                                // className={`input input-bordered ${
+                                                //   isfieldhideproof
+                                                //     ? "hidden"
+                                                //     : "bg-white"
+                                                // }`}
                                               />
                                             </td>
                                             <td>
@@ -1574,165 +1775,278 @@ export default function OrderListView() {
                                     ))}
 
                                     {/* second FieldArray */}
-                                    {fetchedProofingData?.length === 0 ? (
-  <p className="text-center text-sm text-slate-600">No Proofing Data Found</p>
-) : (
-  <FieldArray
-    name="rows3"
-    render={(arrayHelpers) => (
-      <tbody>
-        <tr>
-          <td></td>
-        </tr>
-        {values.rows3.map((row, index) => (
-          <tr key={index}>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows3.${index}.proofing_order_form_id`}
-                type="text"
-                value={orderformdisplay}
-                className="input input-bordered"
-                readOnly
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows3.${index}.proofing_entry_date_time`}
-                type="datetime-local"
-                className="input input-bordered"
-                value={
-                  values.rows3[index].proofing_entry_date_time
-                    ? values.rows3[index].proofing_entry_date_time.slice(0, 16)
-                    : ""
-                }
-                onChange={(e:any) => {
-                  const newValue = e.target.value;
-                  setFieldValue(`rows3.${index}.proofing_entry_date_time`, newValue);
-                }}
-                readOnly={editableRowProof !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows3.${index}.proofing_exit_date_time`}
-                type="datetime-local"
-                className="input input-bordered"
-                value={
-                  values.rows3[index].proofing_exit_date_time
-                    ? values.rows3[index].proofing_exit_date_time.slice(0, 16)
-                    : ""
-                }
-                onChange={(e:any) => {
-                  const newValue = e.target.value;
-                  setFieldValue(`rows3.${index}.proofing_exit_date_time`, newValue);
-                }}
-                readOnly={editableRowProof !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows3.${index}.proofing_num_pallete`}
-                type="number"
-                className="input input-bordered"
-                readOnly={editableRowProof !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <Field
-                name={`rows3.${index}.proofing_program_name`}
-                type="text"
-                className="input input-bordered"
-                readOnly={editableRowProof !== index}
-              />
-            </td>
-            <td className="border-y border-slate-500">
-              <div className="flex gap-2">
-                {editableRowProof === index ? (
-                  <>
-                    <button
-                      type="button"
-                      className="btn btn-success"
-                      onClick={async () => {
-                        try {
-                          await updateProofingMutation.mutateAsync({
-                            proofing_id: values.rows3[index].proofing_id,
-                            proofing_entry_date_time:
-                              values.rows3[index].proofing_entry_date_time,
-                            proofing_exit_date_time:
-                              values.rows3[index].proofing_exit_date_time,
-                            proofing_num_pallete:
-                              values.rows3[index].proofing_num_pallete,
-                            proofing_program_name:
-                              values.rows3[index].proofing_program_name,
-                          });
-                          setEditableRowProof(null); // Reset editable row after saving
-                          refetchProofingData(); // Refetch data after update
-                        } catch (error) {
-                          console.error("Error in mutation:", error);
-                        }
-                      }}
-                    >
-                      Save
-                    </button>
-                    <button
-                     
-                      className="btn btn-primary"
-                      onClick={() => {
-                        if (window.confirm("Are you sure you want to cancel?")) {
-                          setEditableRowProof(null); // Reset the editable state
-                          refetchProofingData(); // Refetch the proofing data
-                          // location.reload();
-                          setIsModalOpen(false);
-                          setTimeout(() => {
-                            setIsModalOpen(true);
-                            setSelectedTab('tab2');
-                          }, 100);
-                        }
-                      }}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      type="button"
-                     
-                      className={`btn btn-primary ${editableRowProof !== null ? "hidden" : ""}`}
-                      onClick={() => setEditableRowProof(index)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                     type="button"
-                     className={`btn btn-error ${editableRowProof !== null ? "hidden" : ""} ${
-                       removeProofingMutation.isPending ? "loading" : ""
-                     }`}
-                      onClick={() => {
-                        const isConfirmed = window.confirm(
-                          "Are you sure you want to remove this proofing?"
-                        );
-                        if (isConfirmed) {
-                          removeProofingMutation.mutate({
-                            proofing_id: values.rows3[index].proofing_id,
-                            is_exist: false,
-                          });
-                        }
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </>
-                )}
-              </div>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    )}
-  />
-)}
-
+                                    {isLoading || isFetching ? (
+                                      <tr>
+                                        <td colSpan={7}>
+                                          <span className="loading loading-dots loading-md"></span>
+                                        </td>
+                                      </tr>
+                                    ) : isError ? (
+                                      <tr>
+                                        <td
+                                          className="text-error font-bold"
+                                          colSpan={7}
+                                        >
+                                          Something went wrong while fetching
+                                          orders list.
+                                        </td>
+                                      </tr>
+                                    ) : fetchedProofingData?.length === 0 ? (
+                                      <p className="text-center text-sm text-slate-600">
+                                        No Proofing Data Found
+                                      </p>
+                                    ) : (
+                                      <FieldArray
+                                        name="rows3"
+                                        render={(arrayHelpers) => (
+                                          <tbody>
+                                            <tr>
+                                              <td></td>
+                                            </tr>
+                                            {values.rows3.map((row, index) => (
+                                              <tr key={index}>
+                                                <td className="border-y border-slate-500">
+                                                  <Field
+                                                    name={`rows3.${index}.proofing_order_form_id`}
+                                                    type="text"
+                                                    value={orderformdisplay}
+                                                    className="input input-bordered"
+                                                    readOnly
+                                                  />
+                                                </td>
+                                                <td className="border-y border-slate-500">
+                                                  <Field
+                                                    name={`rows3.${index}.proofing_entry_date_time`}
+                                                    type="datetime-local"
+                                                    className="input input-bordered"
+                                                    value={
+                                                      values.rows3[index]
+                                                        .proofing_entry_date_time
+                                                        ? values.rows3[
+                                                            index
+                                                          ].proofing_entry_date_time.slice(
+                                                            0,
+                                                            16
+                                                          )
+                                                        : ""
+                                                    }
+                                                    onChange={(e: any) => {
+                                                      const newValue =
+                                                        e.target.value;
+                                                      setFieldValue(
+                                                        `rows3.${index}.proofing_entry_date_time`,
+                                                        newValue
+                                                      );
+                                                    }}
+                                                    readOnly={
+                                                      editableRowProof !== index
+                                                    }
+                                                  />
+                                                </td>
+                                                <td className="border-y border-slate-500">
+                                                  <Field
+                                                    name={`rows3.${index}.proofing_exit_date_time`}
+                                                    type="datetime-local"
+                                                    className="input input-bordered"
+                                                    value={
+                                                      values.rows3[index]
+                                                        .proofing_exit_date_time
+                                                        ? values.rows3[
+                                                            index
+                                                          ].proofing_exit_date_time.slice(
+                                                            0,
+                                                            16
+                                                          )
+                                                        : ""
+                                                    }
+                                                    onChange={(e: any) => {
+                                                      const newValue =
+                                                        e.target.value;
+                                                      setFieldValue(
+                                                        `rows3.${index}.proofing_exit_date_time`,
+                                                        newValue
+                                                      );
+                                                    }}
+                                                    readOnly={
+                                                      editableRowProof !== index
+                                                    }
+                                                  />
+                                                </td>
+                                                <td className="border-y border-slate-500">
+                                                  <Field
+                                                    name={`rows3.${index}.proofing_num_pallete`}
+                                                    type="number"
+                                                    className="input input-bordered"
+                                                    readOnly={
+                                                      editableRowProof !== index
+                                                    }
+                                                  />
+                                                </td>
+                                                <td className="border-y border-slate-500">
+                                                  <Field
+                                                    name={`rows3.${index}.proofing_program_name`}
+                                                    type="text"
+                                                    className="input input-bordered"
+                                                    readOnly={
+                                                      editableRowProof !== index
+                                                    }
+                                                  />
+                                                </td>
+                                                <td className="border-y border-slate-500">
+                                                  <div className="flex gap-2">
+                                                    {editableRowProof ===
+                                                    index ? (
+                                                      <>
+                                                        <button
+                                                          type="button"
+                                                          className="btn btn-success"
+                                                          onClick={async () => {
+                                                            try {
+                                                              await updateProofingMutation.mutateAsync(
+                                                                {
+                                                                  proofing_id:
+                                                                    values
+                                                                      .rows3[
+                                                                      index
+                                                                    ]
+                                                                      .proofing_id,
+                                                                  proofing_entry_date_time:
+                                                                    values
+                                                                      .rows3[
+                                                                      index
+                                                                    ]
+                                                                      .proofing_entry_date_time,
+                                                                  proofing_exit_date_time:
+                                                                    values
+                                                                      .rows3[
+                                                                      index
+                                                                    ]
+                                                                      .proofing_exit_date_time,
+                                                                  proofing_num_pallete:
+                                                                    values
+                                                                      .rows3[
+                                                                      index
+                                                                    ]
+                                                                      .proofing_num_pallete,
+                                                                  proofing_program_name:
+                                                                    values
+                                                                      .rows3[
+                                                                      index
+                                                                    ]
+                                                                      .proofing_program_name,
+                                                                }
+                                                              );
+                                                              setEditableRowProof(
+                                                                null
+                                                              ); // Reset editable row after saving
+                                                              refetchProofingData(); // Refetch data after update
+                                                            } catch (error) {
+                                                              console.error(
+                                                                "Error in mutation:",
+                                                                error
+                                                              );
+                                                            }
+                                                          }}
+                                                        >
+                                                          Save
+                                                        </button>
+                                                        <button
+                                                          type="button"
+                                                          className="btn btn-primary"
+                                                          onClick={() => {
+                                                            if (
+                                                              window.confirm(
+                                                                "Are you sure you want to cancel?"
+                                                              )
+                                                            ) {
+                                                              setTractnumbercontrollenght(
+                                                                0
+                                                              );
+                                                              setEditableRowProof(
+                                                                null
+                                                              ); // Reset the editable state
+                                                              refetchProofingData(); // Refetch the proofing data
+                                                              // location.reload();
+                                                              setIsModalOpen(
+                                                                false
+                                                              );
+                                                              setTimeout(() => {
+                                                                setIsModalOpen(
+                                                                  true
+                                                                );
+                                                                setSelectedTab(
+                                                                  "tab2"
+                                                                );
+                                                              }, 100);
+                                                            }
+                                                          }}
+                                                        >
+                                                          Cancel
+                                                        </button>
+                                                      </>
+                                                    ) : (
+                                                      <>
+                                                        <button
+                                                          type="button"
+                                                          className={`btn btn-primary ${
+                                                            editableRowProof !==
+                                                            null
+                                                              ? "hidden"
+                                                              : ""
+                                                          }`}
+                                                          onClick={() =>
+                                                            setEditableRowProof(
+                                                              index
+                                                            )
+                                                          }
+                                                        >
+                                                          Edit
+                                                        </button>
+                                                        {/* <button
+                                                          type="button"
+                                                          className={`btn btn-error ${
+                                                            editableRowProof !==
+                                                            null
+                                                              ? "hidden"
+                                                              : ""
+                                                          } ${
+                                                            removeProofingMutation.isPending
+                                                              ? "loading"
+                                                              : ""
+                                                          }`}
+                                                          onClick={() => {
+                                                            const isConfirmed =
+                                                              window.confirm(
+                                                                "Are you sure you want to remove this proofing?"
+                                                              );
+                                                            if (isConfirmed) {
+                                                              removeProofingMutation.mutate(
+                                                                {
+                                                                  proofing_id:
+                                                                    values
+                                                                      .rows3[
+                                                                      index
+                                                                    ]
+                                                                      .proofing_id,
+                                                                  is_exist:
+                                                                    false,
+                                                                }
+                                                              );
+                                                            }
+                                                          }}
+                                                        >
+                                                          Remove
+                                                        </button> */}
+                                                      </>
+                                                    )}
+                                                  </div>
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        )}
+                                      />
+                                    )}
                                   </table>
                                 </div>
                               </div>
@@ -1751,523 +2065,812 @@ export default function OrderListView() {
                   className="tab"
                   aria-label="Measurement"
                   id="tab3"
-                  checked={selectedTab === 'tab3'}
-                  onChange={() => setSelectedTab('tab3')}
-
+                  checked={selectedTab === "tab3"}
+                  onChange={() => setSelectedTab("tab3")}
                 />
                 <div
                   role="tabpanel"
                   className="tab-content bg-base-100 border-base-300 rounded-box p-6"
                 >
-                <Formik
-  initialValues={initialValuesMeasurement}
-  enableReinitialize={true}
-  onSubmit={async (values) => {
-    // Check if all rows have 0 or empty values
-    const isAllEmptyOrZero = values.rowsmeasurement.every(
-      (row) =>
-        row.pallete_count === 0 &&
-        row.number_of_control === 0
-    );
+                  <Formik
+                    initialValues={initialValuesMeasurement}
+                    enableReinitialize={true}
+                    onSubmit={async (values) => {
+                      // Check if all rows have 0 or empty values
 
-    if (isAllEmptyOrZero) {
-      alert("Cannot submit: All fields are empty or have a value of 0.");
-      return; // Prevent form submission
-    }
-    // const pallete_number=values.rowsmeasurement[0].pallete_count;
-    // const control_number=values.rowsmeasurement[0].number_of_control;
-       (async () => {
-      for (const row of values.rowsmeasurement) {
-        const measurementData = {
-          order_id: orderid,
-          length: row.length,
-          inside_diameter: row.inside_diameter,
-          outside_diameter: row.outside_diameter,
-          flat_crush: row.flat_crush,
-          h20: row.h20,
-          radial: row.radial,
-          number_control: row.number_of_control,
-          remarks: row.remarks,
-          pallete_count: row.pallete_count,
-          user_id: userID,
-        };
-      setLastpalleteCount(0);
-    setNumberControl(0);
-        // Log for debugging
-        // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
-        console.log("Inserting data:", measurementData);
-    
-        // Wait for mutation to complete before moving to the next
-        await AddMeasurementMutation.mutateAsync(measurementData);
-      }
-    })();
-    // console.log("Values are: ",values.rowsmeasurement);
+                      const isAllEmptyOrZero = values.rowsmeasurement.every(
+                        (row) =>
+                          row.pallete_count === 0 && row.number_of_control === 0
+                      );
+                      console.log(
+                        "current row lenght",
+                        tractnumbercontrollenght + 1
+                      );
+                      if (isAllEmptyOrZero) {
+                        alert(
+                          "Cannot submit: All fields are empty or have a value of 0."
+                        );
+                        return; // Prevent form submission
+                      } else {
+                        // const pallete_number=values.rowsmeasurement[0].pallete_count;
+                        // const control_number=values.rowsmeasurement[0].number_of_control;
+                        // if(numberControl===tractnumbercontrollenght){
+                        // const userConfirmed = window.confirm("The number of controls is not yet complete. Are you sure you want to submit it?");
+                        // if (!userConfirmed) {
+                        //   return;
+                        // }
+                        // }
+                        if (numberControl !== tractnumbercontrollenght + 1) {
+                          const userConfirmed = window.confirm(
+                            "The number of controls is not yet complete. Are you sure you want to submit it?"
+                          );
+                          if (userConfirmed) {
+                            (async () => {
+                              for (const row of values.rowsmeasurement) {
+                                const measurementData = {
+                                  order_id: orderid,
+                                  length: row.length,
+                                  inside_diameter: row.inside_diameter,
+                                  outside_diameter: row.outside_diameter,
+                                  flat_crush: row.flat_crush,
+                                  h20: row.h20,
+                                  radial: row.radial,
+                                  number_control: row.number_of_control,
+                                  remarks: row.remarks,
+                                  pallete_count: row.pallete_count,
+                                  user_id: userID,
+                                };
+                                setLastpalleteCount(0);
+                                // setNumberControl(0);
+                                // Log for debugging
+                                // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
+                                console.log("Inserting data:", measurementData);
 
-   
-  }}
->
-
-                    {({ values, setFieldValue }) => (
-                   <Form>
-  <div className="">
-  <FieldArray 
-      name="rowsmeasurement"
-      render={(arrayHelpers) => (
-
-        <div>
-          <div className="flex place-content-end gap-3">
-            <button
-              className="btn btn-info"
-              type="button"
-              
-              onClick={() => {
-                console.log("enablepallete:", enablepallete); // Debug
-                let currentMaxPallete = values.rowsmeasurement.reduce(
-                  (max, row) => Math.max(max, row.pallete_count || 0),
-                  0
-                );
-              
-                // Fallback to lastpalleteCount if currentMaxPallete is 0
-                if (currentMaxPallete === 0) {
-                  currentMaxPallete = lastpalleteCount;
-                }
-              
-                console.log("Current Max Pallete:", currentMaxPallete); // Debug
-                // console.log("number_control val",values.rowsmeasurement.filter(
-                //   (r) => r.number_of_control === row.number_of_control))
-                console.log("Values are: ",values.rowsmeasurement);
-                
-                 // Remove rows where pallete_count and number_of_control are 0
-    
-
-                const hasInvalidRow = values.rowsmeasurement.some(
-                  (row) => row.number_of_control === 0 && row.pallete_count === 0
-                );
-              
-                if (enablepallete === true || hasInvalidRow) {
-
-
-                const newControlNumber = prompt("Enter a new control number:");
-                
-                if (newControlNumber && !isNaN(parseInt(newControlNumber, 10))) {
-                  
-                  values.rowsmeasurement.forEach((row, index) => {
-      if (row.pallete_count === 0 && row.number_of_control === 0) {
-        console.log(`Removing row at index ${index}:`, row); // Debug
-        arrayHelpers.remove(index); // Trigger the "Remove" button functionality
-      }
-    });
-                setenableplus(true);
-                  arrayHelpers.push({
-                    pallete_count: currentMaxPallete + 1, // Incremented pallete_count
-                    number_of_control: parseInt(newControlNumber, 10), // User input
-                    length: "",
-                    inside_diameter: "",
-                    outside_diameter: "",
-                    flat_crush: "",
-                    h20: "",
-                    radial: "",
-                    remarks: "",
-                    isNew:false,
-                  });
-                } else {
-                  alert("Please enter a valid number for the control number.");
-                }
-                setEnablePallete(true)
-              
-              }else{
-                alert("Please finish the current pallete before adding a new one.");
-              }
-
-              }}
-
-            >
-              Add Pallete
-            </button>
-
-
-            <button
-              className="btn btn-primary"
-              type="submit"
-            >
-              Save Measurement
-            </button>
-
-            <button
-              className="btn btn-accent"
-              onClick={() => {
-                setIsModalOpen(false);
-                setOrderid(null);
-                refetchMeasurentData();
-                refetchProductionData();
-                refetchProofingData();
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-
-          <div className="text-black overflow-auto">
-            
-            <table className="table relative text-center overflow-auto">
-              <thead className="text-black text-sm">
-                <tr>
-                  <th>Pallete</th>
-                  <th>Number Of Control</th>
-                  <th>Length</th>
-                  <th>Inside Diameter</th>
-                  <th>Outside Diameter</th>
-                  <th>Flat Crush</th>
-                  <th>H20</th>
-                  <th>Radial</th>
-                  <th>Remarks</th>
-                </tr>
-              </thead>
-              <tbody>
-                {values.rowsmeasurement.map((row, index) => (
-                  <React.Fragment key={index}>
-                    <tr>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.pallete_count`}
-                          placeholder={` ${row.number_of_control==0?"":""}`}
-                          type="number"
-                          readOnly
-                          className={`input input-bordered w-20 max-w-md ${
-                            values.rowsmeasurement[index]?.isnew ? "text-white" : "bg-white"
-                          }`}
-                          onChange={(e: any) => {
-                            const newPalleteCount = parseInt(e.target.value, 10);
-                            setFieldValue(`rowsmeasurement.${index}.pallete_count`, newPalleteCount);
-                          }}
-                        />
-                      </td>
-
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.number_of_control`}
-                          type="number"
-                          placeholder={`${row.number_of_control==0?"":""}`}
-                          readOnly
-                          className={`input input-bordered w-20 max-w-md ${
-                            values.rowsmeasurement[index]?.isnew ? "text-white" : "bg-white"
-                          }`}
-                          onChange={(e: any) => {
-                            const newControlNumber = parseInt(e.target.value, 10);
-                            setFieldValue(`rowsmeasurement.${index}.number_of_control`, newControlNumber);
-                          }}
-                        />
-                      </td>
-
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.length`}
-                          placeholder="0"
-                          type="number"
-                          className="input bg-white input-bordered w-20 max-w-md"
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.inside_diameter`}
-                          placeholder="0"
-                          type="number"
-                          className="input bg-white input-bordered w-20 max-w-md"
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.outside_diameter`}
-                          placeholder="0"
-                          type="number"
-                          className="input bg-white input-bordered w-20 max-w-md"
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.flat_crush`}
-                          placeholder="0"
-                          type="number"
-                          className="input bg-white input-bordered w-20 max-w-md"
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.h20`}
-                          placeholder="0"
-                          type="number"
-                          className="input bg-white input-bordered w-20 max-w-md"
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.radial`}
-                          placeholder="0"
-                          type="number"
-                          className="input bg-white input-bordered w-20 max-w-md"
-                        />
-                      </td>
-                      <td>
-                        <Field
-                          name={`rowsmeasurement.${index}.remarks`}
-                          placeholder="0"
-                          type="text"
-                          className="input bg-white input-bordered w-auto max-w-md"
-                        />
-                      </td>
-                      <td>
-  {/* Add Row Button */}
-  {
-  values.rowsmeasurement.filter(
-    (r) => r.number_of_control === row.number_of_control
-  ).length < Number(row.number_of_control) ? (
-    <button
-      className={`btn btn-success mt-2`}
-      type="button"
-      onClick={() => {
-        const existingRows = values.rowsmeasurement.filter(
-          (r) => r.number_of_control === row.number_of_control
-        );
-
-        // Check if more rows can be added for the current control
-        if (existingRows.length < Number(row.number_of_control)) {
-          arrayHelpers.push({
-            pallete_count: row.pallete_count,
-            number_of_control: row.number_of_control, // Use same control number
-            length: "",
-            inside_diameter: "",
-            outside_diameter: "",
-            flat_crush: "",
-            h20: "",
-            radial: "",
-            remarks: "",
-            isnew: true, // Mark as new row
-          });
-          setEnablePallete(true); // Optionally handle any UI updates
-        } else {
-          alert("You have reached the maximum rows for this control.");
-        }
-
-        console.log("Current rows length:", existingRows.length); // Debugging
-        console.log("Number of control:", row.number_of_control); // Debugging
-      }}
-    >
-      +
-    </button>
-  ) : null
-}
-
-
-  <button
-    type="button"
-    className="btn btn-error"
-    onClick={() => arrayHelpers.remove(index)}
-  >
-    Remove
-  </button>
-</td>
-
-
-                    </tr>
-                  </React.Fragment>
-                ))}
-              </tbody>
-        
-            </table>
-          </div>
-        </div>
-      )}
-    />
-
-          {fetchedMeasurementData?.length === 0 ? (
-  <p className="text-center text-sm text-slate-600">No Measurement Data Found</p>
-) : (
-  <FieldArray
-    name="rows4"
-    render={(arrayHelpers) => (
-      
-        <tbody className="table relative text-center overflow-auto">
-          {values.rows4.map((row, index) => (
-            <tr key={index}>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.pallete_count`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.pallete_count}
-                  readOnly
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.number_of_control`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.number_of_control}
-                  readOnly
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.length`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.length}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.inside_diameter`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.inside_diameter}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.outside_diameter`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.outside_diameter}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.flat_crush`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.flat_crush}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.h20`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.h20}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.radial`}
-                  type="number"
-                  className="input input-bordered w-20 max-w-md"
-                  value={row.radial}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <Field
-                  name={`rows4.${index}.remarks`}
-                  type="text"
-                  className="input input-bordered"
-                  value={row.remarks}
-                  readOnly={editableRowMes !== index}
-                />
-              </td>
-              <td className="border-y border-slate-500">
-                <div className="flex gap-2">
-                  {editableRowMes === index ? (
-                    <>
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        onClick={async () => {
-                          try {
-                            await updateMeasurementMutation.mutateAsync({
-                              ...row
-                              
-                            });
-                            setEditableRowMes(null); // Reset editable row after saving
-                            refetchMeasurentData(); // Refetch data after update
-                                 
-                          } catch (error) {
-                            console.error("Error in mutation:", error);
-                          }
-                          setIsModalOpen(false);
-                          setTimeout(() => {
-                            setIsModalOpen(true);
-                            setSelectedTab("tab3");
-                          }, 100);
-
-                        }}
-                      >
-                        Save
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={() => {
-                          if (window.confirm("Are you sure you want to cancel?")) {
-                            setEditableRowMes(null); // Reset the editable state
-                            refetchMeasurentData(); // Refetch measurement data
-                            setIsModalOpen(false);
-                            setTimeout(() => {
-                              setIsModalOpen(true);
-                              setSelectedTab("tab3");
-                            }, 100);
-                          }
-                        }}
-                      >
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {!editableRowMes && (
-                        <>
-                          <button
-                            type="button"
-                            className={`btn btn-primary ${editableRowMes !== null ? "hidden" : ""}`}
-                            onClick={() => {
-                              setEditableRowMes(index); 
-                              console.log("the id is:",row.measurement_id);
-                            }}
-                             
-                            
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className={`btn btn-error ${editableRowMes !== null ? "hidden" : ""} ${
-                              removeMeasurementMutation.isPending ? "loading" : ""
-                            }`}
-                            onClick={() => {
-                              const isConfirmed = window.confirm(
-                                "Are you sure you want to remove this measurement?"
-                              );
-                              if (isConfirmed) {
-                                removeMeasurementMutation.mutate({
-                                  measurement_id: row.measurement_id,
-                                  is_exist: false,
-                                });
+                                // Wait for mutation to complete before moving to the next
+                                await AddMeasurementMutation.mutateAsync(
+                                  measurementData
+                                );
                               }
-                            }}
-                          >
-                            <Trash /> Remove
-                          </button>
-                        </>
-                      )}
-                    </>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      
-)}
-  />
-)}
-  </div>
-</Form>
+                            })();
+                          }
+                        } else {
+                          (async () => {
+                            for (const row of values.rowsmeasurement) {
+                              const measurementData = {
+                                order_id: orderid,
+                                length: row.length,
+                                inside_diameter: row.inside_diameter,
+                                outside_diameter: row.outside_diameter,
+                                flat_crush: row.flat_crush,
+                                h20: row.h20,
+                                radial: row.radial,
+                                number_control: row.number_of_control,
+                                remarks: row.remarks,
+                                pallete_count: row.pallete_count,
+                                user_id: userID,
+                              };
+                              setLastpalleteCount(0);
+                              // setNumberControl(0);
+                              // Log for debugging
+                              // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
+                              console.log("Inserting data:", measurementData);
 
+                              // Wait for mutation to complete before moving to the next
+                              await AddMeasurementMutation.mutateAsync(
+                                measurementData
+                              );
+                            }
+                          })();
+                        }
+                      }
+
+                      // console.log("Values are: ",values.rowsmeasurement);
+                    }}
+                  >
+                    {({ values, setFieldValue }) => (
+                      <Form>
+                        <div className="">
+                          <FieldArray
+                            name="rowsmeasurement"
+                            render={(arrayHelpers) => (
+                              <div>
+                                <div className="flex place-content-end gap-3">
+                                  <button
+                                    className="btn btn-info"
+                                    type="button"
+                                    onClick={() => {
+                                      console.log(
+                                        "enablepallete:",
+                                        enablepallete
+                                      ); // Debug
+                                      let currentMaxPallete =
+                                        values.rowsmeasurement.reduce(
+                                          (max, row) =>
+                                            Math.max(
+                                              max,
+                                              row.pallete_count || 0
+                                            ),
+                                          0
+                                        );
+
+                                      // Fallback to lastpalleteCount if currentMaxPallete is 0
+                                      if (currentMaxPallete === 0) {
+                                        currentMaxPallete = lastpalleteCount;
+                                      }
+
+                                      console.log(
+                                        "Current Max Pallete:",
+                                        currentMaxPallete
+                                      ); // Debug
+                                      console.log(
+                                        "the palleteCountrow:",
+                                        filterPalleteCount
+                                      );
+                                      // console.log("number_control val",values.rowsmeasurement.filter(
+                                      //   (r) => r.number_of_control === row.number_of_control))
+                                      console.log(
+                                        "Values are: ",
+                                        values.rowsmeasurement
+                                      );
+                                      console.log(
+                                        "numbr of control:",
+                                        numberControl
+                                      );
+
+                                      // Remove rows where pallete_count and number_of_control are 0
+
+                                      const hasInvalidRow =
+                                        values.rowsmeasurement.some(
+                                          (row) =>
+                                            row.number_of_control === 0 &&
+                                            row.pallete_count === 0
+                                        );
+
+                                      if (
+                                        filterPalleteCount === currentMaxPallete
+                                      ) {
+                                        alert(
+                                          "The pallete count is complete. You can no longer add a new pallete."
+                                        );
+                                      } else {
+                                        if (
+                                          enablepallete === true ||
+                                          hasInvalidRow
+                                        ) {
+                                          const newControlNumber = prompt(
+                                            `The new control number must be equal to the current control number: ${numberControl}.\n\nPlease enter a new control number:`
+                                          );
+                                          if (
+                                            newControlNumber !== null &&
+                                            parseInt(newControlNumber, 10) !==
+                                              numberControl
+                                          ) {
+                                            alert(
+                                              "Please enter a valid number for the control number."
+                                            );
+                                            return;
+                                          }
+
+                                          if (
+                                            newControlNumber &&
+                                            !isNaN(
+                                              parseInt(newControlNumber, 10)
+                                            )
+                                          ) {
+                                            values.rowsmeasurement.forEach(
+                                              (row, index) => {
+                                                if (
+                                                  row.pallete_count === 0 &&
+                                                  row.number_of_control === 0
+                                                ) {
+                                                  console.log(
+                                                    `Removing row at index ${index}:`,
+                                                    row
+                                                  ); // Debug
+                                                  arrayHelpers.remove(index); // Trigger the "Remove" button functionality
+                                                }
+                                              }
+                                            );
+                                            setenableplus(true);
+                                            arrayHelpers.push({
+                                              pallete_count:
+                                                currentMaxPallete + 1, // Incremented pallete_count
+                                              number_of_control: numberControl,
+                                              // User input
+                                              length: "",
+                                              inside_diameter: "",
+                                              outside_diameter: "",
+                                              flat_crush: "",
+                                              h20: "",
+                                              radial: "",
+                                              remarks: "",
+                                              isNew: false,
+                                            });
+                                          } else {
+                                            alert(
+                                              "Please enter a valid number for the control number."
+                                            );
+                                          }
+                                          setEnablePallete(true);
+                                        } else {
+                                          alert(
+                                            "Please finish the current pallete before adding a new one."
+                                          );
+                                        }
+                                      }
+                                    }}
+                                  >
+                                    Add Pallete
+                                  </button>
+
+                                  <button
+                                    className="btn btn-primary"
+                                    type="submit"
+                                  >
+                                    Save Measurement
+                                  </button>
+
+                                  <button
+                                    className="btn btn-accent"
+                                    onClick={() => {
+                                      refetchOrdersData();
+                                      setIsModalOpen(false);
+                                      setOrderid(null);
+                                      refetchMeasurentData();
+                                      refetchProductionData();
+                                      refetchProofingData();
+                                      setTractnumbercontrollenght(0);
+                                    }}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+
+                                <div className="text-black overflow-auto">
+                                  <table className="table relative text-center overflow-auto">
+                                    <thead className="text-black text-sm">
+                                      <tr>
+                                        <th>Pallete</th>
+                                        {/* <th>Number Of Control</th> */}
+                                        <th>Length</th>
+                                        <th>Inside Diameter</th>
+                                        <th>Outside Diameter</th>
+                                        <th>Flat Crush</th>
+                                        <th>H20</th>
+                                        <th>Radial</th>
+                                        <th>Remarks</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {values.rowsmeasurement.map(
+                                        (row, index) => (
+                                          <React.Fragment key={index}>
+                                            <tr>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.pallete_count`}
+                                                  placeholder={` ${
+                                                    row.number_of_control == 0
+                                                      ? ""
+                                                      : ""
+                                                  }`}
+                                                  type="number"
+                                                  readOnly
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.isnew ||
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "text-white hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                  onChange={(e: any) => {
+                                                    const newPalleteCount =
+                                                      parseInt(
+                                                        e.target.value,
+                                                        10
+                                                      );
+                                                    setFieldValue(
+                                                      `rowsmeasurement.${index}.pallete_count`,
+                                                      newPalleteCount
+                                                    );
+                                                  }}
+                                                />
+                                              </td>
+
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.number_of_control`}
+                                                  type="number"
+                                                  placeholder={
+                                                    row.number_of_control === 0
+                                                      ? ""
+                                                      : row.number_of_control.toString()
+                                                  } // Fixes the placeholder issue
+                                                  readOnly
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.isnew ||
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "text-white hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                  onChange={(e: any) => {
+                                                    const newControlNumber =
+                                                      parseInt(
+                                                        e.target.value,
+                                                        10
+                                                      );
+                                                    setFieldValue(
+                                                      `rowsmeasurement.${index}.number_of_control`,
+                                                      newControlNumber
+                                                    );
+                                                  }}
+                                                />
+                                              </td>
+
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.length`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "text-white hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.inside_diameter`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "text-white hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.outside_diameter`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.flat_crush`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.h20`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.radial`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.remarks`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="text"
+                                                  className={`input input-bordered ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                {/* Add Row Button */}
+                                                {values.rowsmeasurement.filter(
+                                                  (r) =>
+                                                    r.number_of_control ===
+                                                    row.number_of_control
+                                                ).length <
+                                                Number(
+                                                  row.number_of_control
+                                                ) ? (
+                                                  <button
+                                                    className={`btn btn-success mt-2`}
+                                                    type="button"
+                                                    onClick={() => {
+                                                      const existingRows =
+                                                        values.rowsmeasurement.filter(
+                                                          (r) =>
+                                                            r.number_of_control ===
+                                                            row.number_of_control
+                                                        );
+
+                                                      // Check if more rows can be added for the current control
+                                                      if (
+                                                        existingRows.length <
+                                                        Number(
+                                                          row.number_of_control
+                                                        )
+                                                      ) {
+                                                        arrayHelpers.push({
+                                                          pallete_count:
+                                                            row.pallete_count,
+                                                          number_of_control:
+                                                            row.number_of_control, // Use same control number
+                                                          length: "",
+                                                          inside_diameter: "",
+                                                          outside_diameter: "",
+                                                          flat_crush: "",
+                                                          h20: "",
+                                                          radial: "",
+                                                          remarks: "",
+                                                          isnew: true, // Mark as new row
+                                                        });
+                                                        setEnablePallete(true); // Optionally handle any UI updates
+                                                      } else {
+                                                        alert(
+                                                          "You have reached the maximum rows for this control."
+                                                        );
+                                                      }
+
+                                                      console.log(
+                                                        "Current rows length:",
+                                                        existingRows.length
+                                                      ); // Debugging
+
+                                                      setTractnumbercontrollenght(
+                                                        existingRows.length
+                                                      );
+                                                      console.log(
+                                                        "Number of control:",
+                                                        row.number_of_control
+                                                      ); // Debugging
+                                                    }}
+                                                  >
+                                                    +
+                                                  </button>
+                                                ) : null}
+
+                                                <button
+                                                  type="button"
+                                                  className={`btn btn-error ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : ""
+                                                  }`}
+                                                  onClick={() => {
+                                                    arrayHelpers.remove(index);
+                                                    setTractnumbercontrollenght((prev) => prev - 1);
+                                                  }}
+                                                >
+                                                  Remove
+                                                </button>
+                                              </td>
+                                            </tr>
+                                          </React.Fragment>
+                                        )
+                                      )}
+                                    </tbody>
+                                    {isLoading || isFetching ? (
+              <tr>
+                <td colSpan={7}>
+                  <span className="loading loading-dots loading-md"></span>
+                </td>
+              </tr>
+            ) : isError ? (
+              <tr>
+                <td className="text-error font-bold" colSpan={7}>
+                  Something went wrong while fetching orders list.
+                </td>
+              </tr>
+            ) : fetchedMeasurementData?.length === 0 ? (
+                            <p className="text-center text-sm text-slate-600">
+                              No Measurement Data Found
+                            </p>
+                          ) : (
+                            <FieldArray
+                              name="rows4"
+                              render={(arrayHelpers) => (
+                                
+                                <tbody className="border-y border-slate-500">
+                                  {values.rows4.map((row, index) => (
+                                    <tr key={index} className="border-y border-slate-500">
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.pallete_count`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.pallete_count}
+                                          readOnly
+                                        />
+                                      </td>
+                                      {/* <td className="">
+                                        
+                                        <Field
+                                          name={`rows4.${index}.number_of_control`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md hidden"
+                                          value={row.number_of_control}
+                                        />
+                                      </td> */}
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.length`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.length}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.inside_diameter`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.inside_diameter}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.outside_diameter`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.outside_diameter}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.flat_crush`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.flat_crush}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.h20`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.h20}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.radial`}
+                                          type="number"
+                                          className="input input-bordered w-20 max-w-md"
+                                          value={row.radial}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <Field
+                                          name={`rows4.${index}.remarks`}
+                                          type="text"
+                                          className="input input-bordered"
+                                          value={row.remarks}
+                                          readOnly={editableRowMes !== index}
+                                        />
+                                      </td>
+                                      <td className="border-y border-slate-500">
+                                        <div className="flex gap-2">
+                                          {editableRowMes === index ? (
+                                            <>
+                                              <button
+                                                type="button"
+                                                className="btn btn-success"
+                                                onClick={async () => {
+                                                  try {
+                                                    await updateMeasurementMutation.mutateAsync(
+                                                      {
+                                                        ...row,
+                                                      }
+                                                    );
+                                                    setEditableRowMes(null); // Reset editable row after saving
+                                                    refetchMeasurentData(); // Refetch data after update
+                                                  } catch (error) {
+                                                    console.error(
+                                                      "Error in mutation:",
+                                                      error
+                                                    );
+                                                  }
+                                                  setIsModalOpen(false);
+                                                  setTimeout(() => {
+                                                    setIsModalOpen(true);
+                                                    setSelectedTab("tab3");
+                                                  }, 100);
+                                                }}
+                                              >
+                                                Save
+                                              </button>
+                                              <button
+                                                type="button"
+                                                className="btn btn-primary"
+                                                onClick={() => {
+                                                  if (
+                                                    window.confirm(
+                                                      "Are you sure you want to cancel?"
+                                                    )
+                                                  ) {
+                                                    setTractnumbercontrollenght(0);
+                                                    setEditableRowMes(null); // Reset the editable state
+                                                    refetchMeasurentData(); // Refetch measurement data
+                                                    setIsModalOpen(false);
+                                                    setTimeout(() => {
+                                                      setIsModalOpen(true);
+                                                      setSelectedTab("tab3");
+                                                    }, 100);
+                                                  }
+                                                }}
+                                              >
+                                                Cancel
+                                              </button>
+                                            </>
+                                          ) : (
+                                            <>
+                                              {!editableRowMes && (
+                                                <>
+                                                  <button
+                                                    type="button"
+                                                    className={`btn btn-primary ${
+                                                      editableRowMes !== null
+                                                        ? "hidden"
+                                                        : ""
+                                                    }`}
+                                                    onClick={() => {
+                                                      setEditableRowMes(index);
+                                                      console.log(
+                                                        "the id is:",
+                                                        row.measurement_id
+                                                      );
+                                                    }}
+                                                  >
+                                                    Edit
+                                                  </button>
+                                                  <button
+                                                    type="button"
+                                                    className={`btn btn-error ${
+                                                      editableRowMes !== null
+                                                        ? "hidden"
+                                                        : ""
+                                                    } ${
+                                                      removeMeasurementMutation.isPending
+                                                        ? "loading"
+                                                        : ""
+                                                    }`}
+                                                    onClick={() => {
+                                                      const isConfirmed =
+                                                        window.confirm(
+                                                          "Are you sure you want to remove this measurement?"
+                                                        );
+                                                      if (isConfirmed) {
+                                                        removeMeasurementMutation.mutate(
+                                                          {
+                                                            measurement_id:
+                                                              row.measurement_id,
+                                                            is_exist: false,
+                                                          }
+                                                        );
+                                                      }
+                                                    }}
+                                                  >
+                                                    Remove
+                                                  </button>
+                                                </>
+                                              )}
+                                            </>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              )}
+                            />
+                          )}
+                                  </table>
+                                </div>
+                              </div>
+                            )}
+                          />
+                        </div>
+                      </Form>
                     )}
                   </Formik>
                 </div>

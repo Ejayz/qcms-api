@@ -89,7 +89,9 @@ export default function AddCustomerList() {
     // middlename: Yup.string().required("Middle Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
     // lastname: Yup.string().required("Last Name is required").matches(/^[A-Za-z]+$/, "Only alphabets are allowed"),
     // email: Yup.string().email("Invalid email").required("Email is required"),
-    company_name: Yup.string().required("Company Name is required"),
+
+    company_name: Yup.string().required("Company Name is required."),
+    customer_id:Yup.number().required("Customer ID is required.")
   });
 
   return (
@@ -112,7 +114,8 @@ export default function AddCustomerList() {
           // middlename: "",
           // lastname: "",
           // email: "",
-          customer_id: isLoading?"Retrieving latest Customer ID...":parseInt(data?.data[0].id||0) + 1,
+          // customer_id: isLoading?"Retrieving latest Customer ID...":parseInt(data?.data[0].id||0) + 1,
+          customer_id:"",
           company_name: "",
         }}
         enableReinitialize={true}
@@ -137,14 +140,14 @@ export default function AddCustomerList() {
                 <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormInput
-                        tooltip="Auto-generated Customer ID."
+                        tooltip="Input of Customer ID. This is required."
                         name="customer_id"
-                        placeholder="Customer ID"
+                        placeholder="Enter Customer ID"
                         label="Customer ID"
-                        errors={errors.company_name ? errors.company_name : ""}
-                        touched={touched.company_name ? "true" : ""}
-                        type="text"
-                        readonly={true}
+                        errors={errors.customer_id ? errors.customer_id : ""}
+                        touched={touched.customer_id ? "true" : ""}
+                        type="number"
+                        // readonly={true}
                       />
                     </label>
                   </div>
@@ -178,7 +181,7 @@ export default function AddCustomerList() {
                   </>
                 ) : (
                   <>
-                    <Plus /> ADD CUSTOMER
+                    ADD CUSTOMER
                   </>
                 )}
               </button>

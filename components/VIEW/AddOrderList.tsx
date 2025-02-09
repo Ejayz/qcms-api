@@ -14,7 +14,7 @@ export default function AddOrderList() {
 
   const Add_Order_Validator = Yup.object().shape({
     Id: Yup.string().required("Id is required"),
-    product_name: Yup.string().required("Product Name is required"),
+    // product_name: Yup.string().required("Product Name is required"),
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
     PalleteCount: Yup.string().required("Pallete Count is required"),
@@ -195,20 +195,20 @@ export default function AddOrderList() {
                       name="Id"
                       placeholder="Order ID"
                       label="Order ID"
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
+                      errors={errors.Id ? errors.Id : ""}
+                      touched={touched.Id ? "true":"" }// Adjust as needed
                     />
                   </div>
-                  <div>
+                  {/* <div>
                     <FormInput
                       tooltip="Enter the product name"
                       name="product_name"
                       placeholder="Product Name"
                       label="Product Name"
-                      errors={error ? error : ""}
-                      touched="true" // Adjust as needed
+                      errors={errors.product_name ? errors.product_name : ""}
+                      touched={touched.product_name ? "true" :""} // Adjust as needed
                     />
-                  </div>
+                  </div> */}
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormSelect
@@ -218,8 +218,8 @@ export default function AddOrderList() {
                         label="Customer Name"
                         options={customerOptions
                         }
-                        errors={error ? error : ""}
-                        touched="true" // Adjust as needed
+                        errors={errors.CustomerName ? errors.CustomerName : ""}
+                        touched={touched.CustomerName ? "true" :"" }// Adjust as needed
                       />
                       {isLoading && <p>Loading customers...</p>}
                       {error && <p className="text-red-500">{error}</p>}
@@ -233,8 +233,8 @@ export default function AddOrderList() {
                         placeholder="Choose a Article"
                         label="Article Name"
                         options={articleOptions}
-                        errors={error ? error : ""}
-                        touched="true" // Adjust as needed
+                        errors={errors.ArticleName ? errors.ArticleName : ""}
+                        touched={touched.ArticleName? "true":""} // Adjust as needed
                       />
                       {isLoading && <p>Loading article...</p>}
                       {error && <p className="text-red-500">{error}</p>}
