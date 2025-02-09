@@ -228,10 +228,10 @@ export default function AddOrderList() {
                   <div>
                     <label className="form-control w-96 max-w-lg">
                       <FormSelect
-                        tooltip="Select the article's name from the dropdown"
+                        tooltip="Select the product's name from the dropdown"
                         name="ArticleName"
-                        placeholder="Choose a Article"
-                        label="Article Name"
+                        placeholder="Choose a Product"
+                        label="Product Name"
                         options={articleOptions}
                         errors={errors.ArticleName ? errors.ArticleName : ""}
                         touched={touched.ArticleName? "true":""} // Adjust as needed

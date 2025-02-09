@@ -1004,7 +1004,7 @@ export default function OrderListView() {
               <th>OF ID</th>
               {/* <th>Product Name</th> */}
               <th>Customer Name</th>
-              <th>Article Name</th>
+              <th>Product Name</th>
               <th>Pallete Count</th>
               {/* <th>Created Date</th> */}
               <th>Production Entry Date</th>

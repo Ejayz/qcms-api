@@ -266,10 +266,10 @@ const removeCustomerMutation = useMutation({
                   <div>
                     <label className="form-control w-96 max-w-lg">
                     <FormSelect
-                      tooltip="Select the article's name from the dropdown"
+                      tooltip="Select the product's name from the dropdown"
                       name="ArticleName"
-                      placeholder="Choose a Article"
-                      label="Article Name"
+                      placeholder="Choose a Product"
+                      label="Product Name"
                       options={articleOptions}
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
