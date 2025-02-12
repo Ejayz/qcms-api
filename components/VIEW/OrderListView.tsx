@@ -2380,7 +2380,7 @@ export default function OrderListView() {
                                                 />
                                               </td>
 
-                                              <td>
+                                              <td className="hidden">
                                                 <Field
                                                   name={`rowsmeasurement.${index}.number_of_control`}
                                                   type="number"
