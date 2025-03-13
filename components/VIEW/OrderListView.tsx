@@ -1046,14 +1046,12 @@ export default function OrderListView() {
                   <td>{order.pallete_count ? order.pallete_count : " "}</td>
                   <td>
                     {order.entry_date_time
-                      ? DateTime.fromISO(order.entry_date_time).toFormat(
-                          "dd/MM/yy hh:mm a"
-                        )
+                      ? DateTime.fromISO(order.entry_date_time, { zone: "utc" }).toFormat("dd/MM/yy hh:mm a")
                       : " "}
                   </td>
                   <td>
                     {order.exit_date_time
-                      ? DateTime.fromISO(order.exit_date_time).toFormat(
+                      ? DateTime.fromISO(order.exit_date_time,{zone:"utc"}).toFormat(
                           "dd/MM/yy hh:mm a"
                         )
                       : " "}
