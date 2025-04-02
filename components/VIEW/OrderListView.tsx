@@ -104,9 +104,7 @@ export default function OrderListView() {
   const [enablepallete, setEnablePallete] = useState(false);
   const [enableplus, setenableplus] = useState(true);
   const [lastpalleteCount, setLastpalleteCount] = useState<number | 1>(1);
-  const [tractnumbercontrollenght, setTractnumbercontrollenght] = useState<
-    number | 0
-  >(0);
+  const [tractnumbercontrollenght, setTractnumbercontrollenght] = useState<number|null>(null);
   const [isbuttonhide, setisbuttonhide] = useState<boolean>(false);
   const [isfieldhide, setisfieldhide] = useState<boolean>(false);
   const [isfieldhideproof, setisfieldhideproof] = useState<boolean>(false);
@@ -115,9 +113,11 @@ export default function OrderListView() {
   const [updatedGroupData, setUpdatedGroupData] = useState<{ [key: string]: any }>({});
   const [retrievedentryDateTime, setRetrievedentryDateTime] = useState<string | null>(null);
   const [retrievedexitDateTime, setRetrievedexitDateTime] = useState<string | null>(null);
+  const [isMaxRow,setisMaxRow] = useState<boolean>(false);
 
 
   console.log("current enablepallete: ", enablepallete);
+  console.log("rows lenght",tractnumbercontrollenght);
 
   useEffect(() => {
     const fetchUserEmail = async () => {
@@ -707,13 +707,14 @@ export default function OrderListView() {
       setEnablePallete(true);
     } else {
       setLastpalleteCount(1);
+      setTractnumbercontrollenght(1);
       setEnablePallete(false);
     }
   }, [fetchedMeasurementData]); // Add fetchedMeasurementData as a dependency
-
+  
   const updateMeasurementMutation = useMutation({
     mutationFn: async (updatedData: any) => {
-      alert("Data to be updated: " + JSON.stringify(updatedData, null, 2));
+      // alert("Data to be updated: " + JSON.stringify(updatedData, null, 2));
       console.log("Data to be updated: ", updatedData);
       const response = await fetch(
         `/api/v1/edit_measurement?id=${updatedData.measurement_id}`,
@@ -723,15 +724,15 @@ export default function OrderListView() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            // pallete_count: updatedData.pallete_count,
-            // number_control: updatedData.number_of_control,
-            // length: updatedData.length,
-            // inside_diameter: updatedData.inside_diameter,
-            // outside_diameter: updatedData.outside_diameter,
-            // flat_crush: updatedData.flat_crush,
-            // h20: updatedData.h20,
-            // radial: updatedData.radial,
-            // remarks: updatedData.remarks,
+            pallete_count: updatedData.pallete_count,
+            number_control: 0,
+            length: updatedData.length,
+            inside_diameter: updatedData.inside_diameter,
+            outside_diameter: updatedData.outside_diameter,
+            flat_crush: updatedData.flat_crush,
+            h20: updatedData.h20,
+            radial: updatedData.radial,
+            remarks: updatedData.remarks,
           }),
         }
       );
@@ -1034,7 +1035,7 @@ export default function OrderListView() {
                       setIsModalOpen(true);
                       setOrderid(order.id);
                       setOrderformdisplay(order.order_fabrication_control);
-                      setNumberControl(order.tbl_article.number_control);
+                      setNumberControl(3);
                       setFilterPalleteCount(order.pallete_count);
                     }}
                   >
@@ -2076,20 +2077,20 @@ export default function OrderListView() {
                     onSubmit={async (values) => {
                       // Check if all rows have 0 or empty values
 
-                      const isAllEmptyOrZero = values.rowsmeasurement.every(
-                        (row) =>
-                          row.pallete_count === 0 && row.number_of_control === 0
-                      );
-                      console.log(
-                        "current row lenght",
-                        tractnumbercontrollenght + 1
-                      );
-                      if (isAllEmptyOrZero) {
-                        alert(
-                          "Cannot submit: All fields are empty or have a value of 0."
-                        );
-                        return; // Prevent form submission
-                      } else {
+                      // const isAllEmptyOrZero = values.rowsmeasurement.every(
+                      //   (row) =>
+                      //     row.pallete_count === 0 && row.number_of_control === 0
+                      // );
+                      // console.log(
+                      //   "current row lenght",
+                      //   tractnumbercontrollenght + 1
+                      // );
+                      // if (isAllEmptyOrZero) {
+                      //   alert(
+                      //     "Cannot submit: All fields are empty or have a value of 0."
+                      //   );
+                      //   return; // Prevent form submission
+                      // } else {
                         // const pallete_number=values.rowsmeasurement[0].pallete_count;
                         // const control_number=values.rowsmeasurement[0].number_of_control;
                         // if(numberControl===tractnumbercontrollenght){
@@ -2098,12 +2099,14 @@ export default function OrderListView() {
                         //   return;
                         // }
                         // }
-                        if (numberControl !== tractnumbercontrollenght + 1) {
-                          const userConfirmed = window.confirm(
-                            "The number of controls is not yet complete. Are you sure you want to submit it?"
+                        if (isMaxRow=== false) {
+                          alert(
+                            "The number of controls is not yet complete. Please ensure that it is completed before submitting."
                           );
-                          if (userConfirmed) {
-                            (async () => {
+                          return;
+                        }
+                          // if (userConfirmed) {
+                          //   (async () => {
                               for (const row of values.rowsmeasurement) {
                                 const measurementData = {
                                   order_id: orderid,
@@ -2118,7 +2121,7 @@ export default function OrderListView() {
                                   pallete_count: row.pallete_count,
                                   user_id: userID,
                                 };
-                                setLastpalleteCount(0);
+                                // setLastpalleteCount(0);
                                 // setNumberControl(0);
                                 // Log for debugging
                                 // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
@@ -2129,38 +2132,38 @@ export default function OrderListView() {
                                   measurementData
                                 );
                               }
-                            })();
-                          }
-                        } else {
-                          (async () => {
-                            for (const row of values.rowsmeasurement) {
-                              const measurementData = {
-                                order_id: orderid,
-                                length: row.length,
-                                inside_diameter: row.inside_diameter,
-                                outside_diameter: row.outside_diameter,
-                                flat_crush: row.flat_crush,
-                                h20: row.h20,
-                                radial: row.radial,
-                                number_control: row.number_of_control,
-                                remarks: row.remarks,
-                                pallete_count: row.pallete_count,
-                                user_id: userID,
-                              };
-                              setLastpalleteCount(0);
-                              // setNumberControl(0);
-                              // Log for debugging
-                              // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
-                              console.log("Inserting data:", measurementData);
+                          //   })();
+                          // }
+                        // } else {
+                        //   (async () => {
+                        //     for (const row of values.rowsmeasurement) {
+                        //       const measurementData = {
+                        //         order_id: orderid,
+                        //         length: row.length,
+                        //         inside_diameter: row.inside_diameter,
+                        //         outside_diameter: row.outside_diameter,
+                        //         flat_crush: row.flat_crush,
+                        //         h20: row.h20,
+                        //         radial: row.radial,
+                        //         number_control: row.number_of_control,
+                        //         remarks: row.remarks,
+                        //         pallete_count: row.pallete_count,
+                        //         user_id: userID,
+                        //       };
+                        //       setLastpalleteCount(0);
+                        //       // setNumberControl(0);
+                        //       // Log for debugging
+                        //       // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
+                        //       console.log("Inserting data:", measurementData);
 
-                              // Wait for mutation to complete before moving to the next
-                              await AddMeasurementMutation.mutateAsync(
-                                measurementData
-                              );
-                            }
-                          })();
-                        }
-                      }
+                        //       // Wait for mutation to complete before moving to the next
+                        //       await AddMeasurementMutation.mutateAsync(
+                        //         measurementData
+                        //       );
+                        //     }
+                        //   })();
+                        // }
+                      // }
 
                       // console.log("Values are: ",values.rowsmeasurement);
                     }}
@@ -2173,133 +2176,53 @@ export default function OrderListView() {
                             render={(arrayHelpers) => (
                               <div>
                                 <div className="flex place-content-end gap-3">
-                                  <button
-                                    className="btn btn-info"
-                                    type="button"
-                                    onClick={() => {
-                                      console.log(
-                                        "enablepallete:",
-                                        enablepallete
-                                      ); // Debug
-                                      let currentMaxPallete =
-                                        values.rowsmeasurement.reduce(
-                                          (max, row) =>
-                                            Math.max(
-                                              max,
-                                              row.pallete_count || 0
-                                            ),
-                                          0
-                                        );
+                                <button
+  className="btn btn-info"
+  type="button"
+  onClick={() => {
+    let currentMaxPallete = values.rowsmeasurement.reduce(
+      (max, row) => Math.max(max, row.pallete_count || 0),
+      0
+    );
 
-                                      // Fallback to lastpalleteCount if currentMaxPallete is 0
-                                      if (currentMaxPallete === 0) {
-                                        currentMaxPallete = lastpalleteCount;
-                                      }
+    if (currentMaxPallete === 0) {
+      currentMaxPallete = lastpalleteCount;
+    }
 
-                                      console.log(
-                                        "Current Max Pallete:",
-                                        currentMaxPallete
-                                      ); // Debug
-                                      console.log(
-                                        "the palleteCountrow:",
-                                        filterPalleteCount
-                                      );
-                                      // console.log("number_control val",values.rowsmeasurement.filter(
-                                      //   (r) => r.number_of_control === row.number_of_control))
-                                      console.log(
-                                        "Values are: ",
-                                        values.rowsmeasurement
-                                      );
-                                      console.log(
-                                        "numbr of control:",
-                                        numberControl
-                                      );
+    // Remove any incomplete rows
+    values.rowsmeasurement.forEach((row, index) => {
+      if (row.pallete_count === 0 && row.number_of_control === 0) {
+        arrayHelpers.remove(index);
+      }
+    });
+    if(isMaxRow===false){
+      alert("The number of controls is not yet complete. Please ensure that it is completed before adding a new pallete.");
+      return;
+    }
+    // Add 3 new rows for the new pallete
+    // for (let i = 0; i < numberControl; i++) {
+      arrayHelpers.push({
+        pallete_count: currentMaxPallete + 1,
+        number_of_control: numberControl,
+        length: "",
+        inside_diameter: "",
+        outside_diameter: "",
+        flat_crush: "",
+        h20: "",
+        radial: "",
+        remarks: "",
+        isNew: true, // Indicating it's a new row
+      });
+    // }
 
-                                      // Remove rows where pallete_count and number_of_control are 0
+    setEnablePallete(true);
+  }}
+>
+  Add Pallete
+</button>
 
-                                      const hasInvalidRow =
-                                        values.rowsmeasurement.some(
-                                          (row) =>
-                                            row.number_of_control === 0 &&
-                                            row.pallete_count === 0
-                                        );
 
-                                      if (
-                                        filterPalleteCount === currentMaxPallete
-                                      ) {
-                                        alert(
-                                          "The pallete count is complete. You can no longer add a new pallete."
-                                        );
-                                      } else {
-                                        if (
-                                          enablepallete === true ||
-                                          hasInvalidRow
-                                        ) {
-                                          const newControlNumber = prompt(
-                                            `The new control number must be equal to the current control number: ${numberControl}.\n\nPlease enter a new control number:`
-                                          );
-                                          if (
-                                            newControlNumber !== null &&
-                                            parseInt(newControlNumber, 10) !==
-                                              numberControl
-                                          ) {
-                                            alert(
-                                              "Please enter a valid number for the control number."
-                                            );
-                                            return;
-                                          }
 
-                                          if (
-                                            newControlNumber &&
-                                            !isNaN(
-                                              parseInt(newControlNumber, 10)
-                                            )
-                                          ) {
-                                            values.rowsmeasurement.forEach(
-                                              (row, index) => {
-                                                if (
-                                                  row.pallete_count === 0 &&
-                                                  row.number_of_control === 0
-                                                ) {
-                                                  console.log(
-                                                    `Removing row at index ${index}:`,
-                                                    row
-                                                  ); // Debug
-                                                  arrayHelpers.remove(index); // Trigger the "Remove" button functionality
-                                                }
-                                              }
-                                            );
-                                            setenableplus(true);
-                                            arrayHelpers.push({
-                                              pallete_count:
-                                                currentMaxPallete + 1, // Incremented pallete_count
-                                              number_of_control: numberControl,
-                                              // User input
-                                              length: "",
-                                              inside_diameter: "",
-                                              outside_diameter: "",
-                                              flat_crush: "",
-                                              h20: "",
-                                              radial: "",
-                                              remarks: "",
-                                              isNew: false,
-                                            });
-                                          } else {
-                                            alert(
-                                              "Please enter a valid number for the control number."
-                                            );
-                                          }
-                                          setEnablePallete(true);
-                                        } else {
-                                          alert(
-                                            "Please finish the current pallete before adding a new one."
-                                          );
-                                        }
-                                      }
-                                    }}
-                                  >
-                                    Add Pallete
-                                  </button>
 
                                   <button
                                     className="btn btn-primary"
@@ -2340,8 +2263,18 @@ export default function OrderListView() {
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {values.rowsmeasurement.map(
-                                        (row, index) => (
+                                    {values.rowsmeasurement.map((row, index) => {
+    // Count how many rows exist for the same number_of_control
+    const existingRows = values.rowsmeasurement.filter(
+      (r) => r.number_of_control === row.number_of_control && r.pallete_count === row.pallete_count
+    );
+
+    const maxRowsReached = existingRows.length >= row.number_of_control;
+    const isLastRow = existingRows.length === 1;
+    
+    console.log("maxRowsReached", maxRowsReached);
+    setisMaxRow(maxRowsReached);
+    return  (
                                           <React.Fragment key={index}>
                                             <tr>
                                               <td>
@@ -2553,92 +2486,64 @@ export default function OrderListView() {
                                                 />
                                               </td>
                                               <td>
-                                                {/* Add Row Button */}
-                                                {values.rowsmeasurement.filter(
-                                                  (r) =>
-                                                    r.number_of_control ===
-                                                    row.number_of_control
-                                                ).length <
-                                                Number(
-                                                  row.number_of_control
-                                                ) ? (
-                                                  <button
-                                                    className={`btn btn-success mt-2`}
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const existingRows =
-                                                        values.rowsmeasurement.filter(
-                                                          (r) =>
-                                                            r.number_of_control ===
-                                                            row.number_of_control
-                                                        );
+            {/* Add Row Button (Hidden if max rows reached) */}
+            {!maxRowsReached && (
+              <><button
+                className="btn btn-success mt-2"
+                type="button"
+                onClick={() => {
+                  arrayHelpers.push({
+                    pallete_count: row.pallete_count,
+                    number_of_control: row.number_of_control,
+                    length: "",
+                    inside_diameter: "",
+                    outside_diameter: "",
+                    flat_crush: "",
+                    h20: "",
+                    radial: "",
+                    remarks: "",
+                    isnew: true,
+                  });
 
-                                                      // Check if more rows can be added for the current control
-                                                      if (
-                                                        existingRows.length <
-                                                        Number(
-                                                          row.number_of_control
-                                                        )
-                                                      ) {
-                                                        arrayHelpers.push({
-                                                          pallete_count:
-                                                            row.pallete_count,
-                                                          number_of_control:
-                                                            row.number_of_control, // Use same control number
-                                                          length: "",
-                                                          inside_diameter: "",
-                                                          outside_diameter: "",
-                                                          flat_crush: "",
-                                                          h20: "",
-                                                          radial: "",
-                                                          remarks: "",
-                                                          isnew: true, // Mark as new row
-                                                        });
-                                                        setEnablePallete(true); // Optionally handle any UI updates
-                                                      } else {
-                                                        alert(
-                                                          "You have reached the maximum rows for this control."
-                                                        );
-                                                      }
+                  setEnablePallete(true);
+                } }
+              >
+                +
+              </button>
+            
+                <button
+                className="btn btn-error mt-2"
+                type="button"
+                onClick={() => {
+                  arrayHelpers.remove(index);
+                }}
+              >
+                Remove
+              </button>
+       
+              
+            </>
+            )}
+            
+            
+            {/* Remove Button (Hidden if it's the last row for this control) */}
+            {/* {isLastRow && (
+              <button
+                type="button"
+                className="btn btn-error"
+                onClick={() => {
+                  arrayHelpers.remove(index);
+                }}
+              >
+                Remove
+              </button>
+            )} */}
+          </td>
 
-                                                      console.log(
-                                                        "Current rows length:",
-                                                        existingRows.length
-                                                      ); // Debugging
-
-                                                      setTractnumbercontrollenght(
-                                                        existingRows.length
-                                                      );
-                                                      console.log(
-                                                        "Number of control:",
-                                                        row.number_of_control
-                                                      ); // Debugging
-                                                    }}
-                                                  >
-                                                    +
-                                                  </button>
-                                                ) : null}
-
-                                                <button
-                                                  type="button"
-                                                  className={`btn btn-error ${
-                                                    values.rowsmeasurement[
-                                                      index
-                                                    ]?.iswhiteAll
-                                                      ? "hidden"
-                                                      : ""
-                                                  }`}
-                                                  onClick={() => {
-                                                    arrayHelpers.remove(index);
-                                                    setTractnumbercontrollenght((prev) => prev - 1);
-                                                  }}
-                                                >
-                                                  Remove
-                                                </button>
-                                              </td>
                                             </tr>
                                           </React.Fragment>
-                                        )
+                                        );
+                                      }
                                       )}
                                     </tbody>
                                     {isLoading || isFetching ? (

@@ -23,6 +23,7 @@ export async function PUT(req: NextRequest) {
       await req.json();
     console.log("the ID",id)    // Initialize Supabase client
     const supabase = await createClient();
+    console.log("the body to edit",req.body)
 
     // Verify user role
     // const current_role = await roleExtractor(supabase);
