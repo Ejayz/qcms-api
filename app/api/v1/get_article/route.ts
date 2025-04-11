@@ -15,15 +15,18 @@ export async function GET(req: NextRequest) {
   // Query to get articles matching search
   let articleQuery = supabase
     .from("tbl_article")
-    .select("*, tbl_customer!inner(id, company_name)", { count: "exact" }) // Ensure inner join
+    .select("*, tbl_customer(id, company_name)", { count: "exact" }) // Ensure inner join
+    // .select("*, tbl_customer!inner(id, company_name)", { count: "exact" }) // Ensure inner join
     // .not("customer_id", "is", null)
+    .eq("is_exist", true) // Filter for existing articles
     .order("created_at", { ascending: false })
     .range(page * limit, (page + 1) * limit - 1);
 
   // Query to get customers matching search
   const customerQuery = supabase
     .from("tbl_article")
-    .select("*, tbl_customer!inner(id, company_name)", { count: "exact" })
+    .select("*, tbl_customer(id, company_name)", { count: "exact" })
+    // .select("*, tbl_customer!inner(id, company_name)", { count: "exact" }) // Ensure inner join
     .filter("tbl_customer.company_name", "ilike", `%${search}%`)
     .order("created_at", { ascending: false })
     .range(page * limit, (page + 1) * limit - 1);

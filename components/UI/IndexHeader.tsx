@@ -32,16 +32,21 @@ export default function IndexHeader(){
 
   const [useremail, setUseremail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
-  useEffect(() => {
-    const fetchUserEmail = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUseremail(data.user?.user_metadata.email || null);
-      setUserRole(data.user?.user_metadata.role || null);
-    };
-
-    fetchUserEmail();
-  }, []);
-  console.log("User Email is:", useremail);
+ 
+    const [Fname, setFname] = useState<string | null>(null);
+    const [Lname, setLname] = useState<string | null>(null);
+    useEffect(() => {
+      const fetchUserEmail = async () => {
+        const { data } = await supabase.auth.getUser();
+        setFname(data.user?.user_metadata.first_name || null);
+        setLname(data.user?.user_metadata.last_name || null);
+        console.log("User Data:", data);
+  
+      };
+      
+      fetchUserEmail();
+    }, []);
+    
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -111,7 +116,7 @@ export default function IndexHeader(){
               className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
             >
               <li>
-                <span className="text-black">{useremail}</span>
+                <span className="text-black">{Lname+" "+Fname}</span>
               </li>
               <li>
                 <a className="text-black" onClick={handleLogout}>

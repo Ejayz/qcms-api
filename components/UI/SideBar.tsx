@@ -37,17 +37,22 @@ export default function Sidebar({
   const [useremail, setUseremail] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userID, setUserID] = useState<string | null>(null);
+  const [Fname, setFname] = useState<string | null>(null);
+  const [Lname, setLname] = useState<string | null>(null);
   useEffect(() => {
     const fetchUserEmail = async () => {
       const { data } = await supabase.auth.getUser();
-      setUseremail(data.user?.user_metadata.email || null);
-      setUserRole(data.user?.user_metadata.role || null);
-      setUserID(data.user?.user_metadata.sub || null);
-    };
+      setUserID(data.user?.id || null);
+      setFname(data.user?.user_metadata.first_name || null);
+      setLname(data.user?.user_metadata.last_name || null);
+      console.log("User Data:", data);
 
+    };
+    
     fetchUserEmail();
   }, []);
-  // console.log("User Email:", useremail);
+    console.log("User ID:", userID);
+
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();

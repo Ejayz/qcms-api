@@ -7,12 +7,24 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 import * as Yup from "yup";
 
 export default function EditArticleListCopy(params:any) {
   const router = useRouter();
   const id = params.params;
+   const supabase = createClient(); 
+   const [UserRole,setUserRole] = useState<string | null>(null);
+    useEffect(() => {
+       const fetchUserEmail = async () => {
+         const { data } = await supabase.auth.getUser();
+         setUserRole(data.user?.user_metadata.role || null);
+         console.log("User Data:", data);
+       };
+       
+       fetchUserEmail();
+     }, []);
+       console.log("UserRole:", UserRole);
 
   const [initialValues,setInitialValues] = useState({ 
     rows: [
@@ -267,6 +279,43 @@ export default function EditArticleListCopy(params:any) {
       return data;
     },
   });
+
+  const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
+  const removeCustomerMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const response = await fetch(`/api/v1/remove_article/?id=${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      const result = await response.json();
+  
+      // ❗ Manually handle non-2xx responses
+      if (!response.ok) {
+        // Throw the error so `onError` will be called
+        throw { status: response.status, message: result.error || "Something went wrong" };
+      }
+  
+      return result;
+    },
+    onError: (error: any) => {
+      console.error("Mutation Error:", error); // for debugging
+      if (error.status === 400) {
+        toast.error("This article is currently used in another table.");
+      } else if (error.status === 405) {
+        toast.error("Something went wrong. Please try again later.");
+      } else {
+        toast.error(error.message || "Failed to remove article");
+      }
+    },
+    onSuccess: (data) => {
+      toast.success("Article removed successfully");
+      router.push("/dashboard/article_management");
+    },
+  });
   
   const UpdateArticleMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -482,8 +531,17 @@ export default function EditArticleListCopy(params:any) {
                                           ))}
                                         </div>
                     <div className="flex place-content-end gap-3">
-                  
-                      {/* <button>Remove</button> */}
+                 {/* Only show the remove button for Super Admins */}
+{UserRole === "Super Admin" && (
+  <button
+    type="button"
+    className="btn btn-error btn-md"
+    onClick={() => setIsRemoveModalOpen(true)}
+  >
+    <Trash2 /> Remove Article
+  </button>
+)}
+
                       <button className="btn btn-primary" type="submit">
                         Save Article
                       </button>
@@ -707,6 +765,34 @@ export default function EditArticleListCopy(params:any) {
           </Form>
         )}
       </Formik>
+      {isRemoveModalOpen && (
+  <div className="modal modal-open">
+    <div className="modal-box">
+      <h3 className="text-lg font-bold">Confirm Removal</h3>
+      <p>Are you sure you want to remove this article? This action cannot be undone.</p>
+      <div className="modal-action">
+      <button
+  type="button"
+  onClick={() => {
+    removeCustomerMutation.mutate({ is_exist: false });
+  }}
+  className={`btn btn-error ${
+    removeCustomerMutation.isPending ? "loading" : ""
+  }`}
+>
+  Confirm
+</button>
+
+        <button
+          onClick={() => setIsRemoveModalOpen(false)}
+          className="btn btn-outline"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
