@@ -9,11 +9,23 @@ import toast from "react-hot-toast";
 import * as Yup from "yup";
 import { FormInput, FormSelect } from "../UI/FormInput";
 import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client";
 export default function AddOrderList(params:any) {
   
   const router = useRouter();
   const id=params.params;
-
+const supabase = createClient(); 
+   const [UserRole,setUserRole] = useState<string | null>(null);
+    useEffect(() => {
+       const fetchUserEmail = async () => {
+         const { data } = await supabase.auth.getUser();
+         setUserRole(data.user?.user_metadata.role || null);
+         console.log("User Data:", data);
+       };
+       
+       fetchUserEmail();
+     }, []);
+       console.log("UserRole:", UserRole);
   const [initialValues, setInitialValues] = useState({
     Id: "",
     // product_name: "",
@@ -206,12 +218,15 @@ const removeCustomerMutation = useMutation({
       </div>
       <div className="flex flex-row justify-end items-center m-4">
       {/* Remove User Button */}
-      <button
-        className="btn btn-error btn-md"
-        onClick={() => setIsRemoveModalOpen(true)}
-      >
+      {UserRole === "Super Admin" && (
+  <button
+    type="button"
+    className="btn btn-error btn-md"
+    onClick={() => setIsRemoveModalOpen(true)}
+  >
         <Trash2 /> Remove Order
       </button>
+      )}
 </div>
       <Formik
         initialValues={initialValues}

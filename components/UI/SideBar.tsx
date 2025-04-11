@@ -45,6 +45,7 @@ export default function Sidebar({
       setUserID(data.user?.id || null);
       setFname(data.user?.user_metadata.first_name || null);
       setLname(data.user?.user_metadata.last_name || null);
+      setUserRole(data.user?.user_metadata.role || null);
       console.log("User Data:", data);
 
     };
