@@ -282,7 +282,6 @@ export default function AddArticleListCopy() {
               toast.error("Failed to add article");
               console.error(error);
             }
-            alert(JSON.stringify(row, null, 2));
             alert(
               `Nominal ID: ${nominalId}, Min ID: ${minId}, Max ID: ${maxId}`);
           
