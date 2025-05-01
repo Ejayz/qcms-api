@@ -188,7 +188,7 @@ export default function Sidebar({
                   <Link
                     href="/dashboard/user_management"
                     className={`${
-                      query == "/dashboard/user_management" ? "bg-primary" : ""
+                      query == "/dashboard/user_management" ? "bg-blue-900" : ""
                     }`}
                   >
                     <Users color="#000000" />
@@ -199,7 +199,7 @@ export default function Sidebar({
                   <Link
                     href="/dashboard/customer_management"
                     className={`${
-                      query == "/dashboard/customer_management" ? "bg-primary" : ""
+                      query == "/dashboard/customer_management" ? "bg-blue-900" : ""
                     }`}
                   >
                     <User color="#000000" />
@@ -212,7 +212,7 @@ export default function Sidebar({
                 <Link
                   href="/dashboard/customer_management"
                   className={`${
-                    query == "/dashboard/customer_management" ? "bg-primary" : ""
+                    query == "/dashboard/customer_management" ? "bg-blue-900" : ""
                   }`}
                 >
                   <User color="#000000" />
@@ -226,7 +226,7 @@ export default function Sidebar({
                       href="/dashboard/article_management"
                       className={`${
                         query == "/dashboard/article_management"
-                          ? "bg-primary"
+                          ? "bg-blue-900"
                           : ""
                       }`}
                     >
@@ -238,7 +238,7 @@ export default function Sidebar({
                       href="/dashboard/order_management"
                       className={`${
                         query == "/dashboard/order_management"
-                          ? "bg-primary"
+                          ? "bg-blue-900"
                           : ""
                       }`}
                     >
@@ -246,12 +246,12 @@ export default function Sidebar({
                       Order Fabrication Management
                     </Link>
                   </li>
-            {/* <li>
+             <li>
               <Link
                 href="/dashboard/production_management"
                 className={`${
                   query == "/dashboard/production_management"
-                    ? "bg-primary"
+                    ? "bg-blue-900"
                     : ""
                 }`}
               >
@@ -259,7 +259,7 @@ export default function Sidebar({
                 Production Management
               </Link>
             </li>
-            <li>
+            {/*<li>
               <Link
                 href="/dashboard/analytical_management"
                 className={`${

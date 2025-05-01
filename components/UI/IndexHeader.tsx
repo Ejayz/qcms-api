@@ -61,71 +61,66 @@ export default function IndexHeader(){
   return (
     <QueryClientProvider client={queryClient}>
         <div
-        className="navbar border-b-2  border-black text-black"
-        style={{
-          backgroundImage: "url('/Img/4.png')",
-
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
+        className="navbar border-b-2 bg-blue-900 border-black text-black"
+       
       >
-        <div className="flex-1">
-          <div className="flex-none lg:hidden ">
-            <label
-              htmlFor="my-drawer-3"
-              aria-label="open sidebar"
-              className="btn btn-square btn-ghost"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 20 20"
-                className="inline-block h-20 w-20 stroke-current"
+          <div className="flex-1">
+            <div className="flex-none lg:hidden ">
+              <label
+                htmlFor="my-drawer-3"
+                aria-label="open sidebar"
+                className="btn btn-square btn-ghost"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                ></path>
-              </svg>
-            </label>
-          </div>
-          <Image
-            src="/Img/logo1.png"
-            className=""
-            alt="logo"
-            width={214}
-            height={85}
-            onClick={() => router.push("/dashboard/order_management")}
-          />
-        </div>
-        <div className="flex-none gap-2">
-          <div className="dropdown dropdown-end">
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-ghost btn-circle avatar"
-            >
-              <div className="w-auto rounded-full">
-              <CircleUserRound className="place-content-center w-full" />
-              </div>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                  className="inline-block h-20 w-20 stroke-current"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  ></path>
+                </svg>
+              </label>
             </div>
-            <ul
-              tabIndex={0}
-              className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-            >
-              <li>
-                <span className="text-black">{Lname+" "+Fname}</span>
-              </li>
-              <li>
-                <a className="text-black" onClick={handleLogout}>
-                  Logout
-                </a>
-              </li>
-            </ul>
+            <Image
+              src="/Img/logo1.png"
+              className=""
+              alt="logo"
+              width={214}
+              height={85}
+              onClick={() => router.push("/dashboard/order_management")}
+            />
           </div>
-        </div>
+          <div className="flex-none gap-2">
+            <div className="dropdown dropdown-end">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-ghost btn-circle avatar"
+              >
+                <div className="w-auto rounded-full">
+                <CircleUserRound className="place-content-center w-full" />
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+              >
+                <li>
+                  <span className="text-black">{Lname+" "+Fname}</span>
+                </li>
+                <li>
+                  <a className="text-black" onClick={handleLogout}>
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
       </div>
     </QueryClientProvider>
   );
