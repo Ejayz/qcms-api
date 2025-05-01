@@ -277,11 +277,14 @@ export default function AddArticleListCopy() {
                 number_control: row.NumberControl,
               });
               // navigator.push("/dashboard/article_management");
+              
             } catch (error) {
               toast.error("Failed to add article");
               console.error(error);
             }
-          
+            alert(JSON.stringify(row, null, 2));
+            alert(
+              `Nominal ID: ${nominalId}, Min ID: ${minId}, Max ID: ${maxId}`);
           
           }
         }}

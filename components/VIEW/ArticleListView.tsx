@@ -56,11 +56,13 @@ console.log("artcle data",data)
   type="text"
   ref={searchInput}
   className="grow w-full"
-  placeholder="Search Product Name or Customer Name"
+  placeholder="Search Product Name"
   onKeyDown={(e) => {
     if (e.key === "Enter") {
-      setSearch(searchInput.current?.value.trim() || "");
-      setPage(1);
+      const searchValue = searchInput.current?.value || "";
+      console.log("Search Triggered:", searchValue); // Debug
+      setSearch(searchValue);
+      setPage(1); // Reset to page 1
     }
   }}
 />
@@ -122,12 +124,12 @@ console.log("artcle data",data)
                   Something went wrong while fetching site list.
                 </td>
               </tr>
-            ) : data.data?.length > 0 ? (
+            ) : data?.data?.length > 0 ? (
               data.data.map((get_users: any, index: any) => (
                 
                 <tr key={index}>
                   <td>{get_users.article_name}</td>
-                  <td>{get_users.tbl_customer?.company_name || "N/A"}</td>
+                  <td>{get_users.tbl_customer?.company_name ? get_users.tbl_customer?.company_name: " "}</td>
 
                   <td>{get_users.article_nominal}</td>
                   <td>{get_users.article_min}</td>
