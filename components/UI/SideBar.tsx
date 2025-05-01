@@ -188,7 +188,7 @@ export default function Sidebar({
                   <Link
                     href="/dashboard/user_management"
                     className={`${
-                      query == "/dashboard/user_management" ? "bg-blue-900" : ""
+                      query == "/dashboard/user_management" ? "bg-blue-900 text-white" : ""
                     }`}
                   >
                     <Users color="#000000" />
@@ -199,7 +199,7 @@ export default function Sidebar({
                   <Link
                     href="/dashboard/customer_management"
                     className={`${
-                      query == "/dashboard/customer_management" ? "bg-blue-900" : ""
+                      query == "/dashboard/customer_management" ? "bg-blue-900 text-white" : ""
                     }`}
                   >
                     <User color="#000000" />
@@ -212,7 +212,7 @@ export default function Sidebar({
                 <Link
                   href="/dashboard/customer_management"
                   className={`${
-                    query == "/dashboard/customer_management" ? "bg-blue-900" : ""
+                    query == "/dashboard/customer_management" ? "bg-blue-900 text-white" : ""
                   }`}
                 >
                   <User color="#000000" />
@@ -226,7 +226,7 @@ export default function Sidebar({
                       href="/dashboard/article_management"
                       className={`${
                         query == "/dashboard/article_management"
-                          ? "bg-blue-900"
+                          ? "bg-blue-900 text-white"
                           : ""
                       }`}
                     >
@@ -238,7 +238,7 @@ export default function Sidebar({
                       href="/dashboard/order_management"
                       className={`${
                         query == "/dashboard/order_management"
-                          ? "bg-blue-900"
+                          ? "bg-blue-900 text-white"
                           : ""
                       }`}
                     >
@@ -251,7 +251,7 @@ export default function Sidebar({
                 href="/dashboard/production_management"
                 className={`${
                   query == "/dashboard/production_management"
-                    ? "bg-blue-900"
+                    ? "bg-blue-900 text-white"
                     : ""
                 }`}
               >
