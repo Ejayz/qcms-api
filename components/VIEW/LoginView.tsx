@@ -57,20 +57,23 @@ export default function LoginView() {
   });
 
   return (
-    <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage: "url('/Img/4.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}>
+    <div className="w-full h-screen flex min-h-screen text-black bg-coverbg-center bg-no-repeat bg-gradient-to-br from-blue-900 from-100% via-blue-700 via-100% to-blue-900 to-100%"
+      // style={{
+      //   backgroundImage: "url('/Img/4.png')",
+      //   backgroundSize: "cover",
+      //   backgroundPosition: "center",
+      // }}
+      // bg-gradient-to-br from-blue-800 from-0% via-indigo-900 via-50% to-blue-900 to-100%  
+      // bg-gradient-to-br from-blue-900 from-100% via-blue-700 via-100% to-blue-900 to-100%
+      >
       <div className="place-content-center bg-transparent card lg:card-side bg-base-100 inline my-auto mx-auto shadow-xl">
         <div className="w-full place-content-center inline bg-transparent">
           <Image
-            src="/Img/logo1.png"
+            src="/Img/corex1.png"
             className=""
             alt="logo"
             width={400}
-            height={429}
+            height={0}
           />
           <Formik
             initialValues={{
@@ -118,18 +121,18 @@ export default function LoginView() {
                   </span>
                 </div>
 
-                <div className="mx-auto w-3/4 flex">
+                <div className="mx-auto w-3/4 flex ">
                   <button
                     type="submit"
-                    className={`btn w-full bg-white  bg-gradient-to-r ${
+                    className={`btn w-full bg-white text-white  bg-gradient-to-r ${
                       mutateManangementLogin.isPending
                         ? "btn-disabled"
                         : "btn-primary"
                     }`}
                   >
                     {mutateManangementLogin.isPending ? (
-                      <div className="flex justify-center items-center">
-                        <div className="animate-spin text-slate-700 rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <div className="flex justify-center items-center text-white">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white text-white"></div>
                         Authenticating...
                       </div>
                     ) : (

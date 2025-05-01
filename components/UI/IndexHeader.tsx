@@ -87,7 +87,7 @@ export default function IndexHeader(){
               </label>
             </div>
             <Image
-              src="/Img/logo1.png"
+              src="/Img/corex1.png"
               className=""
               alt="logo"
               width={214}
