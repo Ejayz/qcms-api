@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     .select("*, tbl_customer(id, company_name)", { count: "exact" }) // Ensure inner join
     // .select("*, tbl_customer!inner(id, company_name)", { count: "exact" }) // Ensure inner join
     // .not("customer_id", "is", null)
-    // .eq("is_exist", true) // Filter for existing articles
+    .eq("is_exist", true) // Filter for existing articles
     .order("created_at", { ascending: false })
     .range(page * limit, (page + 1) * limit - 1);
 
