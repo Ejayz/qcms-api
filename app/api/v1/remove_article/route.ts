@@ -36,7 +36,7 @@ export async function PUT(req: NextRequest) {
     // Update user details in the database
     const { data: userUpdateData, error: userUpdateError } = await supabase
       .from("tbl_article")
-      .update({ is_exist, updated_at: new Date() }).eq("id", id);
+      .update({ is_exist:false, updated_at: new Date() }).eq("id", id);
 
     if (userUpdateError) {
       console.error("Supabase Update Error:", userUpdateError);
