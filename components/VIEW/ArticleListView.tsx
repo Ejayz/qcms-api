@@ -103,7 +103,7 @@ console.log("artcle data",data)
           <thead>
             <tr className="">
               <th>Product Name</th>
-              <th>Customer Name</th>
+              {/* <th>Customer Name</th> */}
               <th>Article Nominal</th>
               <th>Article Min</th>
               <th>Article Max</th>
@@ -129,7 +129,7 @@ console.log("artcle data",data)
                 
                 <tr key={index}>
                   <td>{get_users.article_name}</td>
-                  <td>{get_users.tbl_customer?.company_name ? get_users.tbl_customer?.company_name: " "}</td>
+                  {/* <td>{get_users.tbl_customer?.company_name ? get_users.tbl_customer?.company_name: " "}</td> */}
 
                   <td>{get_users.article_nominal}</td>
                   <td>{get_users.article_min}</td>
