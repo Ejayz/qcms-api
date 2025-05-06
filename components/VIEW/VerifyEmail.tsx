@@ -114,7 +114,7 @@ localStorage.setItem("email", data.data);
                 <div className="mx-auto w-3/4 flex">
                   <button
                     type="submit"
-                    className={`btn w-full bg-white  bg-gradient-to-r ${
+                    className={`btn w-full bg-white text-white bg-gradient-to-r ${
                       mutateManangementLogin.isPending
                         ? "btn-disabled"
                         : "btn-primary"
@@ -122,7 +122,7 @@ localStorage.setItem("email", data.data);
                   >
                     {mutateManangementLogin.isPending ? (
                       <div className="flex justify-center items-center">
-                        <div className="animate-spin text-slate-700 rounded-full h-5 w-5 border-b-2 border-white"></div>{" "}
+                        <div className="animate-spin text-white rounded-full h-5 w-5 border-b-2 border-white"></div>{" "}
                         Authenticating...
                       </div>
                     ) : (
