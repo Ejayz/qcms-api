@@ -54,14 +54,15 @@ localStorage.setItem("email", data.data);
   });
 
   return (
-    <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-no-repeat"
+    <div className="w-full h-screen flex min-h-screen text-black bg-cover bg-center bg-gradient-to-br from-blue-900 from-100% via-blue-700 via-100% to-blue-900 to-100% bg-no-repeat"
     
-    style={{
-      backgroundImage: "url('/Img/4.png')",
+    // style={{
+    //   backgroundImage: "url('/Img/4.png')",
       
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-    }}>
+    //   backgroundSize: "cover",
+    //   backgroundPosition: "center",
+    // }}
+    >
       <div className="place-content-center bg-transparent card lg:card-side bg-base-100 inline  my-auto mx-auto shadow-xl ">
         
 
@@ -69,7 +70,7 @@ localStorage.setItem("email", data.data);
         <div className="w-full place-content-center inline bg-transparent">
           
           <Image
-            src="/Img/logo1.png"
+            src="/Img/corex1.png"
             className=""
             alt="logo"
             width={400}
