@@ -35,12 +35,15 @@ export default function IndexHeader(){
  
     const [Fname, setFname] = useState<string | null>(null);
     const [Lname, setLname] = useState<string | null>(null);
+    const [email, setemail] = useState<string | null>(null);
     useEffect(() => {
       const fetchUserEmail = async () => {
         const { data } = await supabase.auth.getUser();
         setFname(data.user?.user_metadata.first_name || null);
         setLname(data.user?.user_metadata.last_name || null);
-        console.log("User Data:", data);
+        setemail(data.user?.email || null);
+        console.log("User Data:", data.user);
+        console.log("User Email:", data.user?.email);
   
       };
       
@@ -111,7 +114,7 @@ export default function IndexHeader(){
                 className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
               >
                 <li>
-                  <span className="text-black">{Lname+" "+Fname}</span>
+                  <span className="text-black">{email}</span>
                 </li>
                 <li>
                   <a className="text-black" onClick={handleLogout}>
