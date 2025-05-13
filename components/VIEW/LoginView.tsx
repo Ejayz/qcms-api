@@ -5,16 +5,14 @@ import { FormInput } from "../UI/FormInputLogin";
 import * as Yup from "yup";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Eye, EyeClosed } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 export default function LoginView() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const supabase = createClient();
+
   const route = useRouter();
   
   const loginSchema = Yup.object({
