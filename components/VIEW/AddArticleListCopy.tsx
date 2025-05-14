@@ -7,6 +7,7 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Select from 'react-select';
 import { Pencil, Radical } from "lucide-react";
 import * as Yup from "yup";
 
@@ -322,7 +323,7 @@ export default function AddArticleListCopy() {
                           </div>
                           <div className="inline gap-2">
                             <label className="label">Customer Name</label>
-                            <Field
+                            {/* <Field
                               as="select"
                               name={`rows.${index}.customer_id`}
                               className={`select select-bordered
@@ -350,7 +351,26 @@ export default function AddArticleListCopy() {
                                   {option.label}
                                 </option>
                               ))}
-                            </Field>
+                            </Field> */}
+                            <Select
+                              name={`rows.${index}.customer_id`}
+                              placeholder="Select Customer"
+                              options={customerOptions}
+                              onChange={(option: any) => {
+                                setFieldValue(
+                                  `rows.${index}.customer_id`,
+                                  option.value
+                                );
+                              }}
+                              className={`${
+                                typeof errors.rows?.[index] === "object" &&
+                                errors.rows?.[index]?.customer_id &&
+                                touched.rows?.[index]?.customer_id
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
+                              />
+
                             <ErrorMessage
                               name={`rows.${index}.customer_id`}
                               component="div"

@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-import { FormInput, FormSelect } from "../UI/FormInput";
+import { FormInput,FormSearchableSelect, FormSelect } from "../UI/FormInput";
 import { useState, useEffect } from "react";
 export default function AddOrderList() {
   const navigator = useRouter();
@@ -211,7 +211,7 @@ export default function AddOrderList() {
                   </div> */}
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                      <FormSelect
+                      {/* <FormSelect
                         tooltip="Select the customer's name from the dropdown"
                         name="CustomerName"
                         placeholder="Choose a customer"
@@ -222,12 +222,22 @@ export default function AddOrderList() {
                         touched={touched.CustomerName ? "true" :"" }// Adjust as needed
                       />
                       {isLoading && <p>Loading customers...</p>}
-                      {error && <p className="text-red-500">{error}</p>}
+                      {error && <p className="text-red-500">{error}</p>} */}
+                         <FormSearchableSelect
+        name="CustomerName"
+        label="Customer Name"
+        placeholder="Choose a customer"
+        tooltip="Select the customer's name from dropdown"
+
+        errors={errors.ArticleName}
+        touched="true" // Adjust as needed
+        options={customerOptions}
+      />
                     </label>
                   </div>
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                      <FormSelect
+                      {/* <FormSelect
                         tooltip="Select the product's name from the dropdown"
                         name="ArticleName"
                         placeholder="Choose a Product"
@@ -237,7 +247,16 @@ export default function AddOrderList() {
                         touched={touched.ArticleName? "true":""} // Adjust as needed
                       />
                       {isLoading && <p>Loading article...</p>}
-                      {error && <p className="text-red-500">{error}</p>}
+                      {error && <p className="text-red-500">{error}</p>} */}
+                      <FormSearchableSelect
+                              name="ArticleName"
+                              label="Product Name"
+                              placeholder="Choose a product"
+                              tooltip="Select the product name from dropdown"
+                              errors={errors.ArticleName}
+                              touched="true" // Adjust as needed
+                              options={articleOptions}
+                            />
                     </label>
                   </div>
                   {/* <div>

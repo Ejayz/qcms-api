@@ -6,6 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
+import Select from "react-select";
 import toast from "react-hot-toast";
 import { Pencil, Trash2 } from "lucide-react";
 import * as Yup from "yup";
@@ -471,7 +472,7 @@ export default function EditArticleListCopy(params:any) {
                                                                         </div>
                                            <div className="inline gap-2">
                                              <label className="label">Customer Name</label>
-                                             <Field
+                                             {/* <Field
                                                as="select"
                                                name={`rows.${index}.customer_id`}
                                                className={`select select-bordered
@@ -497,7 +498,25 @@ export default function EditArticleListCopy(params:any) {
                                                    {option.label}
                                                  </option>
                                                ))}
-                                             </Field>
+                                             </Field> */}
+                                             <Select
+                              name={`rows.${index}.customer_id`}
+                              placeholder="Select Customer"
+                              options={customerOptions}
+                              onChange={(option: any) => {
+                                setFieldValue(
+                                  `rows.${index}.customer_id`,
+                                  option.value
+                                );
+                              }}
+                              className={`${
+                                typeof errors.rows?.[index] === "object" &&
+                                errors.rows?.[index]?.customer_id &&
+                                touched.rows?.[index]?.customer_id
+                                  ? "border-red-500"
+                                  : ""
+                              }`}
+                              />
                                              <ErrorMessage
                                                                                                                        name={`rows.${index}.customer_id`}
                                                                                                                        component="div"
