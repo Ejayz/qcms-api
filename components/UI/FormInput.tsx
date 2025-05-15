@@ -271,6 +271,7 @@ export function FormSearchableSelect({
 
         <Select
           name={name}
+          className="text-lg  bg-white select-bordered mx-auto w-full max-w-md"
           value={options.find((option) => option.value === field.value) || null}
           onChange={(selectedOption) =>
             setFieldValue(name, selectedOption ? selectedOption.value : "")

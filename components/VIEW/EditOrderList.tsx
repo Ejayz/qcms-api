@@ -277,29 +277,29 @@ const removeCustomerMutation = useMutation({
                       errors={error ? error : ""}
                       touched="true" // Adjust as needed
                     /> */}
-                      <FormSearchableSelect
+                   <FormSearchableSelect
         name="CustomerName"
         label="Customer Name"
         placeholder="Choose a customer"
         tooltip="Select the customer's name from dropdown"
 
-        errors={errors.ArticleName}
-        touched="true" // Adjust as needed
+        errors={errors.CustomerName}
+        touched={touched.CustomerName ? "true" :"" }// Adjust as needed
         options={customerOptions}
       />
                     </label>
                   </div>
                   <div>
                     <label className="form-control w-96 max-w-lg">
-                    <FormSearchableSelect
-        name="ArticleName"
-        label="Product Name"
-        placeholder="Choose a product"
-        tooltip="Select the product name from dropdown"
-        errors={errors.ArticleName}
-        touched="true" // Adjust as needed
-        options={articleOptions}
-      />
+                   <FormSearchableSelect
+                              name="ArticleName"
+                              label="Product Name"
+                              placeholder="Choose a product"
+                              tooltip="Select the product name from dropdown"
+                              errors={errors.ArticleName}
+                              touched={touched.ArticleName ? "true" :"" } // Adjust as needed
+                              options={articleOptions}
+                            />
                     </label>
 
                   </div>

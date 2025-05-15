@@ -229,8 +229,8 @@ export default function AddOrderList() {
         placeholder="Choose a customer"
         tooltip="Select the customer's name from dropdown"
 
-        errors={errors.ArticleName}
-        touched="true" // Adjust as needed
+        errors={errors.CustomerName}
+        touched={touched.CustomerName ? "true" :"" }// Adjust as needed
         options={customerOptions}
       />
                     </label>
@@ -252,9 +252,10 @@ export default function AddOrderList() {
                               name="ArticleName"
                               label="Product Name"
                               placeholder="Choose a product"
+                              className="w-96 max-w-lg"
                               tooltip="Select the product name from dropdown"
                               errors={errors.ArticleName}
-                              touched="true" // Adjust as needed
+                              touched={touched.ArticleName ? "true" :"" } // Adjust as needed
                               options={articleOptions}
                             />
                     </label>

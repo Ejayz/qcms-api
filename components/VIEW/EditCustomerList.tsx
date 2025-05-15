@@ -139,7 +139,7 @@ export default function EditCustomerList(params: any) {
       <div className="breadcrumbs my-4 text-lg text-slate-600 font-semibold">
         <ul>
           <li>
-            <Link href="/dashbaord/customer_management">Customer Management</Link>
+            <Link href="/dashboard/customer_management">Customer Management</Link>
           </li>
           <li>
             <span>Edit Customer</span>

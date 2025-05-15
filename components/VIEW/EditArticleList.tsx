@@ -509,7 +509,7 @@ export default function EditArticleListCopy(params:any) {
                                   option.value
                                 );
                               }}
-                              className={`${
+                              className={`text-lg mt-1 bg-white select-bordered mx-auto w-full max-w-md ${
                                 typeof errors.rows?.[index] === "object" &&
                                 errors.rows?.[index]?.customer_id &&
                                 touched.rows?.[index]?.customer_id
