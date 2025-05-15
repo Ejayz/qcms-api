@@ -12,7 +12,15 @@ import { Eye, EyeClosed } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 
 export default function LoginView() {
+const [userName, setUserName] = useState({ first: "", last: "" });
 
+  useEffect(() => {
+    const storedFirstName = localStorage.getItem("firstName");
+    const storedLastName = localStorage.getItem("lastName");
+    if (storedFirstName && storedLastName) {
+      setUserName({ first: storedFirstName, last: storedLastName });
+    }
+  }, []);
   const route = useRouter();
   
   const loginSchema = Yup.object({
@@ -53,20 +61,12 @@ export default function LoginView() {
         route.push("/verify_email");
         return;
       }
-      console.log("Login data:", data); // Log the joined data for debugging
-      const { user, db_record } = data;
-      const userData = {
-        email: user.email,
-        first_name: user.first_name,
-        uuid: user.id,
-        role: db_record.role,
-        // first_name: db_record.first_name,
-        last_name: db_record.last_name,
-      };
-      localStorage.setItem("userData", JSON.stringify(userData));
-      localStorage.setItem("userRole", db_record.role);
-      console.log("emai",userData.first_name);
-      
+      console.log("Login datas:", data); // Log the joined data for debugging
+     
+  // Save to localStorage
+  localStorage.setItem("firstName", data.db_record.first_name);
+  localStorage.setItem("lastName", data.db_record.last_name);
+
       toast.success("Login Successful");
       route.push("/dashboard");
     }

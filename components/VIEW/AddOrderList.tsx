@@ -252,7 +252,7 @@ export default function AddOrderList() {
                               name="ArticleName"
                               label="Product Name"
                               placeholder="Choose a product"
-                              className="w-96 max-w-lg"
+                              
                               tooltip="Select the product name from dropdown"
                               errors={errors.ArticleName}
                               touched={touched.ArticleName ? "true" :"" } // Adjust as needed

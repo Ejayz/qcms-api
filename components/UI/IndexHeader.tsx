@@ -49,7 +49,17 @@ export default function IndexHeader(){
       
       fetchUserEmail();
     }, []);
-    
+      const [userName, setUserName] = useState({ first: "", last: "" });
+
+  useEffect(() => {
+    // This runs only on client side
+    const storedFirstName = localStorage.getItem("firstName");
+    const storedLastName = localStorage.getItem("lastName");
+
+    if (storedFirstName && storedLastName) {
+      setUserName({ first: storedFirstName, last: storedLastName });
+    }
+  }, []);
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
@@ -114,7 +124,7 @@ export default function IndexHeader(){
                 className="menu menu-sm dropdown-content bg-slate-300 rounded-box z-[1] mt-3 w-52 p-2 shadow"
               >
                 <li>
-                  <span className="text-black">{email}</span>
+                  <span className="text-black">{userName.first+" "+userName.last}</span>
                 </li>
                 <li>
                   <a className="text-black" onClick={handleLogout}>
