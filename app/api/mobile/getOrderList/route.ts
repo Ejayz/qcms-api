@@ -17,21 +17,6 @@ export async function GET(req: NextRequest) {
     .eq("is_exist", true)
 
 
-  // Add date filters
-
-  console.log(startDate, endDate);
-  if(startDate ){
-    const adjustedStartDate = `${startDate}T00:00:00`; // Ensure start of the day
-    query = query
-      .gte("entry_date_time", adjustedStartDate)
-  }
-
-
-  if ( endDate) {
-    const adjustedEndDate = `${endDate}T23:59:59`; // Ensure end of the day
-    query = query
-      .lte("exit_date_time", adjustedEndDate);
-  }
   const { data, error, count } = await query;
 
   if (error) {
