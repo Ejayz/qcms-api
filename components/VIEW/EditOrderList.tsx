@@ -248,6 +248,7 @@ const removeCustomerMutation = useMutation({
                     <FormInput
                       tooltip="Enter the order ID"
                       name="Id"
+                      type="number"
                       placeholder="Order ID"
                       label="Order ID"
                       errors={error ? error : ""}

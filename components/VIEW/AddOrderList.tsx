@@ -193,6 +193,7 @@ export default function AddOrderList() {
                     <FormInput
                       tooltip="Enter the order ID"
                       name="Id"
+                      type="number"
                       placeholder="Order ID"
                       label="Order ID"
                       errors={errors.Id ? errors.Id : ""}
