@@ -107,7 +107,8 @@ export default function EditArticleListCopy(params:any) {
           LengthNominal: nominalData[0].length,
           InsideDiameterNominal: nominalData[0].inside_diameter,
           OutsideDiameterNominal: nominalData[0].outside_diameter,
-          FlatCrushNominal: nominalData[0].flat_crush,
+          // FlatCrushNominal: nominalData[0].flat_crush,
+          FlatCrushNominal: parseFloat(nominalData[0].flat_crush).toFixed(2),
           H20Nominal: nominalData[0].h20,
         })),
       }));
@@ -142,7 +143,7 @@ export default function EditArticleListCopy(params:any) {
           LengthMin: minData[0].length,
           InsideDiameterMin: minData[0].inside_diameter,
           OutsideDiameterMin: minData[0].outside_diameter,
-          FlatCrushMin: minData[0].flat_crush,
+          FlatCrushMin: parseFloat(minData[0].flat_crush).toFixed(2),
           H20Min: minData[0].h20,
         })),
       }));
@@ -168,20 +169,21 @@ export default function EditArticleListCopy(params:any) {
   });
   console.log("Gatherd data:", maxData);
   useEffect(() => {
-    if (isMaxSuccess && maxData?.length > 0) {
-      setInitialValues((prev) => ({
-        ...prev,
-        rows: prev.rows.map((row) => ({
-          ...row,
-          LengthMax: maxData[0].length,
-          InsideDiameterMax: maxData[0].inside_diameter,
-          OutsideDiameterMax: maxData[0].outside_diameter,
-          FlatCrushMax: maxData[0].flat_crush,
-          H20Max: maxData[0].h20,
-        })),
-      }));
-    }
-  }, [isMaxSuccess, maxData]);
+      if (isMaxSuccess && maxData?.length > 0) {
+        setInitialValues((prev) => ({
+          ...prev,
+          rows: prev.rows.map((row) => ({
+            ...row,
+            LengthMax: maxData[0].length,
+            InsideDiameterMax: maxData[0].inside_diameter,
+            OutsideDiameterMax: maxData[0].outside_diameter,
+            // FlatCrushMax: maxData[0].flat_crush,
+            FlatCrushMax: parseFloat(maxData[0].flat_crush).toFixed(2),
+            H20Max: maxData[0].h20,
+          })),
+        }));
+      }
+    }, [isMaxSuccess, maxData]);
 
   const UpdateNominalMutation = useMutation({
     mutationFn: async (data: any) => {

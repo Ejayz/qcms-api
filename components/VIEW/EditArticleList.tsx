@@ -41,9 +41,9 @@ export default function EditArticleListCopy(params:any) {
         OutsideDiameterNominal: 0,
         OutsideDiameterMin: 0,
         OutsideDiameterMax: 0,
-        FlatCrushNominal: 0,
-        FlatCrushMin: 0,
-        FlatCrushMax: 0,
+        FlatCrushNominal: "0",
+        FlatCrushMin: "0",
+        FlatCrushMax: "0",
         H20Nominal: 0,
         H20Min: 0,
         H20Max: 0,
@@ -125,21 +125,22 @@ export default function EditArticleListCopy(params:any) {
   });
   console.log("Gatherd data:", nominalData);
   useEffect(() => {
-    if (isNominalSuccess && nominalData?.length > 0) {
-      setInitialValues((prev) => ({
-        ...prev,
-        rows: prev.rows.map((row) => ({
-          ...row,
-          LengthNominal: nominalData[0].length,
-          InsideDiameterNominal: nominalData[0].inside_diameter,
-          OutsideDiameterNominal: nominalData[0].outside_diameter,
-          FlatCrushNominal: parseFloat(parseFloat(nominalData[0].flat_crush).toFixed(2)),
-          H20Nominal: nominalData[0].h20,
-          RadialNominal:nominalData[0].radial,
-        })),
-      }));
-    }
-  }, [isNominalSuccess, nominalData]);
+      if (isNominalSuccess && nominalData?.length > 0) {
+        setInitialValues((prev) => ({
+          ...prev,
+          rows: prev.rows.map((row) => ({
+            ...row,
+            LengthNominal: nominalData[0].length,
+            InsideDiameterNominal: nominalData[0].inside_diameter,
+            OutsideDiameterNominal: nominalData[0].outside_diameter,
+            // FlatCrushNominal: parseFloat(parseFloat(nominalData[0].flat_crush).toFixed(2)),
+            FlatCrushNominal: parseFloat(nominalData[0].flat_crush).toFixed(2),
+            H20Nominal: nominalData[0].h20,
+            RadialNominal: nominalData[0].radial,
+          })),
+        }));
+      }
+    }, [isNominalSuccess, nominalData]);
   
 
   const {
@@ -161,21 +162,22 @@ export default function EditArticleListCopy(params:any) {
   });
   console.log("Gatherd data:", minData);
   useEffect(() => {
-    if (isMinSuccess && minData?.length > 0) {
-      setInitialValues((prev) => ({
-        ...prev,
-        rows: prev.rows.map((row) => ({
-          ...row,
-          LengthMin: minData[0].length,
-          InsideDiameterMin: minData[0].inside_diameter,
-          OutsideDiameterMin: minData[0].outside_diameter,
-          FlatCrushMin: parseFloat(parseFloat(minData[0].flat_crush).toFixed(2)),
-          H20Min: minData[0].h20,
-          RadialMin:minData[0].radial,
-        })),
-      }));
-    }
-  }, [isMinSuccess, minData]);
+      if (isMinSuccess && minData?.length > 0) {
+        setInitialValues((prev) => ({
+          ...prev,
+          rows: prev.rows.map((row) => ({
+            ...row,
+            LengthMin: minData[0].length,
+            InsideDiameterMin: minData[0].inside_diameter,
+            OutsideDiameterMin: minData[0].outside_diameter,
+            // FlatCrushMin: Number(minData[0].flat_crush),
+            FlatCrushMin: parseFloat(minData[0].flat_crush).toFixed(2),
+            H20Min: minData[0].h20,
+            RadialMin: minData[0].radial,
+          })),
+        }));
+      }
+    }, [isMinSuccess, minData]);
 
   const {
     data: maxData,
@@ -196,21 +198,22 @@ export default function EditArticleListCopy(params:any) {
   });
   console.log("Gatherd data:", maxData);
   useEffect(() => {
-    if (isMaxSuccess && maxData?.length > 0) {
-      setInitialValues((prev) => ({
-        ...prev,
-        rows: prev.rows.map((row) => ({
-          ...row,
-          LengthMax: maxData[0].length,
-          InsideDiameterMax: maxData[0].inside_diameter,
-          OutsideDiameterMax: maxData[0].outside_diameter,
-          FlatCrushMax: parseFloat(parseFloat(maxData[0].flat_crush).toFixed(2)),
-          H20Max: maxData[0].h20,
-          RadialMax:maxData[0].radial,
-        })),
-      }));
-    }
-  }, [isMaxSuccess, maxData]);
+      if (isMaxSuccess && maxData?.length > 0) {
+        setInitialValues((prev) => ({
+          ...prev,
+          rows: prev.rows.map((row) => ({
+            ...row,
+            LengthMax: maxData[0].length,
+            InsideDiameterMax: maxData[0].inside_diameter,
+            OutsideDiameterMax: maxData[0].outside_diameter,
+            // FlatCrushMax: Number(maxData[0].flat_crush),
+            FlatCrushMax: parseFloat(maxData[0].flat_crush).toFixed(2),
+            H20Max: maxData[0].h20,
+            RadialMax: maxData[0].radial,
+          })),
+        }));
+      }
+    }, [isMaxSuccess, maxData]);
 
   const UpdateNominalMutation = useMutation({
     mutationFn: async (data: any) => {
