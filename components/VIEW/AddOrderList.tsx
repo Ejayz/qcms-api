@@ -174,7 +174,7 @@ export default function AddOrderList() {
         validationSchema={Add_Order_Validator}
         onSubmit={async (e, actions) => {
           AddOrderMutation.mutate({
-            id: e.Id,
+            Id: e.Id,
             product_name: e.product_name,
             customer_id: e.CustomerName,
             article_id: e.ArticleName,
@@ -193,7 +193,7 @@ export default function AddOrderList() {
                     <FormInput
                       tooltip="Enter the order ID"
                       name="Id"
-                      type="number"
+                      type="number" 
                       placeholder="Order ID"
                       label="Order ID"
                       errors={errors.Id ? errors.Id : ""}

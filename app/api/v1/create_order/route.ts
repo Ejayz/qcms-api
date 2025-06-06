@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     // Parse incoming request data
     const data = await req.json();
     const {
-      id,
+      Id,
       product_name,
       customer_id,
       article_id,
@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
       is_assigned,
       user,
     } = data;
+    console.log("Received data:", data);
 
-
-
+ 
     // Create Supabase client
     const supabase = await createClient();
 
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
           product_name: product_name || null,
           customer_id: customer_id || null,
           article_id: article_id || null,
-          order_fabrication_control: id || null,
+          order_fabrication_control: Id?.toString() || null,
           //assignee: assignee || null,
           pallete_count: pallete_count || 0, // Default to 0 if not provided
           //is_assigned: true,
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       console.error("Error inserting data:", insertError.message);
       return NextResponse.json({ error: insertError.message }, { status: 500 });
     }
-
+    console.log("Insert Result:", insertResult);
     // Retrieve the inserted ID
     const order_form_id = insertResult[0]?.id;
 
