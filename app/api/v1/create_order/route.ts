@@ -6,14 +6,14 @@ export async function POST(req: NextRequest) {
     // Parse incoming request data
     const data = await req.json();
     const {
-      Id,
-      product_name,
+      order_fabrication_control,
+      // product_name,
       customer_id,
       article_id,
-      assignee,
+      // assignee,
       pallete_count,
-      is_assigned,
-      user,
+      // is_assigned,
+      // user,
     } = data;
     console.log("Received data:", data);
 
@@ -26,10 +26,10 @@ export async function POST(req: NextRequest) {
       .from("tbl_orders_form")
       .insert([
         {
-          product_name: product_name || null,
+          // product_name: product_name || null,
           customer_id: customer_id || null,
           article_id: article_id || null,
-          order_fabrication_control: Id?.toString() || null,
+          order_fabrication_control: order_fabrication_control?.toString() || null,
           //assignee: assignee || null,
           pallete_count: pallete_count || 0, // Default to 0 if not provided
           //is_assigned: true,

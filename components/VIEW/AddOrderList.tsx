@@ -13,7 +13,7 @@ export default function AddOrderList() {
   const navigator = useRouter();
 
   const Add_Order_Validator = Yup.object().shape({
-    Id: Yup.string().required("Id is required"),
+    OFId: Yup.string().required("Id is required"),
     // product_name: Yup.string().required("Product Name is required"),
     CustomerName: Yup.string().required("Customer Name is required"),
     ArticleName: Yup.string().required("Article Name is required"),
@@ -164,21 +164,21 @@ export default function AddOrderList() {
       </div>
       <Formik
         initialValues={{
-          Id: "",
-          product_name: "",
+          OFId: "",
+          // product_name: "",
           CustomerName: "",
           ArticleName: "",
-          AssigneeName: "",
+          // AssigneeName: "",
           PalleteCount: "",
         }}
         validationSchema={Add_Order_Validator}
         onSubmit={async (e, actions) => {
           AddOrderMutation.mutate({
-            Id: e.Id,
-            product_name: e.product_name,
+            order_fabrication_control: e.OFId,
+            // product_name: e.product_name,
             customer_id: e.CustomerName,
             article_id: e.ArticleName,
-            assignee: e.AssigneeName,
+            // assignee: e.AssigneeName,
             pallete_count: e.PalleteCount,
           });
         }}
@@ -192,12 +192,12 @@ export default function AddOrderList() {
                   <div>
                     <FormInput
                       tooltip="Enter the order ID"
-                      name="Id"
+                      name="OFId"
                       type="number" 
                       placeholder="Order ID"
                       label="Order ID"
-                      errors={errors.Id ? errors.Id : ""}
-                      touched={touched.Id ? "true":"" }// Adjust as needed
+                      errors={errors.OFId ? errors.OFId : ""}
+                      touched={touched.OFId ? "true":"" }// Adjust as needed
                     />
                   </div>
                   {/* <div>
