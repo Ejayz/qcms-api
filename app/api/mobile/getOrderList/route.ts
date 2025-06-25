@@ -10,14 +10,14 @@ export async function GET(req: NextRequest) {
   // let totalDataBasedOnQuery = 0;
 
   // Base query
-  let query = supabase
+  const { data, error, count } = await supabase
     .from("tbl_orders_form")
-    .select("* ,tbl_customer(company_name),tbl_article(id,user_id,is_exist,article_max,article_min,article_name,number_control,article_nominal)", { count: "exact" })
-    .eq("order_fabrication_control",search)
-    .eq("is_exist", true)
-
-
-  const { data, error, count } = await query;
+    .select(
+      "* ,tbl_customer(company_name),tbl_article(id,user_id,is_exist,article_max,article_min,article_name,number_control,article_nominal)",
+      { count: "exact" }
+    )
+    .eq("order_fabrication_control", search)
+    .eq("is_exist", true);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
