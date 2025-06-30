@@ -2075,30 +2075,7 @@ export default function OrderListView() {
                     initialValues={initialValuesMeasurement}
                     enableReinitialize={true}
                     onSubmit={async (values) => {
-                      // Check if all rows have 0 or empty values
-
-                      // const isAllEmptyOrZero = values.rowsmeasurement.every(
-                      //   (row) =>
-                      //     row.pallete_count === 0 && row.number_of_control === 0
-                      // );
-                      // console.log(
-                      //   "current row lenght",
-                      //   tractnumbercontrollenght + 1
-                      // );
-                      // if (isAllEmptyOrZero) {
-                      //   alert(
-                      //     "Cannot submit: All fields are empty or have a value of 0."
-                      //   );
-                      //   return; // Prevent form submission
-                      // } else {
-                        // const pallete_number=values.rowsmeasurement[0].pallete_count;
-                        // const control_number=values.rowsmeasurement[0].number_of_control;
-                        // if(numberControl===tractnumbercontrollenght){
-                        // const userConfirmed = window.confirm("The number of controls is not yet complete. Are you sure you want to submit it?");
-                        // if (!userConfirmed) {
-                        //   return;
-                        // }
-                        // }
+                
                         if (isMaxRow=== false) {
                           alert(
                             "The number of controls is not yet complete. Please ensure that it is completed before submitting."
@@ -2121,51 +2098,15 @@ export default function OrderListView() {
                                   pallete_count: row.pallete_count,
                                   user_id: userID,
                                 };
-                                // setLastpalleteCount(0);
-                                // setNumberControl(0);
-                                // Log for debugging
-                                // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
+                            
                                 console.log("Inserting data:", measurementData);
 
-                                // Wait for mutation to complete before moving to the next
+                             
                                 await AddMeasurementMutation.mutateAsync(
                                   measurementData
                                 );
                               }
-                          //   })();
-                          // }
-                        // } else {
-                        //   (async () => {
-                        //     for (const row of values.rowsmeasurement) {
-                        //       const measurementData = {
-                        //         order_id: orderid,
-                        //         length: row.length,
-                        //         inside_diameter: row.inside_diameter,
-                        //         outside_diameter: row.outside_diameter,
-                        //         flat_crush: row.flat_crush,
-                        //         h20: row.h20,
-                        //         radial: row.radial,
-                        //         number_control: row.number_of_control,
-                        //         remarks: row.remarks,
-                        //         pallete_count: row.pallete_count,
-                        //         user_id: userID,
-                        //       };
-                        //       setLastpalleteCount(0);
-                        //       // setNumberControl(0);
-                        //       // Log for debugging
-                        //       // alert("Inserting data: " + JSON.stringify(measurementData, null, 2));
-                        //       console.log("Inserting data:", measurementData);
-
-                        //       // Wait for mutation to complete before moving to the next
-                        //       await AddMeasurementMutation.mutateAsync(
-                        //         measurementData
-                        //       );
-                        //     }
-                        //   })();
-                        // }
-                      // }
-
-                      // console.log("Values are: ",values.rowsmeasurement);
+                       
                     }}
                   >
                     {({ values, setFieldValue }) => (
@@ -2180,43 +2121,43 @@ export default function OrderListView() {
   className="btn btn-info"
   type="button"
   onClick={() => {
-    let currentMaxPallete = values.rowsmeasurement.reduce(
-      (max, row) => Math.max(max, row.pallete_count || 0),
-      0
-    );
+  const userInput = prompt("Enter number of palletes to add:");
+  const numberToAdd = parseInt(userInput || "0", 10);
 
-    if (currentMaxPallete === 0) {
-      currentMaxPallete = lastpalleteCount;
-    }
+  if (isNaN(numberToAdd) || numberToAdd <= 0) {
+    alert("Please enter a valid positive number.");
+    return;
+  }
 
-    // Remove any incomplete rows
-    values.rowsmeasurement.forEach((row, index) => {
-      if (row.pallete_count === 0 && row.number_of_control === 0) {
-        arrayHelpers.remove(index);
-      }
+  // Remove the default row if it exists
+  if (
+    values.rowsmeasurement.length === 1 &&
+    values.rowsmeasurement[0].pallete_count === 1
+  ) {
+    arrayHelpers.remove(0); // ✅ Remove, but don't subtract
+  }
+
+  const startingIndex = values.rowsmeasurement.length;
+
+  for (let i = 1; i <= numberToAdd; i++) {
+    arrayHelpers.push({
+      pallete_count: startingIndex + i,
+      number_of_control: 0,
+      length: "",
+      inside_diameter: "",
+      outside_diameter: "",
+      flat_crush: "",
+      h20: "",
+      radial: "",
+      remarks: "",
+      isnew: true,
+      iswhiteAll: false,
     });
-    if(isMaxRow===false){
-      alert("The number of controls is not yet complete. Please ensure that it is completed before adding a new pallete.");
-      return;
-    }
-    // Add 3 new rows for the new pallete
-    // for (let i = 0; i < numberControl; i++) {
-      arrayHelpers.push({
-        pallete_count: currentMaxPallete + 1,
-        number_of_control: numberControl,
-        length: "",
-        inside_diameter: "",
-        outside_diameter: "",
-        flat_crush: "",
-        h20: "",
-        radial: "",
-        remarks: "",
-        isNew: true, // Indicating it's a new row
-      });
-    // }
+  }
+}}
 
-    setEnablePallete(true);
-  }}
+
+
 >
   Add Pallete
 </button>
@@ -2252,7 +2193,6 @@ export default function OrderListView() {
                                     <thead className="text-black text-sm">
                                       <tr>
                                         <th>Pallete</th>
-                                        {/* <th>Number Of Control</th> */}
                                         <th>Length</th>
                                         <th>Inside Diameter</th>
                                         <th>Outside Diameter</th>
@@ -2486,58 +2426,6 @@ export default function OrderListView() {
                                                 />
                                               </td>
                                               <td>
-            {/* Add Row Button (Hidden if max rows reached) */}
-            {!maxRowsReached && (
-              <><button
-                className="btn btn-success mt-2"
-                type="button"
-                onClick={() => {
-                  arrayHelpers.push({
-                    pallete_count: row.pallete_count,
-                    number_of_control: row.number_of_control,
-                    length: "",
-                    inside_diameter: "",
-                    outside_diameter: "",
-                    flat_crush: "",
-                    h20: "",
-                    radial: "",
-                    remarks: "",
-                    isnew: true,
-                  });
-
-                  setEnablePallete(true);
-                } }
-              >
-                +
-              </button>
-            
-                <button
-                className="btn btn-error mt-2"
-                type="button"
-                onClick={() => {
-                  arrayHelpers.remove(index);
-                }}
-              >
-                Remove
-              </button>
-       
-              
-            </>
-            )}
-            
-            
-            {/* Remove Button (Hidden if it's the last row for this control) */}
-            {/* {isLastRow && (
-              <button
-                type="button"
-                className="btn btn-error"
-                onClick={() => {
-                  arrayHelpers.remove(index);
-                }}
-              >
-                Remove
-              </button>
-            )} */}
           </td>
 
                                             </tr>
