@@ -42,6 +42,7 @@ export default function AddArticleListCopy() {
     rows: [
       {
         // article_name: "",
+        id_number: "",
         article_name: "",
         customer_id: "",
         LengthNominal: "",
@@ -270,6 +271,7 @@ export default function AddArticleListCopy() {
               }
       
               await AddArticleMutation.mutateAsync({
+                id_number:row.id_number,
                 article_name: row.article_name,
                 customer_id: row.customer_id,
                 article_nominal: nominal.id,
@@ -299,6 +301,28 @@ export default function AddArticleListCopy() {
                     <div className="flex place-content-start gap-6">
                       {values.rows.map((row, index) => (
                         <div key={index} className="flex gap-4">
+                          <div className="inline gap-2">
+                            <label className="label">ID Number</label>
+                            <Field
+                              name={`rows.${index}.id_number`}
+                              type="text"
+                              placeholder="Enter ID Number"
+                              className={`input input-bordered
+                             ${
+                               typeof errors.rows?.[index] === "object" &&
+                               errors.rows?.[index]?.id_number &&
+                               touched.rows?.[index]?.id_number
+                                 ? "border-red-500"
+                                 : ""
+                             } 
+                            `}
+                            />{" "}
+                            <ErrorMessage
+                              name={`rows.${index}.id_number`}
+                              component="div"
+                              className="text-red-500 text-sm"
+                            />
+                          </div>
                           <div className="inline gap-2">
                             <label className="label">Product Name</label>
                             <Field

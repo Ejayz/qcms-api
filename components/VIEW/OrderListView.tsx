@@ -2171,7 +2171,12 @@ export default function OrderListView() {
                                   >
                                     Save Measurement
                                   </button>
-
+<button
+                                    className="btn btn-primary"
+                                    type="submit"
+                                  >
+                                    Add Measurement
+                                  </button>
                                   <button
                                     className="btn btn-accent"
                                     onClick={() => {
@@ -2199,6 +2204,7 @@ export default function OrderListView() {
                                         <th>Flat Crush</th>
                                         <th>H20</th>
                                         <th>Radial</th>
+                                        <th>Core Out</th>
                                         <th>Remarks</th>
                                       </tr>
                                     </thead>
@@ -2368,6 +2374,26 @@ export default function OrderListView() {
                                               <td>
                                                 <Field
                                                   name={`rowsmeasurement.${index}.h20`}
+                                                  placeholder={
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? ""
+                                                      : "0"
+                                                  }
+                                                  type="number"
+                                                  className={`input input-bordered w-20 max-w-md ${
+                                                    values.rowsmeasurement[
+                                                      index
+                                                    ]?.iswhiteAll
+                                                      ? "hidden"
+                                                      : "bg-white"
+                                                  }`}
+                                                />
+                                              </td>
+                                              <td>
+                                                <Field
+                                                  name={`rowsmeasurement.${index}.radial`}
                                                   placeholder={
                                                     values.rowsmeasurement[
                                                       index

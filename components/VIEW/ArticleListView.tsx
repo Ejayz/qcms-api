@@ -102,8 +102,9 @@ console.log("artcle data",data)
         <table className="table text-center">
           <thead>
             <tr className="">
+              <th>ID Number</th>
               <th>Product Name</th>
-              {/* <th>Customer Name</th> */}
+              
               <th>Article Nominal</th>
               <th>Article Min</th>
               <th>Article Max</th>
@@ -128,7 +129,9 @@ console.log("artcle data",data)
               data.data.map((get_users: any, index: any) => (
                 
                 <tr key={index}>
+                  <td>{get_users.id_number}</td>
                   <td>{get_users.article_name}</td>
+                  
                   {/* <td>{get_users.tbl_customer?.company_name ? get_users.tbl_customer?.company_name: " "}</td> */}
 
                   <td>{get_users.article_nominal}</td>
