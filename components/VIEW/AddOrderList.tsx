@@ -114,7 +114,7 @@ export default function AddOrderList() {
   const articleOptions =
     articleData?.data.map((article: any) => ({
       value: article.id,
-      label: `${article.article_name}`,
+      label: `${article.id_number}`,
     })) || [];
 
   const {
@@ -251,10 +251,10 @@ export default function AddOrderList() {
                       {error && <p className="text-red-500">{error}</p>} */}
                       <FormSearchableSelect
                               name="ArticleName"
-                              label="Product Name"
-                              placeholder="Choose a product"
+                              label="ID Article"
+                              placeholder="Choose a ID Article"
                               
-                              tooltip="Select the product name from dropdown"
+                              tooltip="Select the ID Article from dropdown"
                               errors={errors.ArticleName}
                               touched={touched.ArticleName ? "true" :"" } // Adjust as needed
                               options={articleOptions}
