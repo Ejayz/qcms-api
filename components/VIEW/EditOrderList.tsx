@@ -120,7 +120,7 @@ const supabase = createClient();
     queryKey: ["get_customer", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_customer?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_customers?page=${page}&search=${search}&limit=${limit}`,
         {
           method: "GET",
           headers: {

@@ -60,7 +60,7 @@ export default function AddOrderList() {
     queryKey: ["get_customer", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_customer?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_customers?page=${page}&search=${search}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -92,7 +92,7 @@ export default function AddOrderList() {
     queryKey: ["get_article", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_article?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/getall_article?page=${page}&search=${search}&limit=${limit}`,
         {
           method: "GET",
           headers: {
