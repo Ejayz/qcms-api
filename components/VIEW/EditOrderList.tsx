@@ -173,7 +173,7 @@ console.log("Customer Data:",customerOptions);
 
   const articleOptions = articleData?.data?.map((article: any) => ({
     value: article.id,
-    label: `${article.article_name}`,
+    label: `${article.id_number}`,
   })) || [];
 
   const [isRemoveModalOpen, setIsRemoveModalOpen] = useState(false);
@@ -294,7 +294,7 @@ const removeCustomerMutation = useMutation({
                     <label className="form-control w-96 max-w-lg">
                    <FormSearchableSelect
                               name="ArticleName"
-                              label="Product Name"
+                              label="ID Article"
                               placeholder="Choose a product"
                               tooltip="Select the product name from dropdown"
                               errors={errors.ArticleName}
