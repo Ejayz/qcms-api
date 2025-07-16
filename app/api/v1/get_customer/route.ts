@@ -17,6 +17,7 @@ export async function GET(req: NextRequest) {
     .eq("is_exist", true)
     .or(`company_name.ilike.%${search}%`)
     .order("created_at", { ascending: false })
+    .range((page - 1) * limit, page * limit - 1);
 
   console.log("Supabase Response:", { data, error, count }); // Debug
 
