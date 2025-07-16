@@ -16,6 +16,7 @@ export default function EditArticleListCopy(params:any) {
   const [initialValues,setInitialValues] = useState({ 
     rows: [
       {
+        id_number: "",
         article_name: "",
         customer_id: "",
         LengthNominal: "",
@@ -73,7 +74,7 @@ export default function EditArticleListCopy(params:any) {
         number_control: user.number_control,
         rows: prev.rows.map((row) => ({
           ...row,
-          article_name: user.article_name,
+          id_number: user.id_number,
           customer_id: user.customer_id,
           NumberControl: user.number_control,
         })),
@@ -347,10 +348,10 @@ export default function EditArticleListCopy(params:any) {
                                                               {values.rows.map((row, index) => (
                                                                 <div key={index} className="flex gap-4">
                                                                   <div className="inline gap-2">
-                                                                  <label className="label">Product Name</label>
+                                                                  <label className="label">ID Number</label>
                                                                   <Field
                                                                   readOnly
-                                                                    name={`rows.${index}.article_name`}
+                                                                    name={`rows.${index}.id_number`}
                                                                     type="text"
                                                                     placeholder="Enter Product Name"
                                                                     className="input input-bordered"

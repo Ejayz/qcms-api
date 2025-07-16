@@ -30,6 +30,7 @@ export default function EditArticleListCopy(params:any) {
   const [initialValues,setInitialValues] = useState({ 
     rows: [
       {
+        id_number: "",
         article_name: "",
         customer_id: "",
         LengthNominal: 0,
@@ -99,7 +100,7 @@ export default function EditArticleListCopy(params:any) {
         number_control: user.number_control,
         rows: prev.rows.map((row) => ({
           ...row,
-          article_name: user.article_name,
+          id_number: user.id_number,
           customer_id: user.customer_id,
           NumberControl: user.number_control,
         })),
@@ -426,7 +427,7 @@ export default function EditArticleListCopy(params:any) {
         radial:row.RadialMax,
       }),
       UpdateArticleMutation.mutateAsync({
-        article_name: row.article_name,
+        id_number: row.id_number,
         customer_id: row.customer_id,
         number_control: row.NumberControl,
       }),
@@ -453,16 +454,16 @@ export default function EditArticleListCopy(params:any) {
                                           {values.rows.map((row, index) => (
                                             <div key={index} className="flex gap-4">
                                                  <div className="inline gap-2">
-                                                                        <label className="label">Product Name</label>
+                                                                        <label className="label">ID Number</label>
                                                                         <Field
-                                                                          name={`rows.${index}.article_name`}
+                                                                          name={`rows.${index}.id_number`}
                                                                           type="text"
-                                                                          placeholder="Enter Product Name"
+                                                                          placeholder="Enter ID Number"
                                                                         className={`input input-bordered
                                                                            ${
                                                     typeof errors.rows?.[index] === "object" &&
-                                                    errors.rows?.[index]?.article_name &&
-                                                    touched.rows?.[index]?.article_name
+                                                    errors.rows?.[index]?.id_number &&
+                                                    touched.rows?.[index]?.id_number
                                                       ? "border-red-500"
                                                       : ""
                                                   } 
