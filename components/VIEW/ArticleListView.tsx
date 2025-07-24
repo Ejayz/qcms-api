@@ -56,7 +56,7 @@ console.log("artcle data",data)
   type="text"
   ref={searchInput}
   className="grow w-full"
-  placeholder="Search Product Name"
+  placeholder="Search ID Number or Designation"
   onKeyDown={(e) => {
     if (e.key === "Enter") {
       const searchValue = searchInput.current?.value || "";
@@ -103,7 +103,8 @@ console.log("artcle data",data)
           <thead>
             <tr className="">
               <th>ID Number</th>
-              <th>Product Name</th>
+              {/* <th>Product Name</th> */}
+              <th>Designation</th>
               <th>Article Nominal</th>
               {/* <th>Article Min</th>
               <th>Article Max</th>
@@ -129,7 +130,7 @@ console.log("artcle data",data)
                 
                 <tr key={index}>
                   <td>{get_users.id_number}</td>
-                  <td>{get_users.article_name}</td>
+                  <td>{get_users.designated_article}</td>
                   
                   {/* <td>{get_users.tbl_customer?.company_name ? get_users.tbl_customer?.company_name: " "}</td> */}
 
