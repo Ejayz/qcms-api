@@ -72,7 +72,7 @@ export default function AddOrderList() {
       if (!response.ok) {
         throw new Error("Failed to fetch customers");
       }
-      return response.json();
+      return response.json(); 
     },
     staleTime: 5000, // Avoid flickering on refetch
     retry: 2,
@@ -92,7 +92,7 @@ export default function AddOrderList() {
     queryKey: ["get_article", page, search, limit],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/getall_article?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_article?page=${page}&search=${search}&limit=${limit}`,
         {
           method: "GET",
           headers: {
@@ -122,10 +122,10 @@ export default function AddOrderList() {
     isFetching: isFetchingAssignees,
     isError: isErrorAssignees,
   } = useQuery({
-    queryKey: ["get_users", page, search, limit],
+    queryKey: ["get_users", page, search],
     queryFn: async () => {
       const response = await fetch(
-        `/api/v1/get_users?page=${page}&search=${search}&limit=${limit}`,
+        `/api/v1/get_users?page=${page}&search=${search}`,
         {
           method: "GET",
           headers: {
