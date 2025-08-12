@@ -128,6 +128,8 @@ export default function OrderListView() {
   const [ish20count, setish20count] = useState<number>(0);
   const [isReadonly, setIsReadonly] = useState<boolean>(true);
   const [flatitem, setFlatitem] = useState([]);
+  const [h20item, setH20item] = useState([]);
+  
 
   console.log("orderformid: ", orderid);
 
@@ -729,6 +731,13 @@ export default function OrderListView() {
 
       // Log valid values
       console.log("Flat Crush Values != 0:", validFlatCrushValues);
+      setFlatitem(validFlatCrushValues);
+      // H20 count (not 0 or null)
+     const validH20Values = fetchedMeasurementData
+        .map((item: any) => parseFloat(item.h20))
+        .filter((v: number) => !isNaN(v) && v !== 0);
+      console.log("H20 Count (not 0 or null):", validH20Values);
+      setH20item(validH20Values);
       setLastpalleteCount(maxPalleteCount);
       setEnablePallete(true);
     } else {
@@ -2256,6 +2265,61 @@ export default function OrderListView() {
                                     Cancel
                                   </button>
                                 </div>
+                                    <table className="table table-zebra w-min mt-4">
+  <thead>
+    <tr>
+      <th>Flat Crush</th>
+      <th>H20</th>
+    </tr>
+  </thead>
+
+  <tbody>
+ <tbody>
+  {isLoading || isFetching ? (
+    <tr>
+      <td colSpan={7}>
+        <span className="loading loading-dots loading-md"></span>
+      </td>
+    </tr>
+  ) : isError ? (
+    <tr>
+      <td className="text-error font-bold" colSpan={7}>
+        Something went wrong while fetching orders list.
+      </td>
+    </tr>
+  ) : flatitem?.length === 0 ? (
+    <tr>
+      <td className="text-center text-sm text-slate-600" colSpan={7}>
+        No flat_crush Data Found
+      </td>
+    </tr>
+  ) : (
+    flatitem.map((flatValue, index) => (
+      <tr key={index}>
+        <td className="border-y border-slate-500">
+          <Field
+            name={`extraFlatCrush.${index}`}
+            type="number"
+            className="input input-bordered w-20 max-w-md"
+            value={flatValue}
+            readOnly
+          />
+        </td>
+        <td className="border-y border-slate-500">
+          <Field
+            name={`extraH20.${index}`}
+            type="number"
+            className="input input-bordered w-20 max-w-md"
+            value={h20item[index] ?? ""}
+            readOnly
+          />
+        </td>
+      </tr>
+    ))
+  )}
+</tbody>
+                                    </tbody>
+                                  </table>
 
                                 <div className="text-black overflow-auto">
                                   <table className="table relative text-center overflow-auto">
@@ -2583,6 +2647,8 @@ export default function OrderListView() {
                                         }
                                       )}
                                     </tbody>
+                                
+
                                     {isLoading || isFetching ? (
                                       <tr>
                                         <td colSpan={7}>
@@ -2619,28 +2685,24 @@ export default function OrderListView() {
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.pallete_count}
-                                                    readOnly
-                                                  />
+                                                    readOnly />
                                                 </td>
                                                 {/* <td className="">
-                                        
-                                        <Field
-                                          name={`rows4.${index}.number_of_control`}
-                                          type="number"
-                                          className="input input-bordered w-20 max-w-md hidden"
-                                          value={row.number_of_control}
-                                        />
-                                      </td> */}
+
+<Field
+name={`rows4.${index}.number_of_control`}
+type="number"
+className="input input-bordered w-20 max-w-md hidden"
+value={row.number_of_control}
+/>
+</td> */}
                                                 <td className="border-y border-slate-500">
                                                   <Field
                                                     name={`rows4.${index}.length`}
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.length}
-                                                    readOnly={
-                                                      editableRowMes !== index
-                                                    }
-                                                  />
+                                                    readOnly={editableRowMes !== index} />
                                                 </td>
                                                 <td className="border-y border-slate-500">
                                                   <Field
@@ -2648,10 +2710,7 @@ export default function OrderListView() {
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.inside_diameter}
-                                                    readOnly={
-                                                      editableRowMes !== index
-                                                    }
-                                                  />
+                                                    readOnly={editableRowMes !== index} />
                                                 </td>
                                                 <td className="border-y border-slate-500">
                                                   <Field
@@ -2659,10 +2718,7 @@ export default function OrderListView() {
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.outside_diameter}
-                                                    readOnly={
-                                                      editableRowMes !== index
-                                                    }
-                                                  />
+                                                    readOnly={editableRowMes !== index} />
                                                 </td>
                                                 <td className="border-y border-slate-500">
                                                   <Field
@@ -2670,21 +2726,15 @@ export default function OrderListView() {
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.radial}
-                                                    readOnly={
-                                                      editableRowMes !== index
-                                                    }
-                                                  />
+                                                    readOnly={editableRowMes !== index} />
                                                 </td>
-                                                 <td className="border-y border-slate-500">
+                                                <td className="border-y border-slate-500">
                                                   <Field
                                                     name={`rows4.${index}.radial`}
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.radial}
-                                                    readOnly={
-                                                      editableRowMes !== index
-                                                    }
-                                                  />
+                                                    readOnly={editableRowMes !== index} />
                                                 </td>
                                                 <td className="border-y border-slate-500">
                                                   <Field
@@ -2692,15 +2742,12 @@ export default function OrderListView() {
                                                     type="text"
                                                     className="input input-bordered"
                                                     value={row.remarks}
-                                                    readOnly={
-                                                      editableRowMes !== index
-                                                    }
-                                                  />
+                                                    readOnly={editableRowMes !== index} />
                                                 </td>
                                                 <td className="border-y border-slate-500">
                                                   <div className="flex gap-2">
                                                     {editableRowMes ===
-                                                    index ? (
+                                                      index ? (
                                                       <>
                                                         <button
                                                           type="button"
@@ -2733,7 +2780,7 @@ export default function OrderListView() {
                                                                 "tab3"
                                                               );
                                                             }, 100);
-                                                          }}
+                                                          } }
                                                         >
                                                           Save
                                                         </button>
@@ -2741,11 +2788,9 @@ export default function OrderListView() {
                                                           type="button"
                                                           className="btn btn-primary"
                                                           onClick={() => {
-                                                            if (
-                                                              window.confirm(
-                                                                "Are you sure you want to cancel?"
-                                                              )
-                                                            ) {
+                                                            if (window.confirm(
+                                                              "Are you sure you want to cancel?"
+                                                            )) {
                                                               setTractnumbercontrollenght(
                                                                 0
                                                               );
@@ -2765,7 +2810,7 @@ export default function OrderListView() {
                                                                 );
                                                               }, 100);
                                                             }
-                                                          }}
+                                                          } }
                                                         >
                                                           Cancel
                                                         </button>
@@ -2776,12 +2821,10 @@ export default function OrderListView() {
                                                           <>
                                                             <button
                                                               type="button"
-                                                              className={`btn btn-primary ${
-                                                                editableRowMes !==
-                                                                null
+                                                              className={`btn btn-primary ${editableRowMes !==
+                                                                  null
                                                                   ? "hidden"
-                                                                  : ""
-                                                              }`}
+                                                                  : ""}`}
                                                               onClick={() => {
                                                                 setEditableRowMes(
                                                                   index
@@ -2790,40 +2833,31 @@ export default function OrderListView() {
                                                                   "the id is:",
                                                                   row.measurement_id
                                                                 );
-                                                              }}
+                                                              } }
                                                             >
                                                               Edit
                                                             </button>
                                                             <button
                                                               type="button"
-                                                              className={`btn btn-error ${
-                                                                editableRowMes !==
-                                                                null
+                                                              className={`btn btn-error ${editableRowMes !==
+                                                                  null
                                                                   ? "hidden"
-                                                                  : ""
-                                                              } ${
-                                                                removeMeasurementMutation.isPending
+                                                                  : ""} ${removeMeasurementMutation.isPending
                                                                   ? "loading"
-                                                                  : ""
-                                                              }`}
+                                                                  : ""}`}
                                                               onClick={() => {
-                                                                const isConfirmed =
-                                                                  window.confirm(
-                                                                    "Are you sure you want to remove this measurement?"
-                                                                  );
-                                                                if (
-                                                                  isConfirmed
-                                                                ) {
+                                                                const isConfirmed = window.confirm(
+                                                                  "Are you sure you want to remove this measurement?"
+                                                                );
+                                                                if (isConfirmed) {
                                                                   removeMeasurementMutation.mutate(
                                                                     {
-                                                                      measurement_id:
-                                                                        row.measurement_id,
-                                                                      is_exist:
-                                                                        false,
+                                                                      measurement_id: row.measurement_id,
+                                                                      is_exist: false,
                                                                     }
                                                                   );
                                                                 }
-                                                              }}
+                                                              } }
                                                             >
                                                               Remove
                                                             </button>
@@ -2839,8 +2873,7 @@ export default function OrderListView() {
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.flat_crush}
-                                                    readOnly
-                                                  />
+                                                    readOnly />
                                                 </td>
                                                 <td className="border-y border-slate-500">
                                                   <Field
@@ -2848,11 +2881,11 @@ export default function OrderListView() {
                                                     type="number"
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.h20}
-                                                    readOnly
-                                                  />
+                                                    readOnly />
                                                 </td>
-                                                
+
                                               </tr>
+                                              
                                             ))}
                                           </tbody>
                                         )}
