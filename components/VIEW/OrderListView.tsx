@@ -2334,8 +2334,8 @@ export default function OrderListView() {
                                         <th>Core Out</th>
                                         <th>Remarks</th>
                                         <th>Option</th>
-                                        <th>Flat Crush</th>
-                                        <th>H20</th>
+                                        {/* <th>Flat Crush</th>
+                                        <th>H20</th> */}
                                       </tr>
                                     </thead>
                                     <tbody>
@@ -2867,7 +2867,7 @@ value={row.number_of_control}
                                                     )}
                                                   </div>
                                                 </td>
-                                                <td className="border-y border-slate-500">
+                                                {/* <td className="border-y border-slate-500">
                                                   <Field
                                                     name={`rows4.${index}.flat_crush`}
                                                     type="number"
@@ -2882,7 +2882,7 @@ value={row.number_of_control}
                                                     className="input input-bordered w-20 max-w-md"
                                                     value={row.h20}
                                                     readOnly />
-                                                </td>
+                                                </td> */}
 
                                               </tr>
                                               
