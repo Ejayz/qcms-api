@@ -711,8 +711,10 @@ export default function OrderListView() {
         parseInt(item.pallete_count || "0", 10)
       );
       const maxPalleteCount = Math.max(...palleteCounts);
-      setcurrentpalleteCount(maxPalleteCount);
+      // setcurrentpalleteCount(maxPalleteCount);
       const nextPalleteCount = maxPalleteCount + 1;
+      setcurrentpalleteCount(nextPalleteCount);
+      console.log("Next Pallete Count:", nextPalleteCount);
 
       // Flat Crush count (not 0 or null)
       const flatcrushValidCount = fetchedMeasurementData.filter(
@@ -2216,7 +2218,7 @@ export default function OrderListView() {
                                           values.rowsmeasurement.length + i - 1;
                                         arrayHelpers.push({
                                           pallete_count:
-                                            currentpalleteCount,
+                                            currentpalleteCount +1,
                                           number_of_control: 0,
                                           length: "",
                                           inside_diameter: "",
@@ -2334,8 +2336,8 @@ export default function OrderListView() {
                                         <th>Core Out</th>
                                         <th>Remarks</th>
                                         <th>Option</th>
-                                        {/* <th>Flat Crush</th>
-                                        <th>H20</th> */}
+                                        <th>Flat Crush</th>
+                                        <th>H20</th>
                                       </tr>
                                     </thead>
                                     <tbody>
@@ -2382,7 +2384,7 @@ export default function OrderListView() {
                                                       values.rowsmeasurement[
                                                         index
                                                       ]?.iswhiteAll
-                                                        ? "text-black hidden "
+                                                        ? "text-black hidden"
                                                         : "bg-white"
                                                     }`}
                                                     onChange={(e: any) => {
