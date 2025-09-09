@@ -2276,7 +2276,6 @@ export default function OrderListView() {
   </thead>
 
   <tbody>
- <tbody>
   {isLoading || isFetching ? (
     <tr>
       <td colSpan={7}>
@@ -2319,7 +2318,6 @@ export default function OrderListView() {
       </tr>
     ))
   )}
-</tbody>
                                     </tbody>
                                   </table>
 
